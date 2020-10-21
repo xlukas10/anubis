@@ -1,0 +1,67 @@
+#:kivy 1.11.1
+
+<MenuButton>:
+
+<CameraImage>:
+
+<CameraControls>:
+    canvas.before:
+        Color:
+            rgba: 0,1,1,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<CameraSettings>:
+    orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: 0,1,1,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Button:
+        text: 'parameter 1'
+    Button:
+        text: 'parameter 2'
+    Button:
+        text: 'parameter 3'
+    Button:
+        text: 'parameter 4'
+    Button:
+        text: 'parameter 5'
+    Button:
+        text: 'parameter 6'
+ #   canvas:
+  #      color:
+   #         rgba: 1, .1, .1, .9
+
+
+<MainMenu>:
+    orientation: 'horizontal'
+    size_hint_y: 0.15
+    pos_hint: {'top':.98}
+    id: mainMenu
+    MenuButton:
+        text: 'Connect camera'
+    MenuButton:
+        text: 'Open camera/image acquisition'
+    MenuButton:
+        text: 'Camera settings'
+    MenuButton:
+        text: 'App settings'
+    MenuButton:
+        text: 'help'
+
+<MainLayout>:
+    MainMenu:
+    CameraImage:
+        pos_hint: {'x': 0.01, 'top': 0.82}
+        size_hint: 0.6, 0.6
+    CameraSettings: #in future change for active menu
+        pos_hint: {'right': 0.99, 'top': 0.82}
+        size_hint: 0.37, 0.81
+    CameraControls:
+        pos_hint: {'x': 0.01, 'y': 0.01}
+        size_hint: 0.6, 0.21
+#Needs to be derived from MainMenu's position

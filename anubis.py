@@ -6,11 +6,14 @@ Created on Mon Oct 19 09:08:58 2020
 """
 
 from kivy.app import App
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.config import Config
+
 
 #from harvesters import Harvester
 
@@ -53,23 +56,53 @@ from kivy.config import Config
 
 #maybe language settings
 
-
-class LoginScreen(GridLayout):
+class MenuButton(Button):
+    """
+    Definition of appearenco of main menu buttons
+    """
     def __init__(self, **kwargs):
-        super(LoginScreen, self).__init__(**kwargs)
-        self.cols = 2
-        self.add_widget(Label(text='User Name'))
-        self.username = TextInput(multiline=False)
-        self.add_widget(self.username)
-        self.add_widget(Label(text='Password'))
-        self.password = TextInput(multiline=False,password=True)
-        self.add_widget(self.password)
-        self.add_widget(Button(text='Send'))
+        super(MenuButton, self).__init__(**kwargs)
 
+class MainMenu(BoxLayout):
+    """
+    Defines main selections of categories
+    """
+    def __init__(self, **kwargs):
+        super(MainMenu, self).__init__(**kwargs)
+
+
+class MainLayout(FloatLayout):
+    """
+    Draws window in basic app layout
+    """
+    def __init__(self, **kwargs):
+        super(MainLayout, self).__init__(**kwargs)
+        
+
+class CameraImage(Button):
+    """
+    Placeholder for widget which will draw image from camera
+    """
+    def __init__(self, **kwargs):
+        super(CameraImage, self).__init__(**kwargs)
+
+class CameraSettings(BoxLayout):
+    """
+    Contains all modifiable parameters for opened camera
+    """
+    def __init__(self, **kwargs):
+        super(CameraSettings, self).__init__(**kwargs)
+
+class CameraControls(GridLayout):
+    """
+    A set of controls used to manipulate with CameraImage window
+    """
+    def __init__(self, **kwargs):
+        super(CameraControls, self).__init__(**kwargs)
 
 class AnubisApp(App):
     def build(self):
-        return LoginScreen()
+        return MainLayout()
    
     
 if __name__ == '__main__':
