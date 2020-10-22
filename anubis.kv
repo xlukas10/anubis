@@ -4,13 +4,42 @@
 
 <CameraImage>:
 
+<PlayPause>:
+    text: 'Play/Pause'
+
+<ZoomIn>:
+    text: 'Zoom in'
+
+<ZoomOut>:
+    text: 'Zoom out'
+
+<ZoomFit>:
+    text: 'Fit to screen'
+
+<Zoom100>:
+    text: 'Real size'
+
 <CameraControls>:
+    rows: 2
+    cols: 6
     canvas.before:
         Color:
             rgba: 0,1,1,1
         Rectangle:
             pos: self.pos
             size: self.size
+    PlayPause:
+        #size_hint: self.parent.size_hint * 0.2, 0.2
+        #pos_hint: {'y': root.pos_hint_y}
+    ZoomIn:
+
+    ZoomOut:
+
+    ZoomFit:
+
+    Zoom100:
+
+
 
 <CameraSettings>:
     orientation: 'vertical'

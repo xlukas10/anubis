@@ -14,6 +14,9 @@ from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.config import Config
 
+#importing controls defined for controlling the camera.
+#used in the .kv file
+import camera_control_elements
 
 #from harvesters import Harvester
 
