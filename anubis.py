@@ -13,6 +13,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.config import Config
+from kivy.core.window import Window
 
 #importing controls defined for controlling the camera.
 #used in the .kv file
@@ -59,6 +60,7 @@ import camera_control_elements
 
 #maybe language settings
 
+
 class MenuButton(Button):
     """
     Definition of appearenco of main menu buttons
@@ -73,14 +75,12 @@ class MainMenu(BoxLayout):
     def __init__(self, **kwargs):
         super(MainMenu, self).__init__(**kwargs)
 
-
 class MainLayout(FloatLayout):
     """
     Draws window in basic app layout
     """
     def __init__(self, **kwargs):
         super(MainLayout, self).__init__(**kwargs)
-        
 
 class CameraImage(Button):
     """
@@ -106,7 +106,9 @@ class CameraControls(GridLayout):
 class AnubisApp(App):
     def build(self):
         return MainLayout()
-   
-    
+
+Window.size = (800, 450)
+Window.minimum_width, Window.minimum_height = Window.size
+
 if __name__ == '__main__':
     AnubisApp().run()
