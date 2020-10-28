@@ -65,32 +65,59 @@
   #      color:
    #         rgba: 1, .1, .1, .9
 
-
 <MainMenu>:
     orientation: 'horizontal'
     size_hint_y: 0.15
     pos_hint: {'top':.98}
-    id: mainMenu
-    MenuButton:
+    active_tab: ''
+    MenuConnectCam:
         text: 'Connect camera'
-    MenuButton:
-        text: 'Open camera/image acquisition'
-    MenuButton:
+        on_release:
+            root.active_tab = 'ConnectCamera'
+    MenuCamParameters:
         text: 'Camera settings'
+        on_release:
+            root.active_tab = 'CamParameters'
+    MenuOptions:
+        text: 'App Options'
+        on_release:
+            root.active_tab = 'Options'
     MenuButton:
-        text: 'App settings'
-    MenuButton:
+        text: 'Tensorflow'
+
+    MenuHelp:
         text: 'help'
+        on_release:
+            root.active_tab = 'Help'
+
+<Tabs>:
+    pos_hint: {'right': 0.99, 'top': 0.82}
+    size_hint: 0.37, 0.99
+    #size behaves funky
+
+<TabLayout>:
+    row_default_height: 20
+    cols: 1
+    rows: 6
 
 <MainLayout>:
+
+    Tabs:
+        tab: main_menu.active_tab
     MainMenu:
+        id: main_menu
+
     CameraImage:
         pos_hint: {'x': 0.01, 'top': 0.82}
         size_hint: 0.6, 0.6
-    CameraSettings: #in future change for active menu
-        pos_hint: {'right': 0.99, 'top': 0.82}
-        size_hint: 0.37, 0.81
+    #CameraSettings: #in future change for active menu
+    #   pos_hint: {'right': 0.99, 'top': 0.82}
+    #    size_hint: 0.37, 0.81
+     #in future change for active menu
+        #pos_hint: {'right': 0.99, 'top': 0.82}
+        #size_hint: 0.37, 0.81
     CameraControls:
         pos_hint: {'x': 0.01, 'y': 0.01}
         size_hint: 0.6, 0.21
+
 #Needs to be derived from MainMenu's position

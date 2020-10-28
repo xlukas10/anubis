@@ -14,10 +14,16 @@ from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.config import Config
 from kivy.core.window import Window
-
+from kivy.uix.tabbedpanel import TabbedPanel
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.properties import StringProperty
 #importing controls defined for controlling the camera.
 #used in the .kv file
 import camera_control_elements
+
+from camera_communication import Camera
+import main_menu
+import tabs as tb
 
 #from harvesters import Harvester
 
@@ -59,20 +65,16 @@ import camera_control_elements
 #app settings save/load
 
 #maybe language settings
+kamerka = Camera()
 
-
-class MenuButton(Button):
-    """
-    Definition of appearenco of main menu buttons
-    """
-    def __init__(self, **kwargs):
-        super(MenuButton, self).__init__(**kwargs)
 
 class MainMenu(BoxLayout):
     """
     Defines main selections of categories
     """
+    active_tab = StringProperty()
     def __init__(self, **kwargs):
+
         super(MainMenu, self).__init__(**kwargs)
 
 class MainLayout(FloatLayout):
@@ -103,9 +105,37 @@ class CameraControls(GridLayout):
     def __init__(self, **kwargs):
         super(CameraControls, self).__init__(**kwargs)
 
+class Tabs(BoxLayout):
+    tab = StringProperty('')
+    def __init__(self, **kwargs):
+        super(Tabs, self).__init__(**kwargs)
+        
+        self.menu = (tb.TabConnectCam(), 
+                     tb.TabCamParameters(), 
+                     tb.TabOptions(), 
+                     tb.TabHelp())
+        self.show_menu(0)
+
+    def show_menu(self, menu_index):
+        self.clear_widgets()
+        self.add_widget(self.menu[menu_index])
+        
+    def on_tab(self, instance, value):
+        if value == 'ConnectCamera':
+            self.show_menu(0)
+        elif value == 'CamParameters':
+            self.show_menu(1)
+        elif value == 'Options':
+            self.show_menu(2)
+        elif value == 'Help':
+            self.show_menu(3)
+        
+        
+
 class AnubisApp(App):
     def build(self):
         return MainLayout()
+
 
 Window.size = (800, 450)
 Window.minimum_width, Window.minimum_height = Window.size
