@@ -59,3 +59,8 @@ class Camera:
     def disconnect_camera(self,):
         self.h.reset()
 #add update camera list function h.update()
+
+kamera = Camera('C:/Programy/Allied Vision/Vimba_4.0/VimbaGigETL/Bin/Win64/VimbaGigETL.cti')
+
+kamera.get_camera_list()
+print(kamera.h.device_info_list)

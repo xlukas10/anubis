@@ -6,25 +6,15 @@ Created on Mon Oct 19 09:08:58 2020
 """
 
 from kivy.app import App
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
-from kivy.config import Config
 from kivy.core.window import Window
-from kivy.uix.tabbedpanel import TabbedPanel
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.properties import StringProperty
 #importing controls defined for controlling the camera.
 #used in the .kv file
-import camera_control_elements
+
 
 from camera_communication import Camera
-import main_menu
-import tabs as tb
 
+import kivy_elements
+import threading
 #from harvesters import Harvester
 
 #Determine if there is a config file present and read it.
@@ -65,80 +55,20 @@ import tabs as tb
 #app settings save/load
 
 #maybe language settings
-kamerka = Camera()
-
-
-class MainMenu(BoxLayout):
-    """
-    Defines main selections of categories
-    """
-    active_tab = StringProperty()
-    def __init__(self, **kwargs):
-
-        super(MainMenu, self).__init__(**kwargs)
-
-class MainLayout(FloatLayout):
-    """
-    Draws window in basic app layout
-    """
-    def __init__(self, **kwargs):
-        super(MainLayout, self).__init__(**kwargs)
-
-class CameraImage(Button):
-    """
-    Placeholder for widget which will draw image from camera
-    """
-    def __init__(self, **kwargs):
-        super(CameraImage, self).__init__(**kwargs)
-
-class CameraSettings(BoxLayout):
-    """
-    Contains all modifiable parameters for opened camera
-    """
-    def __init__(self, **kwargs):
-        super(CameraSettings, self).__init__(**kwargs)
-
-class CameraControls(GridLayout):
-    """
-    A set of controls used to manipulate with CameraImage window
-    """
-    def __init__(self, **kwargs):
-        super(CameraControls, self).__init__(**kwargs)
-
-class Tabs(BoxLayout):
-    tab = StringProperty('')
-    def __init__(self, **kwargs):
-        super(Tabs, self).__init__(**kwargs)
-        
-        self.menu = (tb.TabConnectCam(), 
-                     tb.TabCamParameters(), 
-                     tb.TabOptions(), 
-                     tb.TabHelp())
-        self.show_menu(0)
-
-    def show_menu(self, menu_index):
-        self.clear_widgets()
-        self.add_widget(self.menu[menu_index])
-        
-    def on_tab(self, instance, value):
-        if value == 'ConnectCamera':
-            self.show_menu(0)
-        elif value == 'CamParameters':
-            self.show_menu(1)
-        elif value == 'Options':
-            self.show_menu(2)
-        elif value == 'Help':
-            self.show_menu(3)
-        
-        
+cam = Camera()
 
 class AnubisApp(App):
     def build(self):
-        return MainLayout()
-
+        return kivy_elements.MainLayout()
 
 Window.size = (800, 450)
 Window.minimum_width, Window.minimum_height = Window.size
 
 if __name__ == '__main__':
     AnubisApp().run()
+    
+    producer_thread = threading.Thread(target=cam.get_image(), args=("""argument for get_mage function"""))
+    
+    consumer_thread = threading.Thread(target=f.save_image(), args("""argument for save image function"""))
+    
+    
