@@ -15,6 +15,7 @@ from camera_communication import Camera
 
 import kivy_elements
 import threading
+from queue import Queue
 #from harvesters import Harvester
 
 #Determine if there is a config file present and read it.
