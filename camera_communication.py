@@ -43,14 +43,16 @@ class Camera:
             self.buffer = self.cam.fetch_buffer().payload.components[0]
             return self.buffer.data
     
-    def set_parameters(self,**kwargs):
+    def set_parameter(self,parameter, new_value):
         if(self.vendor == 'Allied Vision Technologies'):
 #EDIT to work well with new parameter dictionary (name, value, maximum etc.)
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras()
                 with cams[self.active_camera] as cam:
-                    for key, value in kwargs.items():
-                        getattr(cam, key).set(value)
+                    try:
+                        getattr(cam, parameter['name']).set(new_value)
+                    except (AttributeError, VimbaFeatureError):
+                        pass
         else:                
             return 42
     
@@ -64,6 +66,7 @@ class Camera:
                     for feature in features:
                         name = feature.get_name()
                         features_out[name] = {}
+                        features_out[name]['name'] = name
                         
                         #Get feature's type if it exists
                         try:
@@ -159,14 +162,14 @@ class Camera:
 
     def disconnect_harvester(self,):
         self.h.reset()
-#add update camera list function h.update()
 
 kamera = Camera('C:/Programy/Allied Vision/Vimba_4.0/VimbaGigETL/Bin/Win64/VimbaGigETL.cti')
 kamera.get_camera_list()
 kamera.select_camera(0)
-kamera.set_parameters(GVSPPacketSize=1500)
-print(kamera.get_single_frame())
 p = kamera.get_parameters()
+kamera.set_parameter(p['GVSPPacketSize'],1500)
+print(kamera.get_single_frame())
+
 
 for param in p:
     print(param)
@@ -175,3 +178,13 @@ val = kamera.read_param_values()
 
 for v in val:
     print(f'{v} HAS FEATURES: {val[v]}')
+
+print('----------------------')
+print(kamera.get_single_frame())    
+kamera.set_parameter(p['Width'],1)
+kamera.set_parameter(p['Height'],1)
+
+print('----------------------')
+print(kamera.get_single_frame())
+
+print('----------------------')
