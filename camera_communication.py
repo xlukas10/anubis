@@ -6,6 +6,11 @@ Created on Fri Oct 23 15:25:27 2020
 """
 from harvesters.core import Harvester
 from vimba import *
+import threading
+import queue
+import copy
+
+import time#tmp for testing purposes
 
 class Camera:
     def __init__(self, producer_path = 'ZDE VLOZIT DEFAULTNI CESTU'):
@@ -13,6 +18,8 @@ class Camera:
         self.set_gentl_producer(producer_path)
         self.vendor = 'Other'
         self.is_recording = False
+        self.acquisition_running = False
+        self.frame_queue = None
 
     def get_camera_list(self,):
         return self.h.update()
@@ -132,15 +139,49 @@ class Camera:
     def save_parameters(self,):
         return 42
     
-    
-    def start_acquisition():
+    def start_acquisition(self,frame_queue):
         #create threading object for vimba, harvester or future api and start the thread
+        #this is not nice
+        if not self.acquisition_running:
+            self.frame_queue = frame_queue
+            self._stream_stop_switch = threading.Event()
+            self._frame_producer_thread = threading.Thread(target=self._frame_producer)
+            self._frame_producer_thread.start()
+            self.acquisition_running = True
         pass
     
-    def stop_acquisition():
+    def stop_acquisition(self,):
         #stop threas created by start_acquisition
-        pass
+        if self.acquisition_running == True:
+            self._stream_stop_switch.set()
+            #this hopefully stops producer thread
+            self.acquisition_running = False
+            self.frame_queue = None
+        #return is tmp
+        return
     
+    def _frame_producer(self):
+        with Vimba.get_instance() as vimba:
+            cams = vimba.get_all_cameras()
+            with cams[self.active_camera] as c:
+                try:
+                    c.start_streaming(handler=self.__frame_handler)
+                    self._stream_stop_switch.wait()
+                finally:
+                    c.stop_streaming()
+            pass
+        return
+    
+    def __frame_handler(self,cam ,frame):
+        try:
+            if frame.get_status() == FrameStatus.Complete:
+                if not self.frame_queue.full():
+                    frame_copy = copy.deepcopy(frame)
+                    self.frame_queue.put_nowait(frame_copy)
+            cam.queue_frame(frame)
+        except:
+            pass
+            
     def start_recording(self,):
         self.cam.start_acquisition()
         self.is_recording = True
@@ -162,7 +203,9 @@ class Camera:
 
     def disconnect_harvester(self,):
         self.h.reset()
+        
 
+#---------------------------------------------------------------------------
 kamera = Camera('C:/Programy/Allied Vision/Vimba_4.0/VimbaGigETL/Bin/Win64/VimbaGigETL.cti')
 kamera.get_camera_list()
 kamera.select_camera(0)
@@ -171,20 +214,31 @@ kamera.set_parameter(p['GVSPPacketSize'],1500)
 print(kamera.get_single_frame())
 
 
-for param in p:
-    print(param)
+#for param in p:
+#    print(param)
     
 val = kamera.read_param_values()
 
-for v in val:
-    print(f'{v} HAS FEATURES: {val[v]}')
+#for v in val:
+#    print(f'{v} HAS FEATURES: {val[v]}')
 
 print('----------------------')
-print(kamera.get_single_frame())    
-kamera.set_parameter(p['Width'],1)
-kamera.set_parameter(p['Height'],1)
+#print(kamera.get_single_frame())    
 
 print('----------------------')
-print(kamera.get_single_frame())
+#print(kamera.get_single_frame())
 
 print('----------------------')
+
+
+fronta = queue.Queue()
+
+kamera.start_acquisition(fronta)
+time.sleep(5)
+kamera.stop_acquisition()
+
+#fronta.join()
+
+
+
+print(fronta.queue)
