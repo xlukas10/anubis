@@ -1,0 +1,457 @@
+\hypertarget{classcamera__communication_1_1_camera}{}\doxysection{camera\+\_\+communication.\+Camera Class Reference}
+\label{classcamera__communication_1_1_camera}\index{camera\_communication.Camera@{camera\_communication.Camera}}
+
+
+Collaboration diagram for camera\+\_\+communication.\+Camera\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=237pt]{classcamera__communication_1_1_camera__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a9af624bdb52a45d4dea7b18c8fd2826e}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, producer\+\_\+path=\textquotesingle{}Z\+DE V\+L\+O\+Z\+IT D\+E\+F\+A\+U\+L\+T\+NI C\+E\+S\+TU\textquotesingle{})
+\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_aaef32dd93447a6a9b572e0455baf4c66}{get\+\_\+camera\+\_\+list}} (self)
+\begin{DoxyCompactList}\small\item\em Connected camera discovery. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a041b628e446701c28d67247286d84cc9}{select\+\_\+camera}} (self, selected\+\_\+device)
+\begin{DoxyCompactList}\small\item\em choose camera to connect to \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a6a185582ffa3e1a0789c0deed95226bb}{get\+\_\+single\+\_\+frame}} (self)
+\begin{DoxyCompactList}\small\item\em grab single frame from camera \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a37bb09934c340579d891da45a838812a}{set\+\_\+parameter}} (self, parameter, new\+\_\+value)
+\begin{DoxyCompactList}\small\item\em method for setting camera\textquotesingle{}s parameters \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_ab1068a261b93f5686d1b49f48118bda2}{get\+\_\+parameters}} (self)
+\begin{DoxyCompactList}\small\item\em Read parameters from camera. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a6b428024a8172a008a72aeee2b1358cb}{read\+\_\+param\+\_\+values}} (self)
+\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_aa08a0b6efcfea702d38c5a7abe7c0619}{save\+\_\+parameters}} (self, save\+\_\+path)
+\begin{DoxyCompactList}\small\item\em saves configuration of a camera to .xml file \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a5875ba4ab78601ec853a1d2a2fd1eb28}{start\+\_\+acquisition}} (self, \mbox{\hyperlink{classcamera__communication_1_1_camera_a79961e7a7b3a5bf51486b9df5b000f60}{frame\+\_\+queue}})
+\begin{DoxyCompactList}\small\item\em Starts continuous acquisition of image frames. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a1889cce2a5d667beda85f2400bcfc80f}{stop\+\_\+acquisition}} (self)
+\begin{DoxyCompactList}\small\item\em Stops continuous acquisition. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a2f633092428fb4447160f82e02eaa40d}{start\+\_\+recording}} (self)
+\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a1d8c9662f8e29ec375774d5ddfde86d4}{stop\+\_\+recording}} (self)
+\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_ab748b9cca5c78ba5bd5b671592323069}{configure\+\_\+recording}} (self, path)
+\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_acd7e2628d6a5cc064d15b9c1487834a8}{set\+\_\+gentl\+\_\+producer}} (self, producer\+\_\+path)
+\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a3cce78f3c2c20b0adc02e8b779dc7fd0}{remove\+\_\+gentl\+\_\+producer}} (self, producer\+\_\+path)
+\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a83c4f6caa3dff650dd4669a90fbb11f0}{disconnect\+\_\+harvester}} (self)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classcamera__communication_1_1_camera_ae003be2fbac8039e0ecc33750701b989}{h}}
+\item 
+\mbox{\hyperlink{classcamera__communication_1_1_camera_ac5f1920efa680a6ffa215be2fb2278a9}{vendor}}
+\item 
+\mbox{\hyperlink{classcamera__communication_1_1_camera_a76e4b00d640988c58cba1017416fb4c5}{is\+\_\+recording}}
+\item 
+\mbox{\hyperlink{classcamera__communication_1_1_camera_a8486d1b6a764d8a9ddad1d970b3df730}{acquisition\+\_\+running}}
+\item 
+\mbox{\hyperlink{classcamera__communication_1_1_camera_a79961e7a7b3a5bf51486b9df5b000f60}{frame\+\_\+queue}}
+\item 
+\mbox{\hyperlink{classcamera__communication_1_1_camera_affd31b279585199441989028b363df60}{active\+\_\+camera}}
+\item 
+\mbox{\hyperlink{classcamera__communication_1_1_camera_a059b16be0b6b332f93b216aff9b1ce52}{cam}}
+\item 
+\mbox{\hyperlink{classcamera__communication_1_1_camera_a718bd901c514856ffe8f8bfecc1acfa6}{buffer}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a5fa247aa3e69c9a3cbb48babeb48e9bf}{\+\_\+frame\+\_\+producer}} (self)
+\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a78756e70d46874d557fd51ea9bb5affd}{\+\_\+\+\_\+frame\+\_\+handler}} (self, \mbox{\hyperlink{classcamera__communication_1_1_camera_a059b16be0b6b332f93b216aff9b1ce52}{cam}}, frame)
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classcamera__communication_1_1_camera_af8009078458c395e73837a6dd3b4c0b3}{\+\_\+stream\+\_\+stop\+\_\+switch}}
+\item 
+\mbox{\hyperlink{classcamera__communication_1_1_camera_aae7efd837bae69e6249580c90fe836b5}{\+\_\+frame\+\_\+producer\+\_\+thread}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 15 of file camera\+\_\+communication.\+py.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a9af624bdb52a45d4dea7b18c8fd2826e}\label{classcamera__communication_1_1_camera_a9af624bdb52a45d4dea7b18c8fd2826e}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{producer\+\_\+path = {\ttfamily \textquotesingle{}ZDE~VLOZIT~DEFAULTNI~CESTU\textquotesingle{}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 16 of file camera\+\_\+communication.\+py.
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a78756e70d46874d557fd51ea9bb5affd}\label{classcamera__communication_1_1_camera_a78756e70d46874d557fd51ea9bb5affd}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!\_\_frame\_handler@{\_\_frame\_handler}}
+\index{\_\_frame\_handler@{\_\_frame\_handler}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{\_\_frame\_handler()}{\_\_frame\_handler()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+\_\+\+\_\+frame\+\_\+handler (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{cam,  }\item[{}]{frame }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 211 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a5fa247aa3e69c9a3cbb48babeb48e9bf}\label{classcamera__communication_1_1_camera_a5fa247aa3e69c9a3cbb48babeb48e9bf}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!\_frame\_producer@{\_frame\_producer}}
+\index{\_frame\_producer@{\_frame\_producer}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{\_frame\_producer()}{\_frame\_producer()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+\_\+frame\+\_\+producer (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 199 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_ab748b9cca5c78ba5bd5b671592323069}\label{classcamera__communication_1_1_camera_ab748b9cca5c78ba5bd5b671592323069}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!configure\_recording@{configure\_recording}}
+\index{configure\_recording@{configure\_recording}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{configure\_recording()}{configure\_recording()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+configure\+\_\+recording (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{path }\end{DoxyParamCaption})}
+
+
+
+Definition at line 230 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a83c4f6caa3dff650dd4669a90fbb11f0}\label{classcamera__communication_1_1_camera_a83c4f6caa3dff650dd4669a90fbb11f0}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!disconnect\_harvester@{disconnect\_harvester}}
+\index{disconnect\_harvester@{disconnect\_harvester}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{disconnect\_harvester()}{disconnect\_harvester()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+disconnect\+\_\+harvester (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 240 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_aaef32dd93447a6a9b572e0455baf4c66}\label{classcamera__communication_1_1_camera_aaef32dd93447a6a9b572e0455baf4c66}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!get\_camera\_list@{get\_camera\_list}}
+\index{get\_camera\_list@{get\_camera\_list}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{get\_camera\_list()}{get\_camera\_list()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+get\+\_\+camera\+\_\+list (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Connected camera discovery. 
+
+Uses Harvester object to discover all connected cameras \begin{DoxyReturn}{Returns}
+List of Dictionaries cantaining informations about cameras 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000001}{Todo}}]W\+H\+AT IS T\+HE D\+I\+C\+T\+I\+O\+N\+A\+RY F\+O\+R\+M\+AT?\end{DoxyRefDesc}
+
+
+Definition at line 24 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_ab1068a261b93f5686d1b49f48118bda2}\label{classcamera__communication_1_1_camera_ab1068a261b93f5686d1b49f48118bda2}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!get\_parameters@{get\_parameters}}
+\index{get\_parameters@{get\_parameters}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{get\_parameters()}{get\_parameters()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+get\+\_\+parameters (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Read parameters from camera. 
+
+Based on self.\+vendor and self.\+active\+\_\+camera chooses right A\+PI and loads all available camera parameters \begin{DoxyReturn}{Returns}
+A dictionary with parameter names as keys. Each key points to dictionary containing given parameter information\+: name, value, type, range, increment and max\+\_\+length if given information exist for the parameter 
+\end{DoxyReturn}
+
+
+Definition at line 84 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a6a185582ffa3e1a0789c0deed95226bb}\label{classcamera__communication_1_1_camera_a6a185582ffa3e1a0789c0deed95226bb}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!get\_single\_frame@{get\_single\_frame}}
+\index{get\_single\_frame@{get\_single\_frame}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{get\_single\_frame()}{get\_single\_frame()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+get\+\_\+single\+\_\+frame (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+grab single frame from camera 
+
+Based on vendor variable chooses right A\+PI for acquisition and loads single frame from active\+\_\+camera \begin{DoxyReturn}{Returns}
+unmodified frame from camera 
+\end{DoxyReturn}
+
+
+Definition at line 46 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a6b428024a8172a008a72aeee2b1358cb}\label{classcamera__communication_1_1_camera_a6b428024a8172a008a72aeee2b1358cb}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!read\_param\_values@{read\_param\_values}}
+\index{read\_param\_values@{read\_param\_values}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{read\_param\_values()}{read\_param\_values()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+read\+\_\+param\+\_\+values (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@brief Is not used for now, will be probably removed
+@todo Remove if not changed
+\end{DoxyVerb}
+ 
+
+Definition at line 148 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a3cce78f3c2c20b0adc02e8b779dc7fd0}\label{classcamera__communication_1_1_camera_a3cce78f3c2c20b0adc02e8b779dc7fd0}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!remove\_gentl\_producer@{remove\_gentl\_producer}}
+\index{remove\_gentl\_producer@{remove\_gentl\_producer}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{remove\_gentl\_producer()}{remove\_gentl\_producer()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+remove\+\_\+gentl\+\_\+producer (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{producer\+\_\+path }\end{DoxyParamCaption})}
+
+
+
+Definition at line 237 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_aa08a0b6efcfea702d38c5a7abe7c0619}\label{classcamera__communication_1_1_camera_aa08a0b6efcfea702d38c5a7abe7c0619}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!save\_parameters@{save\_parameters}}
+\index{save\_parameters@{save\_parameters}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{save\_parameters()}{save\_parameters()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+save\+\_\+parameters (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{save\+\_\+path }\end{DoxyParamCaption})}
+
+
+
+saves configuration of a camera to .xml file 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em save\+\_\+path} & A path where the file will be saved \\
+\hline
+\end{DoxyParams}
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000003}{Todo}}]what will happen if a file already exists\end{DoxyRefDesc}
+
+
+Definition at line 161 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a041b628e446701c28d67247286d84cc9}\label{classcamera__communication_1_1_camera_a041b628e446701c28d67247286d84cc9}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!select\_camera@{select\_camera}}
+\index{select\_camera@{select\_camera}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{select\_camera()}{select\_camera()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+select\+\_\+camera (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{selected\+\_\+device }\end{DoxyParamCaption})}
+
+
+
+choose camera to connect to 
+
+Select camera you will be using and set \mbox{\hyperlink{classcamera__communication_1_1_camera}{Camera}} object accordingly 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em selected\+\_\+device} & list index for now in future unique identifier of a camera \\
+\hline
+\end{DoxyParams}
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000002}{Todo}}]S\+T\+A\+RT U\+S\+I\+NG U\+N\+I\+Q\+UE I\+D\+E\+N\+T\+I\+F\+I\+ER\end{DoxyRefDesc}
+
+
+Definition at line 32 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_acd7e2628d6a5cc064d15b9c1487834a8}\label{classcamera__communication_1_1_camera_acd7e2628d6a5cc064d15b9c1487834a8}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!set\_gentl\_producer@{set\_gentl\_producer}}
+\index{set\_gentl\_producer@{set\_gentl\_producer}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{set\_gentl\_producer()}{set\_gentl\_producer()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+set\+\_\+gentl\+\_\+producer (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{producer\+\_\+path }\end{DoxyParamCaption})}
+
+
+
+Definition at line 234 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a37bb09934c340579d891da45a838812a}\label{classcamera__communication_1_1_camera_a37bb09934c340579d891da45a838812a}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!set\_parameter@{set\_parameter}}
+\index{set\_parameter@{set\_parameter}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{set\_parameter()}{set\_parameter()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+set\+\_\+parameter (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{parameter,  }\item[{}]{new\+\_\+value }\end{DoxyParamCaption})}
+
+
+
+method for setting camera\textquotesingle{}s parameters 
+
+Sets parameter to value defined by new\+\_\+value 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em parameter} & A dictionary with mandatory keys name and value, other keys will be used in later versions \\
+\hline
+\mbox{\texttt{ in}}  & {\em new\+\_\+value} & variable compatible with value key in parameter \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 65 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a5875ba4ab78601ec853a1d2a2fd1eb28}\label{classcamera__communication_1_1_camera_a5875ba4ab78601ec853a1d2a2fd1eb28}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!start\_acquisition@{start\_acquisition}}
+\index{start\_acquisition@{start\_acquisition}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{start\_acquisition()}{start\_acquisition()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+start\+\_\+acquisition (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{frame\+\_\+queue }\end{DoxyParamCaption})}
+
+
+
+Starts continuous acquisition of image frames. 
+
+Creates a threading object for the right A\+PI and starts frame acquisition in that thread (producer thread) 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em frame\+\_\+queue} & A queue in which the frames will be stored \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 168 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a2f633092428fb4447160f82e02eaa40d}\label{classcamera__communication_1_1_camera_a2f633092428fb4447160f82e02eaa40d}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!start\_recording@{start\_recording}}
+\index{start\_recording@{start\_recording}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{start\_recording()}{start\_recording()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+start\+\_\+recording (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 221 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a1889cce2a5d667beda85f2400bcfc80f}\label{classcamera__communication_1_1_camera_a1889cce2a5d667beda85f2400bcfc80f}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!stop\_acquisition@{stop\_acquisition}}
+\index{stop\_acquisition@{stop\_acquisition}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{stop\_acquisition()}{stop\_acquisition()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+stop\+\_\+acquisition (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Stops continuous acquisition. 
+
+Sets stream\+\_\+stop\+\_\+switch, acquisition running to false and removes inner link to queue object 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em parameter} & A dictionary with mandatory keys name and value, other keys will be used in later versions \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 184 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a1d8c9662f8e29ec375774d5ddfde86d4}\label{classcamera__communication_1_1_camera_a1d8c9662f8e29ec375774d5ddfde86d4}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!stop\_recording@{stop\_recording}}
+\index{stop\_recording@{stop\_recording}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{stop\_recording()}{stop\_recording()}}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+stop\+\_\+recording (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 225 of file camera\+\_\+communication.\+py.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_aae7efd837bae69e6249580c90fe836b5}\label{classcamera__communication_1_1_camera_aae7efd837bae69e6249580c90fe836b5}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!\_frame\_producer\_thread@{\_frame\_producer\_thread}}
+\index{\_frame\_producer\_thread@{\_frame\_producer\_thread}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{\_frame\_producer\_thread}{\_frame\_producer\_thread}}
+{\footnotesize\ttfamily camera\+\_\+communication.\+Camera.\+\_\+frame\+\_\+producer\+\_\+thread\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 179 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_af8009078458c395e73837a6dd3b4c0b3}\label{classcamera__communication_1_1_camera_af8009078458c395e73837a6dd3b4c0b3}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!\_stream\_stop\_switch@{\_stream\_stop\_switch}}
+\index{\_stream\_stop\_switch@{\_stream\_stop\_switch}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{\_stream\_stop\_switch}{\_stream\_stop\_switch}}
+{\footnotesize\ttfamily camera\+\_\+communication.\+Camera.\+\_\+stream\+\_\+stop\+\_\+switch\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 178 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a8486d1b6a764d8a9ddad1d970b3df730}\label{classcamera__communication_1_1_camera_a8486d1b6a764d8a9ddad1d970b3df730}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!acquisition\_running@{acquisition\_running}}
+\index{acquisition\_running@{acquisition\_running}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{acquisition\_running}{acquisition\_running}}
+{\footnotesize\ttfamily camera\+\_\+communication.\+Camera.\+acquisition\+\_\+running}
+
+
+
+Definition at line 21 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_affd31b279585199441989028b363df60}\label{classcamera__communication_1_1_camera_affd31b279585199441989028b363df60}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!active\_camera@{active\_camera}}
+\index{active\_camera@{active\_camera}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{active\_camera}{active\_camera}}
+{\footnotesize\ttfamily camera\+\_\+communication.\+Camera.\+active\+\_\+camera}
+
+
+
+Definition at line 42 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a718bd901c514856ffe8f8bfecc1acfa6}\label{classcamera__communication_1_1_camera_a718bd901c514856ffe8f8bfecc1acfa6}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!buffer@{buffer}}
+\index{buffer@{buffer}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{buffer}{buffer}}
+{\footnotesize\ttfamily camera\+\_\+communication.\+Camera.\+buffer}
+
+
+
+Definition at line 60 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a059b16be0b6b332f93b216aff9b1ce52}\label{classcamera__communication_1_1_camera_a059b16be0b6b332f93b216aff9b1ce52}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!cam@{cam}}
+\index{cam@{cam}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{cam}{cam}}
+{\footnotesize\ttfamily camera\+\_\+communication.\+Camera.\+cam}
+
+
+
+Definition at line 44 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a79961e7a7b3a5bf51486b9df5b000f60}\label{classcamera__communication_1_1_camera_a79961e7a7b3a5bf51486b9df5b000f60}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!frame\_queue@{frame\_queue}}
+\index{frame\_queue@{frame\_queue}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{frame\_queue}{frame\_queue}}
+{\footnotesize\ttfamily camera\+\_\+communication.\+Camera.\+frame\+\_\+queue}
+
+
+
+Definition at line 22 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_ae003be2fbac8039e0ecc33750701b989}\label{classcamera__communication_1_1_camera_ae003be2fbac8039e0ecc33750701b989}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!h@{h}}
+\index{h@{h}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{h}{h}}
+{\footnotesize\ttfamily camera\+\_\+communication.\+Camera.\+h}
+
+
+
+Definition at line 17 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a76e4b00d640988c58cba1017416fb4c5}\label{classcamera__communication_1_1_camera_a76e4b00d640988c58cba1017416fb4c5}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!is\_recording@{is\_recording}}
+\index{is\_recording@{is\_recording}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{is\_recording}{is\_recording}}
+{\footnotesize\ttfamily camera\+\_\+communication.\+Camera.\+is\+\_\+recording}
+
+
+
+Definition at line 20 of file camera\+\_\+communication.\+py.
+
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_ac5f1920efa680a6ffa215be2fb2278a9}\label{classcamera__communication_1_1_camera_ac5f1920efa680a6ffa215be2fb2278a9}} 
+\index{camera\_communication.Camera@{camera\_communication.Camera}!vendor@{vendor}}
+\index{vendor@{vendor}!camera\_communication.Camera@{camera\_communication.Camera}}
+\doxysubsubsection{\texorpdfstring{vendor}{vendor}}
+{\footnotesize\ttfamily camera\+\_\+communication.\+Camera.\+vendor}
+
+
+
+Definition at line 19 of file camera\+\_\+communication.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{camera__communication_8py}{camera\+\_\+communication.\+py}}\end{DoxyCompactItemize}

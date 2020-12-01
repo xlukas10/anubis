@@ -1,0 +1,53 @@
+\hypertarget{namespaceanubis}{}\doxysection{anubis Namespace Reference}
+\label{namespaceanubis}\index{anubis@{anubis}}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classanubis_1_1_anubis_app}{Anubis\+App}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespaceanubis_add73a0f16af45f8d499c3ab23395e55f}{cam}} = \mbox{\hyperlink{classcamera__communication_1_1_camera}{Camera}}()
+\begin{DoxyCompactList}\small\item\em Config.\+read(\textquotesingle{}P\+A\+TH TO .I\+NI F\+I\+LE\textquotesingle{}) set config Config.\+write() \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespaceanubis_a2ce315be01625c73be009e1d847ae021}{producer\+\_\+thread}} = threading.\+Thread(target=cam.\+get\+\_\+image(), args=())
+\item 
+\mbox{\hyperlink{namespaceanubis_a764bdeae453095c5941aa0a01ef799bb}{consumer\+\_\+thread}} = threading.\+Thread(target=f.\+save\+\_\+image(), args())
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{namespaceanubis_add73a0f16af45f8d499c3ab23395e55f}\label{namespaceanubis_add73a0f16af45f8d499c3ab23395e55f}} 
+\index{anubis@{anubis}!cam@{cam}}
+\index{cam@{cam}!anubis@{anubis}}
+\doxysubsubsection{\texorpdfstring{cam}{cam}}
+{\footnotesize\ttfamily anubis.\+cam = \mbox{\hyperlink{classcamera__communication_1_1_camera}{Camera}}()}
+
+
+
+Config.\+read(\textquotesingle{}P\+A\+TH TO .I\+NI F\+I\+LE\textquotesingle{}) set config Config.\+write() 
+
+
+
+Definition at line 59 of file anubis.\+py.
+
+\mbox{\Hypertarget{namespaceanubis_a764bdeae453095c5941aa0a01ef799bb}\label{namespaceanubis_a764bdeae453095c5941aa0a01ef799bb}} 
+\index{anubis@{anubis}!consumer\_thread@{consumer\_thread}}
+\index{consumer\_thread@{consumer\_thread}!anubis@{anubis}}
+\doxysubsubsection{\texorpdfstring{consumer\_thread}{consumer\_thread}}
+{\footnotesize\ttfamily anubis.\+consumer\+\_\+thread = threading.\+Thread(target=f.\+save\+\_\+image(), args())}
+
+
+
+Definition at line 73 of file anubis.\+py.
+
+\mbox{\Hypertarget{namespaceanubis_a2ce315be01625c73be009e1d847ae021}\label{namespaceanubis_a2ce315be01625c73be009e1d847ae021}} 
+\index{anubis@{anubis}!producer\_thread@{producer\_thread}}
+\index{producer\_thread@{producer\_thread}!anubis@{anubis}}
+\doxysubsubsection{\texorpdfstring{producer\_thread}{producer\_thread}}
+{\footnotesize\ttfamily anubis.\+producer\+\_\+thread = threading.\+Thread(target=cam.\+get\+\_\+image(), args=())}
+
+
+
+Definition at line 71 of file anubis.\+py.
+

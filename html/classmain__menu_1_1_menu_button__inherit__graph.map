@@ -1,0 +1,8 @@
+<map id="main_menu.MenuButton" name="main_menu.MenuButton">
+<area shape="rect" id="node1" title=" " alt="" coords="367,131,529,208"/>
+<area shape="rect" id="node3" href="$classmain__menu_1_1_menu_cam_parameters.html" title=" " alt="" coords="5,263,224,341"/>
+<area shape="rect" id="node4" href="$classmain__menu_1_1_menu_connect_cam.html" title=" " alt="" coords="248,256,448,348"/>
+<area shape="rect" id="node5" href="$classmain__menu_1_1_menu_help.html" title=" " alt="" coords="473,263,623,341"/>
+<area shape="rect" id="node6" href="$classmain__menu_1_1_menu_options.html" title=" " alt="" coords="648,263,819,341"/>
+<area shape="rect" id="node2" title=" " alt="" coords="418,5,478,83"/>
+</map>

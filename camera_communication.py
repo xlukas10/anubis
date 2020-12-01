@@ -22,9 +22,19 @@ class Camera:
         self.frame_queue = None
 
     def get_camera_list(self,):
+        """!@brief Connected camera discovery
+        @details Uses Harvester object to discover all connected cameras
+        @return List of Dictionaries cantaining informations about cameras
+        @todo WHAT IS THE DICTIONARY FORMAT?
+        """
         return self.h.update()
     
     def select_camera(self,selected_device):
+        """!@brief choose camera to connect to
+        @details Select camera you will be using and set Camera object accordingly
+        @param[in] selected_device list index for now in future unique identifier of a camera
+        @todo START USING UNIQUE IDENTIFIER
+        """
         if(self.h.device_info_list[selected_device].vendor == 'Allied Vision Technologies'):
             self.disconnect_harvester()
             self.vendor = 'Allied Vision Technologies'
@@ -34,11 +44,11 @@ class Camera:
             self.cam = self.h.create_image_acquirer(selected_device)
     
     def get_single_frame(self,):
-        '''
-        Returns unmodified image data from camera.
-        -------
-        Uses selected camera to acquire single frame with active settings.
-        '''
+        """!@brief grab single frame from camera
+        @details Based on vendor variable chooses right API for acquisition and 
+            loads single frame from active_camera
+        @return unmodified frame from camera
+        """
         if(self.vendor == 'Allied Vision Technologies'):
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras()
@@ -50,7 +60,15 @@ class Camera:
             self.buffer = self.cam.fetch_buffer().payload.components[0]
             return self.buffer.data
     
+    
+    
     def set_parameter(self,parameter, new_value):
+        """!@brief method for setting camera's parameters
+        @details Sets parameter to value defined by new_value
+        @param[in] parameter A dictionary with mandatory keys name and value,
+                         other keys will be used in later versions
+        @param[in] new_value variable compatible with value key in parameter
+        """
         if(self.vendor == 'Allied Vision Technologies'):
 #EDIT to work well with new parameter dictionary (name, value, maximum etc.)
             with Vimba.get_instance() as vimba:
@@ -64,6 +82,14 @@ class Camera:
             return 42
     
     def get_parameters(self,):
+        """!@brief Read parameters from camera
+        @details Based on self.vendor and self.active_camera chooses right API and
+            loads all available camera parameters
+        @return A dictionary with parameter names as keys. Each key points to 
+            dictionary containing given parameter information: name, 
+            value, type, range, increment and max_length 
+            if given information exist for the parameter
+        """
         if(self.vendor == 'Allied Vision Technologies'):
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras ()
@@ -120,26 +146,30 @@ class Camera:
             return dir(self.cam.remote_device.node_map)
     
     def read_param_values(self,):
-        '''
-        
-        Returns
-        -------
-        values[]
-            Returns list of parameter dictionaries each containing information about parameters.
-            
-        '''
+        """@brief Is not used for now, will be probably removed
+        @todo Remove if not changed
+        """
 #This method may turn out to be redundant (for Vimba it is not needed, depends on harvester implementation)
         values = []
         
         if(self.vendor == 'Allied Vision Technologies'):
             return self.get_parameters()
         else:
-            return 42
+            pass
     
-    def save_parameters(self,):
-        return 42
+    def save_parameters(self,save_path):
+        """!@brief saves configuration of a camera to .xml file
+        @param[in] save_path A path where the file will be saved
+        @todo what will happen if a file already exists
+        """
+        pass
     
     def start_acquisition(self,frame_queue):
+        """!@brief Starts continuous acquisition of image frames
+        @details Creates a threading object for the right API and starts frame 
+            acquisition in that thread (producer thread)
+        @param[in] frame_queue A queue in which the frames will be stored
+        """
         #create threading object for vimba, harvester or future api and start the thread
         #this is not nice
         if not self.acquisition_running:
@@ -151,6 +181,11 @@ class Camera:
         pass
     
     def stop_acquisition(self,):
+        """!@brief Stops continuous acquisition
+        @details Sets stream_stop_switch, acquisition running to false and removes inner link to queue object
+        @param[in] parameter A dictionary with mandatory keys name and value,
+                         other keys will be used in later versions
+        """
         #stop threas created by start_acquisition
         if self.acquisition_running == True:
             self._stream_stop_switch.set()
@@ -219,8 +254,8 @@ print(kamera.get_single_frame())
     
 val = kamera.read_param_values()
 
-#for v in val:
-#    print(f'{v} HAS FEATURES: {val[v]}')
+for v in val:
+    print(f'{v} HAS FEATURES: {val[v]}')
 
 print('----------------------')
 #print(kamera.get_single_frame())    
@@ -234,6 +269,7 @@ print('----------------------')
 fronta = queue.Queue()
 
 kamera.start_acquisition(fronta)
+print('Toto se tiskne behem zisku obrazu')
 time.sleep(5)
 kamera.stop_acquisition()
 
