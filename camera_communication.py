@@ -217,11 +217,23 @@ class Camera:
         except:
             pass
             
-    def start_recording(self,):
+    def start_recording(self,file_path,configuration,frame_queue):
+        """!@brief Starts continuous acquisition of image frames and saves them to files/video
+        @details Calls start_acquisition method and configures camera parameters for optimal acquisition
+        @param[in] file_path path where the files will be saved
+        @param[in] configuration parameters of output files and possibly camera parameters
+        @param[in] frame_queue object to store acquired frames in
+        """
         self.cam.start_acquisition()
         self.is_recording = True
     
     def stop_recording(self,):
+        """!@brief Stops continuous acquisition of image frames and closes all files
+        @details Calls start_acquisition method and configures camera parameters for optimal acquisition
+        @param[in] file_path path where the files will be saved
+        @param[in] configuration parameters of output files and possibly camera parameters
+        @param[in] frame_queue object to store acquired frames in
+        """
         self.cam.stop_acquisition()
         self.cam.destroy()
         self.is_recording = False
