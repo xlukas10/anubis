@@ -203,7 +203,8 @@ class Camera:
             with cams[self.active_camera] as c:
                 try:
                     c.start_streaming(handler=self.__frame_handler)
-"""!@bug _stream_stop_switch as Event object is no good"""
+                    """!@bug _stream_stop_switch as Event object is no good
+                    """
 #POSSIBLE SLOWDOWN _stream_stop_switch as Event object is no good
                     self._stream_stop_switch.wait()
                 finally:
