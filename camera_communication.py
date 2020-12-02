@@ -219,6 +219,11 @@ class Camera:
         return
     
     def __frame_handler(self,cam ,frame):
+        """!@brief Defines how to process incoming frames
+        @details Currently is defined for Vimba and defines how to acquire
+            whole frame and put into the frame_queu
+        @todo implement for harvesters and define interface for APIs to come
+        """
         try:
             if frame.get_status() == FrameStatus.Complete:
                 if not self.frame_queue.full():
