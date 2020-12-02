@@ -10,6 +10,7 @@ import threading
 import queue
 import copy
 import cv2
+import os #for working with save path
 
 import time#tmp for testing purposes
 
@@ -228,12 +229,12 @@ class Camera:
         @todo Implement for harvester as well
         """
         num = 0
-
+        extension = '.png'
 #NOT tested yet
         while not self.frame_queue.is_empty() and self.acquisition_running:
             frame = self.frame_queue.get_nowait()
-            cv2.imwrite(f'{num}.png', frame.as_opencv_image())
-#Dont know if works with fstring
+            cv2.imwrite(os.path.join(file_path, num, extension), frame.as_opencv_image())
+#Dont know if works
             num += 1
         
         
@@ -265,6 +266,12 @@ class Camera:
         pass
     
     def set_gentl_producer(self,producer_path):
+        """!@brief Add a new frame producer to the harvester object
+        @details adds .cti file specified by producer_path to the harvester object
+        @param[in] producer_path path to a .cti file
+        @todo producer_path probably should be also attached to
+            application configuration for later use
+        """
         self.h.add_file(producer_path)
     
     def remove_gentl_producer(self,producer_path):
