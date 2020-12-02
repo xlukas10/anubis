@@ -9,6 +9,7 @@ from vimba import *
 import threading
 import queue
 import copy
+import cv2
 
 import time#tmp for testing purposes
 
@@ -224,8 +225,16 @@ class Camera:
         @param[in] file_path path where the files will be saved
         @param[in] additional_config unused for now, in future may contain image format, specific naming convention etc.
         @todo If configuration is implemented elsewhere remove this method
+        @todo Implement for harvester as well
         """
-        
+        num = 0
+
+#NOT tested yet
+        while not self.frame_queue.is_empty() and self.acquisition_running:
+            frame = self.frame_queue.get_nowait()
+            cv2.imwrite(f'{num}.png', frame.as_opencv_image())
+#Dont know if works with fstring
+            num += 1
         
         
     def start_recording(self,file_path,configuration,frame_queue):
