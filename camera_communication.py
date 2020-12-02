@@ -249,6 +249,8 @@ class Camera:
         self.h.remove_file(producer_path)
 
     def disconnect_harvester(self,):
+        """!@brief Destroys harvester object so other APIs can access cameras
+        """
         self.h.reset()
         
 

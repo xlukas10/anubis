@@ -8,7 +8,7 @@ var searchData=
   ['set_5frecording_5fsave_5fpath_143',['set_recording_save_path',['../classfile__configuration_1_1_file.html#a6938fa6f86b526160059abc590472763',1,'file_configuration::File']]],
   ['show_5fmenu_144',['show_menu',['../classkivy__elements_1_1_tabs.html#aed8e411c50aacd55bea796b302792fe9',1,'kivy_elements::Tabs']]],
   ['start_5facquisition_145',['start_acquisition',['../classcamera__communication_1_1_camera.html#a5875ba4ab78601ec853a1d2a2fd1eb28',1,'camera_communication::Camera']]],
-  ['start_5frecording_146',['start_recording',['../classcamera__communication_1_1_camera.html#a2f633092428fb4447160f82e02eaa40d',1,'camera_communication::Camera']]],
+  ['start_5frecording_146',['start_recording',['../classcamera__communication_1_1_camera.html#a9c17f91887ad099c8a8aa4b754486a1e',1,'camera_communication::Camera']]],
   ['stop_5facquisition_147',['stop_acquisition',['../classcamera__communication_1_1_camera.html#a1889cce2a5d667beda85f2400bcfc80f',1,'camera_communication::Camera']]],
   ['stop_5frecording_148',['stop_recording',['../classcamera__communication_1_1_camera.html#a1d8c9662f8e29ec375774d5ddfde86d4',1,'camera_communication::Camera']]]
 ];

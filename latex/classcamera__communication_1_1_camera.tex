@@ -32,10 +32,10 @@ def \mbox{\hyperlink{classcamera__communication_1_1_camera_a5875ba4ab78601ec853a
 \begin{DoxyCompactList}\small\item\em Starts continuous acquisition of image frames. \end{DoxyCompactList}\item 
 def \mbox{\hyperlink{classcamera__communication_1_1_camera_a1889cce2a5d667beda85f2400bcfc80f}{stop\+\_\+acquisition}} (self)
 \begin{DoxyCompactList}\small\item\em Stops continuous acquisition. \end{DoxyCompactList}\item 
-def \mbox{\hyperlink{classcamera__communication_1_1_camera_a2f633092428fb4447160f82e02eaa40d}{start\+\_\+recording}} (self)
-\item 
+def \mbox{\hyperlink{classcamera__communication_1_1_camera_a9c17f91887ad099c8a8aa4b754486a1e}{start\+\_\+recording}} (self, file\+\_\+path, configuration, \mbox{\hyperlink{classcamera__communication_1_1_camera_a79961e7a7b3a5bf51486b9df5b000f60}{frame\+\_\+queue}})
+\begin{DoxyCompactList}\small\item\em Starts continuous acquisition of image frames and saves them to files/video. \end{DoxyCompactList}\item 
 def \mbox{\hyperlink{classcamera__communication_1_1_camera_a1d8c9662f8e29ec375774d5ddfde86d4}{stop\+\_\+recording}} (self)
-\item 
+\begin{DoxyCompactList}\small\item\em Stops continuous acquisition of image frames and closes all files. \end{DoxyCompactList}\item 
 def \mbox{\hyperlink{classcamera__communication_1_1_camera_ab748b9cca5c78ba5bd5b671592323069}{configure\+\_\+recording}} (self, path)
 \item 
 def \mbox{\hyperlink{classcamera__communication_1_1_camera_acd7e2628d6a5cc064d15b9c1487834a8}{set\+\_\+gentl\+\_\+producer}} (self, producer\+\_\+path)
@@ -108,7 +108,7 @@ Definition at line 16 of file camera\+\_\+communication.\+py.
 
 
 
-Definition at line 211 of file camera\+\_\+communication.\+py.
+Definition at line 210 of file camera\+\_\+communication.\+py.
 
 \mbox{\Hypertarget{classcamera__communication_1_1_camera_a5fa247aa3e69c9a3cbb48babeb48e9bf}\label{classcamera__communication_1_1_camera_a5fa247aa3e69c9a3cbb48babeb48e9bf}} 
 \index{camera\_communication.Camera@{camera\_communication.Camera}!\_frame\_producer@{\_frame\_producer}}
@@ -118,7 +118,7 @@ Definition at line 211 of file camera\+\_\+communication.\+py.
 
 
 
-Definition at line 199 of file camera\+\_\+communication.\+py.
+Definition at line 198 of file camera\+\_\+communication.\+py.
 
 \mbox{\Hypertarget{classcamera__communication_1_1_camera_ab748b9cca5c78ba5bd5b671592323069}\label{classcamera__communication_1_1_camera_ab748b9cca5c78ba5bd5b671592323069}} 
 \index{camera\_communication.Camera@{camera\_communication.Camera}!configure\_recording@{configure\_recording}}
@@ -128,7 +128,7 @@ Definition at line 199 of file camera\+\_\+communication.\+py.
 
 
 
-Definition at line 230 of file camera\+\_\+communication.\+py.
+Definition at line 241 of file camera\+\_\+communication.\+py.
 
 \mbox{\Hypertarget{classcamera__communication_1_1_camera_a83c4f6caa3dff650dd4669a90fbb11f0}\label{classcamera__communication_1_1_camera_a83c4f6caa3dff650dd4669a90fbb11f0}} 
 \index{camera\_communication.Camera@{camera\_communication.Camera}!disconnect\_harvester@{disconnect\_harvester}}
@@ -138,7 +138,7 @@ Definition at line 230 of file camera\+\_\+communication.\+py.
 
 
 
-Definition at line 240 of file camera\+\_\+communication.\+py.
+Definition at line 251 of file camera\+\_\+communication.\+py.
 
 \mbox{\Hypertarget{classcamera__communication_1_1_camera_aaef32dd93447a6a9b572e0455baf4c66}\label{classcamera__communication_1_1_camera_aaef32dd93447a6a9b572e0455baf4c66}} 
 \index{camera\_communication.Camera@{camera\_communication.Camera}!get\_camera\_list@{get\_camera\_list}}
@@ -214,7 +214,7 @@ Definition at line 148 of file camera\+\_\+communication.\+py.
 
 
 
-Definition at line 237 of file camera\+\_\+communication.\+py.
+Definition at line 248 of file camera\+\_\+communication.\+py.
 
 \mbox{\Hypertarget{classcamera__communication_1_1_camera_aa08a0b6efcfea702d38c5a7abe7c0619}\label{classcamera__communication_1_1_camera_aa08a0b6efcfea702d38c5a7abe7c0619}} 
 \index{camera\_communication.Camera@{camera\_communication.Camera}!save\_parameters@{save\_parameters}}
@@ -235,7 +235,7 @@ saves configuration of a camera to .xml file
 \item[\mbox{\hyperlink{todo__todo000003}{Todo}}]what will happen if a file already exists\end{DoxyRefDesc}
 
 
-Definition at line 161 of file camera\+\_\+communication.\+py.
+Definition at line 160 of file camera\+\_\+communication.\+py.
 
 \mbox{\Hypertarget{classcamera__communication_1_1_camera_a041b628e446701c28d67247286d84cc9}\label{classcamera__communication_1_1_camera_a041b628e446701c28d67247286d84cc9}} 
 \index{camera\_communication.Camera@{camera\_communication.Camera}!select\_camera@{select\_camera}}
@@ -266,7 +266,7 @@ Definition at line 32 of file camera\+\_\+communication.\+py.
 
 
 
-Definition at line 234 of file camera\+\_\+communication.\+py.
+Definition at line 245 of file camera\+\_\+communication.\+py.
 
 \mbox{\Hypertarget{classcamera__communication_1_1_camera_a37bb09934c340579d891da45a838812a}\label{classcamera__communication_1_1_camera_a37bb09934c340579d891da45a838812a}} 
 \index{camera\_communication.Camera@{camera\_communication.Camera}!set\_parameter@{set\_parameter}}
@@ -306,17 +306,30 @@ Creates a threading object for the right A\+PI and starts frame acquisition in t
 \end{DoxyParams}
 
 
-Definition at line 168 of file camera\+\_\+communication.\+py.
+Definition at line 167 of file camera\+\_\+communication.\+py.
 
-\mbox{\Hypertarget{classcamera__communication_1_1_camera_a2f633092428fb4447160f82e02eaa40d}\label{classcamera__communication_1_1_camera_a2f633092428fb4447160f82e02eaa40d}} 
+\mbox{\Hypertarget{classcamera__communication_1_1_camera_a9c17f91887ad099c8a8aa4b754486a1e}\label{classcamera__communication_1_1_camera_a9c17f91887ad099c8a8aa4b754486a1e}} 
 \index{camera\_communication.Camera@{camera\_communication.Camera}!start\_recording@{start\_recording}}
 \index{start\_recording@{start\_recording}!camera\_communication.Camera@{camera\_communication.Camera}}
 \doxysubsubsection{\texorpdfstring{start\_recording()}{start\_recording()}}
-{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+start\+\_\+recording (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily def camera\+\_\+communication.\+Camera.\+start\+\_\+recording (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{file\+\_\+path,  }\item[{}]{configuration,  }\item[{}]{frame\+\_\+queue }\end{DoxyParamCaption})}
 
 
 
-Definition at line 221 of file camera\+\_\+communication.\+py.
+Starts continuous acquisition of image frames and saves them to files/video. 
+
+Calls start\+\_\+acquisition method and configures camera parameters for optimal acquisition 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em file\+\_\+path} & path where the files will be saved \\
+\hline
+\mbox{\texttt{ in}}  & {\em configuration} & parameters of output files and possibly camera parameters \\
+\hline
+\mbox{\texttt{ in}}  & {\em frame\+\_\+queue} & object to store acquired frames in \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 220 of file camera\+\_\+communication.\+py.
 
 \mbox{\Hypertarget{classcamera__communication_1_1_camera_a1889cce2a5d667beda85f2400bcfc80f}\label{classcamera__communication_1_1_camera_a1889cce2a5d667beda85f2400bcfc80f}} 
 \index{camera\_communication.Camera@{camera\_communication.Camera}!stop\_acquisition@{stop\_acquisition}}
@@ -335,7 +348,7 @@ Sets stream\+\_\+stop\+\_\+switch, acquisition running to false and removes inne
 \end{DoxyParams}
 
 
-Definition at line 184 of file camera\+\_\+communication.\+py.
+Definition at line 183 of file camera\+\_\+communication.\+py.
 
 \mbox{\Hypertarget{classcamera__communication_1_1_camera_a1d8c9662f8e29ec375774d5ddfde86d4}\label{classcamera__communication_1_1_camera_a1d8c9662f8e29ec375774d5ddfde86d4}} 
 \index{camera\_communication.Camera@{camera\_communication.Camera}!stop\_recording@{stop\_recording}}
@@ -345,7 +358,20 @@ Definition at line 184 of file camera\+\_\+communication.\+py.
 
 
 
-Definition at line 225 of file camera\+\_\+communication.\+py.
+Stops continuous acquisition of image frames and closes all files. 
+
+Calls start\+\_\+acquisition method and configures camera parameters for optimal acquisition 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em file\+\_\+path} & path where the files will be saved \\
+\hline
+\mbox{\texttt{ in}}  & {\em configuration} & parameters of output files and possibly camera parameters \\
+\hline
+\mbox{\texttt{ in}}  & {\em frame\+\_\+queue} & object to store acquired frames in \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 230 of file camera\+\_\+communication.\+py.
 
 
 
@@ -358,7 +384,7 @@ Definition at line 225 of file camera\+\_\+communication.\+py.
 
 
 
-Definition at line 179 of file camera\+\_\+communication.\+py.
+Definition at line 178 of file camera\+\_\+communication.\+py.
 
 \mbox{\Hypertarget{classcamera__communication_1_1_camera_af8009078458c395e73837a6dd3b4c0b3}\label{classcamera__communication_1_1_camera_af8009078458c395e73837a6dd3b4c0b3}} 
 \index{camera\_communication.Camera@{camera\_communication.Camera}!\_stream\_stop\_switch@{\_stream\_stop\_switch}}
@@ -368,7 +394,7 @@ Definition at line 179 of file camera\+\_\+communication.\+py.
 
 
 
-Definition at line 178 of file camera\+\_\+communication.\+py.
+Definition at line 177 of file camera\+\_\+communication.\+py.
 
 \mbox{\Hypertarget{classcamera__communication_1_1_camera_a8486d1b6a764d8a9ddad1d970b3df730}\label{classcamera__communication_1_1_camera_a8486d1b6a764d8a9ddad1d970b3df730}} 
 \index{camera\_communication.Camera@{camera\_communication.Camera}!acquisition\_running@{acquisition\_running}}
