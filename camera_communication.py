@@ -289,6 +289,12 @@ class Camera:
         self.h.add_file(producer_path)
     
     def remove_gentl_producer(self,producer_path):
+        """!@brief Remove existing frame producer from the harvester object
+        @details removes .cti file specified by producer_path from the harvester object
+        @param[in] producer_path path to a .cti file
+        @todo producer_path probably should be also removed from
+            application configuration
+        """
         self.h.remove_file(producer_path)
 
     def disconnect_harvester(self,):
