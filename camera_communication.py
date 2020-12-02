@@ -259,7 +259,7 @@ class Camera:
         @param[in] configuration parameters of output files and possibly camera parameters
         @param[in] frame_queue object to store acquired frames in
         """
-        self.cam.start_acquisition()
+        self.start_acquisition()
         self._frame_consumer_thread = threading.Thread(target=self._frame_consumer)
         self._frame_consumer_thread.start()
         self.is_recording = True
@@ -271,8 +271,7 @@ class Camera:
         @param[in] configuration parameters of output files and possibly camera parameters
         @param[in] frame_queue object to store acquired frames in
         """
-        self.cam.stop_acquisition()
-        self.cam.destroy()
+        self.stop_acquisition()
         self.is_recording = False
     
     def configure_recording(self,path):
@@ -331,13 +330,16 @@ print('----------------------')
 
 fronta = queue.Queue()
 
-kamera.start_acquisition(fronta)
-print('Toto se tiskne behem zisku obrazu')
-time.sleep(5)
-kamera.stop_acquisition()
+#kamera.start_acquisition(fronta)
+#print('Toto se tiskne behem zisku obrazu')
+#time.sleep(5)
+#kamera.stop_acquisition()
 
 #fronta.join()
 
 
 
-print(fronta.queue)
+#print(fronta.queue)
+kamera.start_recording('c:/','nic',fronta)
+time.sleep(5)
+kamera.stop_recording()
