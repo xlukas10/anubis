@@ -245,11 +245,13 @@ class Camera:
         num = 0
         extension = '.png'
 #NOT tested yet
-        while not self.frame_queue.is_empty() and self.acquisition_running:
-            frame = self.frame_queue.get_nowait()
-            cv2.imwrite(os.path.join(file_path, num, extension), frame.as_opencv_image())
-#Dont know if works
-            num += 1
+        while self.acquisition_running:
+            if not self.frame_queue.empty(): 
+                frame = self.frame_queue.get_nowait()
+                cv2.imwrite(file_path + str(num) + extension, frame.as_opencv_image())
+#use rather os.path.join method
+    #Dont know if works
+                num += 1
         
         
     def start_recording(self,file_path,configuration,frame_queue):
@@ -260,7 +262,7 @@ class Camera:
         @param[in] frame_queue object to store acquired frames in
         """
         self.start_acquisition(frame_queue)
-        self._frame_consumer_thread = threading.Thread(target=self._frame_consumer)
+        self._frame_consumer_thread = threading.Thread(target=self._frame_consumer, args=(file_path,configuration))
         self._frame_consumer_thread.start()
         self.is_recording = True
     
@@ -340,6 +342,7 @@ fronta = queue.Queue()
 
 
 #print(fronta.queue)
-kamera.start_recording('c:/','nic',fronta)
+kamera.start_recording('C:/Users/Jakub Lukaszczyk/Documents/','nic',fronta)
 time.sleep(5)
 kamera.stop_recording()
+
