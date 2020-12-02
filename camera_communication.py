@@ -259,7 +259,7 @@ class Camera:
         @param[in] configuration parameters of output files and possibly camera parameters
         @param[in] frame_queue object to store acquired frames in
         """
-        self.start_acquisition()
+        self.start_acquisition(frame_queue)
         self._frame_consumer_thread = threading.Thread(target=self._frame_consumer)
         self._frame_consumer_thread.start()
         self.is_recording = True
