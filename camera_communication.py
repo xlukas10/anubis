@@ -159,12 +159,16 @@ class Camera:
         else:
             pass
     
-    def save_parameters(self,save_path):
+    def save_parameters(self,save_path, file_name):
         """!@brief saves configuration of a camera to .xml file
         @param[in] save_path A path where the file will be saved
         @todo what will happen if a file already exists
         """
-        pass
+        if self.vendor=='Allied Vision Technologies':
+            with Vimba.get_instance() as vimba:
+                cams = vimba.get_all_cameras ()
+                with cams[self.active_camera] as cam:
+                    cam.save_settings(save_path + file_name + '.xml', PersistType.All)
     
     def start_acquisition(self,frame_queue):
         """!@brief Starts continuous acquisition of image frames
@@ -343,6 +347,8 @@ fronta = queue.Queue()
 
 #print(fronta.queue)
 kamera.start_recording('C:/Users/Jakub Lukaszczyk/Documents/','nic',fronta)
-time.sleep(5)
+time.sleep(30)
 kamera.stop_recording()
+
+kamera.save_parameters('c:/Users/Jakub Lukaszczyk/Documents/', 'konfigurace1')
 
