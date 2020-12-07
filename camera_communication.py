@@ -192,7 +192,7 @@ class Camera:
         @param[in] parameter A dictionary with mandatory keys name and value,
                          other keys will be used in later versions
         """
-        #stop threas created by start_acquisition
+        #stop threads created by start_acquisition
         if self.acquisition_running == True:
             self._stream_stop_switch.set()
             #this hopefully stops producer thread
