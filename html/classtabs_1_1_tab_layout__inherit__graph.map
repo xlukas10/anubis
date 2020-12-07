@@ -1,8 +1,0 @@
-<map id="tabs.TabLayout" name="tabs.TabLayout">
-<area shape="rect" id="node1" title=" " alt="" coords="288,131,399,208"/>
-<area shape="rect" id="node3" href="$classtabs_1_1_tab_cam_parameters.html" title=" " alt="" coords="5,256,172,333"/>
-<area shape="rect" id="node4" href="$classtabs_1_1_tab_connect_cam.html" title=" " alt="" coords="197,256,343,333"/>
-<area shape="rect" id="node5" href="$classtabs_1_1_tab_help.html" title=" " alt="" coords="367,256,466,333"/>
-<area shape="rect" id="node6" href="$classtabs_1_1_tab_options.html" title=" " alt="" coords="490,256,607,333"/>
-<area shape="rect" id="node2" title=" " alt="" coords="301,5,386,83"/>
-</map>

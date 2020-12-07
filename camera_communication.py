@@ -347,7 +347,7 @@ fronta = queue.Queue()
 
 #print(fronta.queue)
 kamera.start_recording('C:/Users/Jakub Lukaszczyk/Documents/','nic',fronta)
-time.sleep(30)
+time.sleep(40)
 kamera.stop_recording()
 
 kamera.save_parameters('c:/Users/Jakub Lukaszczyk/Documents/', 'konfigurace1')
