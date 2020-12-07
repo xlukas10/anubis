@@ -18,10 +18,13 @@ from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import StringProperty
 from kivy.graphics.texture import Texture #drawing image from camera
+from kivy.graphics import Rectangle
+from kivy.uix.image import Image
 
 import main_menu
 import tabs as tb
 import camera_control_elements
+from anubis import frame_queue
 
 import cv2
 
@@ -48,14 +51,24 @@ class CameraImage(Image):
     def __init__(self, **kwargs):
         super(CameraImage, self).__init__(**kwargs)
 
-    def draw(self, frame):
+    def draw(self, dt):
         # Frame is converted to texture, so it fits app window regardless of camera's resolution
-        frame_1D = frame.tostring() # converts frame to a format expected by blit_buffer method
-        print(frame)
-        frame_texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='rgb')
-        frame_texture.blit_buffer(frame_1D, colorfmt='rgb', bufferfmt='ubyte')
-        # display image from the texture
-        self.texture = frame_texture
+        try:
+            frame = frame_queue.get_nowait()
+            frame_flip = cv2.flip(frame, 0) # converts frame to a format expected by blit_buffer method
+            frame_1D = frame_flip.tostring()
+            frame_texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
+            frame_texture.blit_buffer(frame_1D, colorfmt='bgr', bufferfmt='ubyte')
+            print('test')
+            # show image
+            #with self.canvas: 
+             #   Rectangle(texture=frame_texture, pos=self.pos, size=self.size)
+            self.texture = frame_texture
+        except:
+            print('kde nic tu nic')
+            pass
+        #self.ask_update()
+        #self.reload()
 
 class CameraSettings(BoxLayout):
     """
