@@ -176,6 +176,7 @@ class Camera:
             acquisition in that thread (producer thread)
         @param[in] frame_queue A queue in which the frames will be stored
         """
+        print('I am in')
         #create threading object for vimba, harvester or future api and start the thread
         if not self.acquisition_running:
             self.frame_queue = frame_queue
@@ -225,7 +226,8 @@ class Camera:
             if frame.get_status() == FrameStatus.Complete:
                 if not self.frame_queue.full():
                     frame_copy = copy.deepcopy(frame)
-                    self.frame_queue.put_nowait(frame_copy)
+                    self.frame_queue.put_nowait(frame_copy.as_opencv_image())
+                    #Saving only image data, metadata are lost - is it a problem?
             cam.queue_frame(frame)
         except:
             print("comething went terribly wrong and I have no idea what")
@@ -244,7 +246,8 @@ class Camera:
         while self.acquisition_running:
             if not self.frame_queue.empty(): 
                 frame = self.frame_queue.get_nowait()
-                cv2.imwrite(file_path + str(num) + extension, frame.as_opencv_image())
+                cv2.imwrite(file_path + str(num) + extension, frame)
+                #because th __frame_handler saves only image data, I can save frame directly here without conversions
 #use rather os.path.join method
                 num += 1
         
@@ -300,6 +303,7 @@ class Camera:
         
 
 #---------------------------------------------------------------------------
+'''
 kamera = Camera('C:/Programy/Allied Vision/Vimba_4.0/VimbaGigETL/Bin/Win64/VimbaGigETL.cti')
 kamera.get_camera_list()
 kamera.select_camera(0)
@@ -338,8 +342,9 @@ fronta = queue.Queue()
 
 #print(fronta.queue)
 kamera.start_recording('C:/Users/Jakub Lukaszczyk/Documents/','nic',fronta)
-time.sleep(40)
+time.sleep(10)
 kamera.stop_recording()
 
 kamera.save_parameters('c:/Users/Jakub Lukaszczyk/Documents/', 'konfigurace1')
 
+'''

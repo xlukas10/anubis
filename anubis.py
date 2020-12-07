@@ -56,7 +56,13 @@ from queue import Queue
 #app settings save/load
 
 #maybe language settings
-cam = Camera()
+frame_queue = Queue()
+
+cam = Camera('C:/Programy/Allied Vision/Vimba_4.0/VimbaGigETL/Bin/Win64/VimbaGigETL.cti')
+cam.get_camera_list()
+print('Hallo')
+cam.select_camera(0)
+#set maximum size defined by user (So the app does not eat all of the ram)
 
 class AnubisApp(App):
     def build(self):
@@ -67,9 +73,5 @@ Window.minimum_width, Window.minimum_height = Window.size
 
 if __name__ == '__main__':
     AnubisApp().run()
-    
-    producer_thread = threading.Thread(target=cam.get_image(), args=("""argument for get_mage function"""))
-    
-    consumer_thread = threading.Thread(target=f.save_image(), args("""argument for save image function"""))
     
     
