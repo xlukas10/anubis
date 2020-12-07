@@ -177,7 +177,6 @@ class Camera:
         @param[in] frame_queue A queue in which the frames will be stored
         """
         #create threading object for vimba, harvester or future api and start the thread
-        #this is not nice
         if not self.acquisition_running:
             self.frame_queue = frame_queue
             self._stream_stop_switch = threading.Event()
@@ -195,11 +194,9 @@ class Camera:
         #stop threads created by start_acquisition
         if self.acquisition_running == True:
             self._stream_stop_switch.set()
-            #this hopefully stops producer thread
+            #this stops producer thread
             self.acquisition_running = False
             self.frame_queue = None
-        #return is tmp
-        return
     
     def _frame_producer(self):
         """!@brief Gets frames from camera while continuous acquisition is active
@@ -212,10 +209,6 @@ class Camera:
             with cams[self.active_camera] as c:
                 try:
                     c.start_streaming(handler=self.__frame_handler)
-                    """!@bug _stream_stop_switch as Event object is no good
-                    """
-#POSSIBLE SLOWDOWN _stream_stop_switch as Event object is no good
-#it is probably ok start_streaming method does not run in a loop here
                     self._stream_stop_switch.wait()
                 finally:
                     c.stop_streaming()
@@ -248,13 +241,11 @@ class Camera:
         """
         num = 0
         extension = '.png'
-#NOT tested yet
         while self.acquisition_running:
             if not self.frame_queue.empty(): 
                 frame = self.frame_queue.get_nowait()
                 cv2.imwrite(file_path + str(num) + extension, frame.as_opencv_image())
 #use rather os.path.join method
-    #Dont know if works
                 num += 1
         
         
