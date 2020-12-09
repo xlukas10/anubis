@@ -5,17 +5,17 @@ Created on Mon Oct 19 09:08:58 2020
 @author: Jakub Lukaszczyk
 """
 
-from kivy.app import App
+from kivymd.app import MDApp
 from kivy.core.window import Window
 #importing controls defined for controlling the camera.
 #used in the .kv file
 
 
-from camera_communication import Camera
 
 import kivy_elements
 import threading
-from queue import Queue
+
+import global_objects
 #from harvesters import Harvester
 
 #Determine if there is a config file present and read it.
@@ -56,16 +56,14 @@ from queue import Queue
 #app settings save/load
 
 #maybe language settings
-frame_queue = Queue()
 
-cam = Camera('C:/Programy/Allied Vision/Vimba_4.0/VimbaGigETL/Bin/Win64/VimbaGigETL.cti')
-cam.get_camera_list()
-print('Hallo')
-cam.select_camera(0)
+
 #set maximum size defined by user (So the app does not eat all of the ram)
 
-class AnubisApp(App):
+class AnubisApp(MDApp):        
     def build(self):
+        #global_objects.cam.get_camera_list()
+        #global_objects.cam.select_camera(0)
         return kivy_elements.MainLayout()
 
 Window.size = (800, 450)

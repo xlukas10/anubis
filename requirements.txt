@@ -1,5 +1,6 @@
 harvesters >= 1.2.8
 genicam >= 1.0.0
 kivy >= 1.11.1
+kivymd >= 0.104.1 #maybe delete
 OpenCV
 Vimba

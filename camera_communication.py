@@ -14,6 +14,7 @@ import os #for working with save path
 
 import time#tmp for testing purposes
 
+
 class Camera:
     def __init__(self, producer_path = 'ZDE VLOZIT DEFAULTNI CESTU'):
         self.h = Harvester()
@@ -176,9 +177,9 @@ class Camera:
             acquisition in that thread (producer thread)
         @param[in] frame_queue A queue in which the frames will be stored
         """
-        print('I am in')
         #create threading object for vimba, harvester or future api and start the thread
-        if not self.acquisition_running:
+        if not self.acquisition_running:    
+            print('I am in')
             self.frame_queue = frame_queue
             self._stream_stop_switch = threading.Event()
             self._frame_producer_thread = threading.Thread(target=self._frame_producer)
@@ -193,7 +194,7 @@ class Camera:
                          other keys will be used in later versions
         """
         #stop threads created by start_acquisition
-        if self.acquisition_running == True:
+        if self.acquisition_running:
             self._stream_stop_switch.set()
             #this stops producer thread
             self.acquisition_running = False
@@ -304,9 +305,10 @@ class Camera:
 
 #---------------------------------------------------------------------------
 '''
-kamera = Camera('C:/Programy/Allied Vision/Vimba_4.0/VimbaGigETL/Bin/Win64/VimbaGigETL.cti')
-kamera.get_camera_list()
-kamera.select_camera(0)
+kamera = Camera('C:/Programy/JAI/SDK/bin/JaiUSB3vTL.cti')
+print(kamera.get_camera_list())
+'''
+'''kamera.select_camera(0)
 p = kamera.get_parameters()
 kamera.set_parameter(p['GVSPPacketSize'],1500)
 print(kamera.get_single_frame())
@@ -346,5 +348,4 @@ time.sleep(10)
 kamera.stop_recording()
 
 kamera.save_parameters('c:/Users/Jakub Lukaszczyk/Documents/', 'konfigurace1')
-
 '''
