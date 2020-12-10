@@ -6,44 +6,38 @@ Created on Wed Oct 28 11:21:29 2020
 """
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
-
-
-from kivymd.uix.list import MDList, TwoLineListItem
-from kivymd.uix.list import OneLineIconListItem, IconLeftWidget
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.label import Label
+from kivy.properties import StringProperty
+from kivy.app import App
 
-from kivy.uix.floatlayout import FloatLayout
+from global_objects import cam
 
-
-
-class TabLayout(FloatLayout):
+class TabLayout(GridLayout):
     def __init__(self,**kwargs):
         super(TabLayout, self).__init__(**kwargs)
 
-
 class TabConnectCam(TabLayout):
-    def __init__(self, **kwargs):
+    #detect_cameras = StringProperty([])
+    def __init__(self,**kwargs):
         super(TabConnectCam, self).__init__(**kwargs)
-        # Creating a Simple List
-        self.scroll = ScrollView()
+        scroll_view = ScrollView()
+        self.add_widget(scroll_view)
+        
+        
+        #scroll view does not work
+    def detect_cameras(self,):
+        cameras = cam.get_camera_list()
+        print(cameras)
+        self.clear_widgets(children=self.children[:-1])
+        if not cameras:
+            self.add_widget(Label(text='No cameras found'))
+        else:
+            print('camera found')
+            for camera in cameras:
+                self.add_widget(Label(text=camera.vendor + ' - ' + camera.model))
+        
 
-        self.list_view = MDList()
-        for i in range(20):
-
-            # items = ThreeLineListItem(text=str(i) + ' item',
-            #                          secondary_text='This is ' + str(i) + 'th item',
-            #                          tertiary_text='hello')
-
-            icons = IconLeftWidget(icon="android")
-            items = OneLineIconListItem(text=str(i) + ' item')
-            items.add_widget(icons)
-            self.list_view.add_widget(items)
-
-        self.scroll.add_widget(self.list_view)
-        # End List
-
-        self.add_widget(self.scroll)
-    
 
 class TabCamParameters(TabLayout):
     def __init__(self,**kwargs):
@@ -61,3 +55,7 @@ class TabHelp(TabLayout):
         super(TabHelp, self).__init__(**kwargs)
         self.add_widget(Button(text='Pls Help me :o'))
 
+class RefreshButton(Button):
+    def __init__(self,**kwargs):
+        super(RefreshButton, self).__init__(**kwargs)
+        self.text = 'Refresh cameras'

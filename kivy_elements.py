@@ -13,7 +13,6 @@ from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.config import Config
 from kivy.uix.image import Image
-from kivymd.app import MDApp
 
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -25,8 +24,7 @@ from kivy.uix.image import Image
 import main_menu
 import tabs as tb
 import camera_control_elements
-
-import global_objects
+from global_objects import frame_queue
 
 import cv2
 
@@ -52,12 +50,11 @@ class CameraImage(Image):
     """
     def __init__(self, **kwargs):
         super(CameraImage, self).__init__(**kwargs)
-        
+
     def draw(self, dt):
         # Frame is converted to texture, so it fits app window regardless of camera's resolution
         try:
-            frame = global_objects.frame_queue.get_nowait()
-            
+            frame = frame_queue.get_nowait()
             frame_flip = cv2.flip(frame, 0) # converts frame to a format expected by blit_buffer method
             frame_1D = frame_flip.tostring()
             frame_texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
@@ -69,6 +66,7 @@ class CameraImage(Image):
             self.texture = frame_texture
         except:
             print('kde nic tu nic')
+            pass
         #self.ask_update()
         #self.reload()
 

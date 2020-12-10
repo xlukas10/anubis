@@ -5,15 +5,14 @@ Created on Thu Oct 22 07:09:54 2020
 @author: Jakub Lukaszczyk
 """
 from kivy.uix.button import Button
-from kivymd.app import MDApp
+from global_objects import cam
+from global_objects import frame_queue
+from kivy.app import App
 from kivy.clock import Clock
 
 import kivy_elements
 import threading
 import cv2
-
-
-import global_objects
 
 class PlayPause(Button):
     def __init__(self, **kwargs):
@@ -24,11 +23,11 @@ class PlayPause(Button):
         super(PlayPause, self).on_press()
         print('Here')
         if self.acquisition_running:
-            global_objects.cam.stop_acquisition()
+            cam.stop_acquisition()
             self.acquisition_running = False
             pass
         else:
-            global_objects.cam.start_acquisition(global_objects.frame_queue)
+            cam.start_acquisition(frame_queue)
             self._frame_preview_thread = threading.Thread(target=self._live_preview)
             self._frame_preview_thread.start()
             self.acquisition_running = True
@@ -39,10 +38,10 @@ class PlayPause(Button):
     
     def _live_preview(self):
         #method name is a subject to change
-        cam_img = MDApp.get_running_app().root.ids.camera_image
+        cam_img = App.get_running_app().root.ids.camera_image
         preview = Clock.schedule_interval(cam_img.draw, 1/30)
         print('preview started')
-        global_objects.cam._stream_stop_switch.wait()
+        cam._stream_stop_switch.wait()
         preview.cancel()
         print('preview stopped')
     

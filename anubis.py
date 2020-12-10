@@ -5,17 +5,14 @@ Created on Mon Oct 19 09:08:58 2020
 @author: Jakub Lukaszczyk
 """
 
-from kivymd.app import MDApp
+from kivy.app import App
 from kivy.core.window import Window
 #importing controls defined for controlling the camera.
 #used in the .kv file
 
 
-
 import kivy_elements
 import threading
-
-import global_objects
 #from harvesters import Harvester
 
 #Determine if there is a config file present and read it.
@@ -57,13 +54,10 @@ import global_objects
 
 #maybe language settings
 
-
 #set maximum size defined by user (So the app does not eat all of the ram)
 
-class AnubisApp(MDApp):        
+class AnubisApp(App):
     def build(self):
-        #global_objects.cam.get_camera_list()
-        #global_objects.cam.select_camera(0)
         return kivy_elements.MainLayout()
 
 Window.size = (800, 450)

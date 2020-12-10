@@ -6,12 +6,10 @@ Created on Sat Oct 24 09:11:35 2020
 """
 
 from kivy.uix.button import Button
-from kivymd.app import MDApp
+from kivy.app import App
 from kivy.properties import StringProperty
 
 import camera_control_elements
-
-
 #import Tabs as tb
 
 class MenuButton(Button):

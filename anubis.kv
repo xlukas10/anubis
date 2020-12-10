@@ -65,6 +65,11 @@
   #      color:
    #         rgba: 1, .1, .1, .9
 
+<TabConnectCam>:
+    RefreshButton:
+        on_release:
+            root.detect_cameras()
+
 <MainMenu>:
     orientation: 'horizontal'
     size_hint_y: 0.15
@@ -96,9 +101,9 @@
     #size behaves funky
 
 <TabLayout>:
-#    row_default_height: 20
-#    cols: 1
-#    rows: 6
+    row_default_height: 20
+    cols: 1
+    rows: 6
 
 
 
@@ -111,8 +116,8 @@
 
     CameraImage:
         id: camera_image
-        pos_hint: {'x': 0.01, 'top': 0.82}
-        size_hint: 0.6, 0.6
+        #pos_hint: {'x': 0.01, 'top': 0.82}
+        #size_hint: 0.6, 0.6
     #CameraSettings: #in future change for active menu
     #   pos_hint: {'right': 0.99, 'top': 0.82}
     #    size_hint: 0.37, 0.81
