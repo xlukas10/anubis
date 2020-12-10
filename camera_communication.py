@@ -36,14 +36,20 @@ class Camera:
         """!@brief choose camera to connect to
         @details Select camera you will be using and set Camera object accordingly
         @param[in] selected_device list index for now in future unique identifier of a camera
-        @todo START USING UNIQUE IDENTIFIER
+        @todo START USING UNIQUE IDENTIFIER - now using id_ of camera - in testing
         """
-        if(self.h.device_info_list[selected_device].vendor == 'Allied Vision Technologies'):
+        #for now the id is hardset - edit translation of id_ to index
+        #for camera in h.device_info_list:
+        #    if camera.id_ == selected_device:
+        selected_device_TMP = 0       
+        if(self.h.device_info_list[selected_device_TMP].vendor == 'Allied Vision Technologies'):
             self.disconnect_harvester()
             self.vendor = 'Allied Vision Technologies'
             #add code transforming harvester camera index to Vimba
-            self.active_camera = selected_device
+            self.active_camera = selected_device_TMP
         else:
+            self.active_camera = selected_device
+            self.vendor = 'Other'
             self.cam = self.h.create_image_acquirer(selected_device)
     
     def get_single_frame(self,):

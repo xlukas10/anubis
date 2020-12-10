@@ -28,14 +28,13 @@ class TabConnectCam(TabLayout):
         #scroll view does not work
     def detect_cameras(self,):
         cameras = cam.get_camera_list()
-        print(cameras)
         self.clear_widgets(children=self.children[:-1])
         if not cameras:
             self.add_widget(Label(text='No cameras found'))
         else:
-            print('camera found')
             for camera in cameras:
-                self.add_widget(Label(text=camera.vendor + ' - ' + camera.model))
+                self.add_widget(CameraLabel(camera, text=camera.vendor + ' - ' + camera.model))
+            print(cameras)
         
 
 
@@ -59,3 +58,14 @@ class RefreshButton(Button):
     def __init__(self,**kwargs):
         super(RefreshButton, self).__init__(**kwargs)
         self.text = 'Refresh cameras'
+
+class CameraLabel(Label):
+    def __init__(self,camera_info, **kwargs):
+        super(CameraLabel, self).__init__(**kwargs)
+        self.camera_info = camera_info
+        
+    def on_touch_down(self, touch):
+        if touch.is_double_tap:
+            print('double')
+            cam.select_camera(self.camera_info.id_)
+            self.color = [1,0,0,1]
