@@ -32,17 +32,30 @@ class Camera:
         self.h.update()
         return self.h.device_info_list
     
+    def __translate_selected_device(self, selected_device):
+        """!@brief Translates camera ID to index in a list of detected cameras
+        @details Index is returned according to currently active camera vendor.
+            This method must be called in every method where new connection to a camera is made.
+        @param[in] selected_device ID of a camera you want to connect to
+        """
+        if self.vendor == 'Allied Vision Technologies':
+            with Vimba.get_instance() as vimba:
+                cams = vimba.get_all_cameras()
+                for index, camera in enumerate(cams):
+                    if camera.id_ == selected_device:
+                        return index#Test this if it works right probably different name for id than id_
+        else:
+            for index, camera in enumerate(h.device_info_list):
+                if camera.id_ == selected_device:
+                    return index
+    
     def select_camera(self,selected_device):
         """!@brief choose camera to connect to
         @details Select camera you will be using and set Camera object accordingly
-        @param[in] selected_device list index for now in future unique identifier of a camera
-        @todo START USING UNIQUE IDENTIFIER - now using id_ of camera - in testing
+        @param[in] selected_device ID of a camera you want to connect to
         """
-        #for now the id is hardset - edit translation of id_ to index
-        #for camera in h.device_info_list:
-        #    if camera.id_ == selected_device:
-        selected_device_TMP = 0       
-        if(self.h.device_info_list[selected_device_TMP].vendor == 'Allied Vision Technologies'):
+        device_index = self.__translate_selected_device(selected_device)
+        if(self.h.device_info_list[device_index].vendor == 'Allied Vision Technologies'):
             self.disconnect_harvester()
             self.vendor = 'Allied Vision Technologies'
             #add code transforming harvester camera index to Vimba
