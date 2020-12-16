@@ -14,6 +14,8 @@ import os #for working with save path
 
 import time#tmp for testing purposes
 
+from global_objects import frame_queue
+
 class Camera:
     def __init__(self, producer_path = 'ZDE VLOZIT DEFAULTNI CESTU'):
         self.h = Harvester()
@@ -21,7 +23,6 @@ class Camera:
         self.vendor = 'Other'
         self.is_recording = False
         self.acquisition_running = False
-        self.frame_queue = None
 
     def get_camera_list(self,):
         """!@brief Connected camera discovery
@@ -59,11 +60,11 @@ class Camera:
             self.disconnect_harvester()
             self.vendor = 'Allied Vision Technologies'
             #add code transforming harvester camera index to Vimba
-            self.active_camera = selected_device_TMP
+            self.active_camera = device_index
         else:
-            self.active_camera = selected_device
+            self.active_camera = device_index
             self.vendor = 'Other'
-            self.cam = self.h.create_image_acquirer(selected_device)
+            self.cam = self.h.create_image_acquirer(device_index)
     
     def get_single_frame(self,):
         """!@brief grab single frame from camera
@@ -190,16 +191,14 @@ class Camera:
                 with cams[self.active_camera] as cam:
                     cam.save_settings(save_path + file_name + '.xml', PersistType.All)
     
-    def start_acquisition(self,frame_queue):
+    def start_acquisition(self,):
         """!@brief Starts continuous acquisition of image frames
         @details Creates a threading object for the right API and starts frame 
             acquisition in that thread (producer thread)
-        @param[in] frame_queue A queue in which the frames will be stored
         """
         print('I am in')
         #create threading object for vimba, harvester or future api and start the thread
         if not self.acquisition_running:
-            self.frame_queue = frame_queue
             self._stream_stop_switch = threading.Event()
             self._frame_producer_thread = threading.Thread(target=self._frame_producer)
             self._frame_producer_thread.start()
@@ -217,7 +216,6 @@ class Camera:
             self._stream_stop_switch.set()
             #this stops producer thread
             self.acquisition_running = False
-            self.frame_queue = None
     
     def _frame_producer(self):
         """!@brief Gets frames from camera while continuous acquisition is active
@@ -239,14 +237,14 @@ class Camera:
     def __frame_handler(self,cam ,frame):
         """!@brief Defines how to process incoming frames
         @details Currently is defined for Vimba and defines how to acquire
-            whole frame and put into the frame_queu
+            whole frame and put into the frame_queue
         @todo implement for harvesters and define interface for APIs to come
         """
         try:
             if frame.get_status() == FrameStatus.Complete:
-                if not self.frame_queue.full():
+                if not frame_queue.full():
                     frame_copy = copy.deepcopy(frame)
-                    self.frame_queue.put_nowait(frame_copy.as_opencv_image())
+                    frame_queue.put_nowait(frame_copy.as_opencv_image())
                     #Saving only image data, metadata are lost - is it a problem?
             cam.queue_frame(frame)
         except:
@@ -264,22 +262,21 @@ class Camera:
         num = 0
         extension = '.png'
         while self.acquisition_running:
-            if not self.frame_queue.empty(): 
-                frame = self.frame_queue.get_nowait()
+            if not frame_queue.empty(): 
+                frame = frame_queue.get_nowait()
                 cv2.imwrite(file_path + str(num) + extension, frame)
                 #because th __frame_handler saves only image data, I can save frame directly here without conversions
 #use rather os.path.join method
                 num += 1
         
         
-    def start_recording(self,file_path,configuration,frame_queue):
+    def start_recording(self,file_path,configuration,):
         """!@brief Starts continuous acquisition of image frames and saves them to files/video
         @details Calls start_acquisition method and configures camera parameters for optimal acquisition
         @param[in] file_path path where the files will be saved
         @param[in] configuration parameters of output files and possibly camera parameters
-        @param[in] frame_queue object to store acquired frames in
         """
-        self.start_acquisition(frame_queue)
+        self.start_acquisition()
         self._frame_consumer_thread = threading.Thread(target=self._frame_consumer, args=(file_path,configuration))
         self._frame_consumer_thread.start()
         self.is_recording = True
@@ -289,7 +286,6 @@ class Camera:
         @details Calls start_acquisition method and configures camera parameters for optimal acquisition
         @param[in] file_path path where the files will be saved
         @param[in] configuration parameters of output files and possibly camera parameters
-        @param[in] frame_queue object to store acquired frames in
         """
         self.stop_acquisition()
         self.is_recording = False

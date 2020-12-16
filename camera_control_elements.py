@@ -41,17 +41,6 @@ class PlayPause(Button):
     def _live_preview(self):
         #method name is a subject to change
         cam_img = App.get_running_app().root.ids.camera_image
-        
-        cap = cv2.VideoCapture("./test.mp4")
-        x = 0
-        while x < 600:
-            if cap.grab():
-                flag, frame = cap.retrieve()
-                frame_queue.put_nowait(frame)
-                if not flag:
-                    continue
-            x += 1
-        
         print(frame_queue.qsize())
         
         preview = Clock.schedule_interval(cam_img.draw, 1/60)
