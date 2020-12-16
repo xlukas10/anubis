@@ -311,13 +311,13 @@ class Camera:
 
 #---------------------------------------------------------------------------
 '''
-kamera = Camera('C:/Programy/Allied Vision/Vimba_4.0/VimbaGigETL/Bin/Win64/VimbaGigETL.cti')
+kamera = Camera('C:/Programy/Allied Vision/Vimba_4.0/VimbaUSBETL/Bin/Win64/VimbaUSBTL.cti')
 l = kamera.get_camera_list()
 print(l)
 
 kamera.select_camera(0)
 p = kamera.get_parameters()
-kamera.set_parameter(p['GVSPPacketSize'],1500)
+#kamera.set_parameter(p['GVSPPacketSize'],1500)
 print(kamera.get_single_frame())
 
 
@@ -355,5 +355,4 @@ time.sleep(10)
 kamera.stop_recording()
 
 kamera.save_parameters('c:/Users/Jakub Lukaszczyk/Documents/', 'konfigurace1')
-
 '''

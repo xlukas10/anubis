@@ -26,6 +26,8 @@ import tabs as tb
 import camera_control_elements
 from global_objects import frame_queue
 
+import time #TESTING
+
 import cv2
 
 class MainMenu(BoxLayout):
@@ -55,15 +57,21 @@ class CameraImage(Image):
         # Frame is converted to texture, so it fits app window regardless of camera's resolution
         try:
             frame = frame_queue.get_nowait()
+            print('zde')
+            #print(frame_queue.queue)
             frame_flip = cv2.flip(frame, 0) # converts frame to a format expected by blit_buffer method
+            print('Tady')
             frame_1D = frame_flip.tostring()
-            frame_texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
+            print('Tu')
+            frame_texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='rgb')
+            print('Hallo')
             frame_texture.blit_buffer(frame_1D, colorfmt='bgr', bufferfmt='ubyte')
             print('test')
             # show image
             #with self.canvas: 
              #   Rectangle(texture=frame_texture, pos=self.pos, size=self.size)
             self.texture = frame_texture
+            time.wait(10)
         except:
             print('kde nic tu nic')
             pass
