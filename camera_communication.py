@@ -56,6 +56,9 @@ class Camera:
         @param[in] selected_device ID of a camera you want to connect to
         """
         device_index = self.__translate_selected_device(selected_device)
+        """
+        @bug We are trying to test vendor based on index for different vendor, also __translate_selected_device expect vendor to be set but it isnt
+        """
         if(self.h.device_info_list[device_index].vendor == 'Allied Vision Technologies'):
             self.disconnect_harvester()
             self.vendor = 'Allied Vision Technologies'
@@ -223,6 +226,7 @@ class Camera:
             in a frame queue for consumer thread to process. The thread runs until stream_stop_switch is set
         @todo implement for harvesters and define interface for APIs to come
         """
+#implement if vendor mechanism
         with Vimba.get_instance() as vimba:
             cams = vimba.get_all_cameras()
             with cams[self.active_camera] as c:
