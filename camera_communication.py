@@ -55,19 +55,20 @@ class Camera:
         @details Select camera you will be using and set Camera object accordingly
         @param[in] selected_device ID of a camera you want to connect to
         """
-        device_index = self.__translate_selected_device(selected_device)
-        """
-        @bug We are trying to test vendor based on index for different vendor, also __translate_selected_device expect vendor to be set but it isnt
-        """
-        if(self.h.device_info_list[device_index].vendor == 'Allied Vision Technologies'):
+        
+        #translate selected device to index in harvester's device info list
+        for index, camera in enumerate(h.device_info_list):
+                if camera.id_ == selected_device:
+                    harvester_index = index
+                    break
+        if(self.h.device_info_list[harvester_index].vendor == 'Allied Vision Technologies'):
             self.disconnect_harvester()
             self.vendor = 'Allied Vision Technologies'
-            #add code transforming harvester camera index to Vimba
-            self.active_camera = device_index
+            self.active_camera = self.__translate_selected_device(selected_device)
         else:
-            self.active_camera = device_index
+            self.active_camera = harvester_index
             self.vendor = 'Other'
-            self.cam = self.h.create_image_acquirer(device_index)
+            self.cam = self.h.create_image_acquirer(harvester_index)
     
     def get_single_frame(self,):
         """!@brief grab single frame from camera
@@ -244,6 +245,7 @@ class Camera:
             whole frame and put into the frame_queue
         @todo implement for harvesters and define interface for APIs to come
         """
+#maybe rename to __rame_handler_vimba
         try:
             if frame.get_status() == FrameStatus.Complete:
                 if not frame_queue.full():
