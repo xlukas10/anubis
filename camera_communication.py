@@ -14,7 +14,7 @@ import os #for working with save path
 
 import time#tmp for testing purposes
 
-from global_objects import frame_queue
+#from global_objects import frame_queue
 
 class Camera:
     def __init__(self, producer_path = 'ZDE VLOZIT DEFAULTNI CESTU'):
@@ -43,7 +43,7 @@ class Camera:
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras()
                 for index, camera in enumerate(cams):
-                    if camera.id_ == selected_device:
+                    if camera.get_id() == selected_device:
                         return index#Test this if it works right probably different name for id than id_
         else:
             for index, camera in enumerate(h.device_info_list):
@@ -57,7 +57,7 @@ class Camera:
         """
         
         #translate selected device to index in harvester's device info list
-        for index, camera in enumerate(h.device_info_list):
+        for index, camera in enumerate(self.h.device_info_list):
                 if camera.id_ == selected_device:
                     harvester_index = index
                     break
