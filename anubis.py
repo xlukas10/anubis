@@ -5,13 +5,13 @@ Created on Mon Oct 19 09:08:58 2020
 @author: Jakub Lukaszczyk
 """
 
-from kivy.app import App
-from kivy.core.window import Window
+import sys
+from PyQt5 import QtGui, QtCore, QtWidgets
 #importing controls defined for controlling the camera.
 #used in the .kv file
 
 
-import kivy_elements
+from gui_elements import CameraImage
 import threading
 #from harvesters import Harvester
 
@@ -56,14 +56,23 @@ import threading
 
 #set maximum size defined by user (So the app does not eat all of the ram)
 
-class AnubisApp(App):
-    def build(self):
-        return kivy_elements.MainLayout()
+class Window(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(Window,self).__init__()
+        self.setGeometry(50, 50, 800,450)
+        self.setWindowTitle('Anubis')
+        self.layout()
+        self.show()
+        
+    def layout(self):
+        preview = CameraImage()
+        self.show()
 
-Window.size = (800, 450)
-Window.minimum_width, Window.minimum_height = Window.size
+
 
 if __name__ == '__main__':
-    AnubisApp().run()
+    anubis_app = QtWidgets.QApplication(sys.argv)
+    gui = Window()
+    sys.exit(anubis_app.exec_())
     
     

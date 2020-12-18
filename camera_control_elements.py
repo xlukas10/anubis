@@ -4,32 +4,31 @@ Created on Thu Oct 22 07:09:54 2020
 
 @author: Jakub Lukaszczyk
 """
-from kivy.uix.button import Button
-from global_objects import cam
-from global_objects import frame_queue
-from kivy.app import App
-from kivy.clock import Clock
+from PyQt5 import QtWidgets
 
-import kivy_elements
+from global_camera import cam
+from global_queue import frame_queue
+
+
+import gui_elements
 import threading
 import cv2
 
 import time #testing only
 
-class PlayPause(Button):
-    def __init__(self, **kwargs):
-        super(PlayPause, self).__init__(**kwargs)
+class PlayPause(QtWidgets.QPushButton):
+    def __init__(self):
+        super(PlayPause, self).__init__()
         self.acquisition_running = False
+        self.clicked.connect(self.on_press)
     
     def on_press(self):
-        super(PlayPause, self).on_press()
         print('Here')
-        if False:#self.acquisition_running:
+        if self.acquisition_running:
             cam.stop_acquisition()
             self.acquisition_running = False
-            pass
         else:
-            #cam.start_acquisition(frame_queue)
+            cam.start_acquisition()
             self._frame_preview_thread = threading.Thread(target=self._live_preview)
             self._frame_preview_thread.start()
             self.acquisition_running = True
@@ -45,36 +44,42 @@ class PlayPause(Button):
         
         preview = Clock.schedule_interval(cam_img.draw, 1/60)
         print('preview started')
-        time.sleep(5)
-        #cam._stream_stop_switch.wait()
+        cam._stream_stop_switch.wait()
         preview.cancel()
         print('preview stopped')
     
 
-class ZoomIn(Button):
-    def __init__(self, **kwargs):
-        super(ZoomIn, self).__init__(**kwargs)
+class Record(QtWidgets.QPushButton):
+    def __init__(self):
+        super(Record, self).__init__()
+        self.recording_running = False
+        self.clicked.connect(self.on_press)
     
-    #def on_touchdown 
-    #function to zoom image in by lets say 15%
+    def on_press(self):
+        if self.recording_running:
+            cam.stop_recording()
+            self.recording_running = False
+        else:
+            cam.start_recording('C:/Users/Jakub Lukaszczyk/Documents/Test/','nic')
+            self.recording_running = True
 
-class ZoomOut(Button):
-    def __init__(self, **kwargs):
-        super(ZoomOut, self).__init__(**kwargs)
+class ZoomOut(QtWidgets.QPushButton):
+    def __init__(self):
+        super(ZoomOut, self).__init__()
     
     #def on_touchdown 
     #function to zoom image out by lets say 15%
 
-class ZoomFit(Button):
-    def __init__(self, **kwargs):
-        super(ZoomFit, self).__init__(**kwargs)
+class ZoomFit(QtWidgets.QPushButton):
+    def __init__(self):
+        super(ZoomFit, self).__init__()
     
     #def on_touchdown 
     #function to fit camera image to image window
 
-class Zoom100(Button):
-    def __init__(self, **kwargs):
-        super(Zoom100, self).__init__(**kwargs)
+class Zoom100(QtWidgets.QPushButton):
+    def __init__(self):
+        super(Zoom100, self).__init__()
     
     #def on_touchdown 
     #function to show camera image pixel ratio 1:1

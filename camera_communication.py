@@ -14,7 +14,7 @@ import os #for working with save path
 
 import time#tmp for testing purposes
 
-#from global_objects import frame_queue
+from global_queue import frame_queue
 
 class Camera:
     def __init__(self, producer_path = 'ZDE VLOZIT DEFAULTNI CESTU'):
@@ -228,6 +228,7 @@ class Camera:
         @todo implement for harvesters and define interface for APIs to come
         """
 #implement if vendor mechanism
+        print("frame producer thread")
         with Vimba.get_instance() as vimba:
             cams = vimba.get_all_cameras()
             with cams[self.active_camera] as c:
@@ -246,12 +247,19 @@ class Camera:
         @todo implement for harvesters and define interface for APIs to come
         """
 #maybe rename to __rame_handler_vimba
+        print("rame handler")
         try:
-            if frame.get_status() == FrameStatus.Complete:
-                if not frame_queue.full():
-                    frame_copy = copy.deepcopy(frame)
-                    frame_queue.put_nowait(frame_copy.as_opencv_image())
-                    #Saving only image data, metadata are lost - is it a problem?
+            #if frame.get_status() == FrameStatus.Complete:
+            if not frame_queue.full():
+                frame_copy = copy.deepcopy(frame)
+                print("trying to insert to the queue")
+                frame_queue.put_nowait(frame_copy.as_opencv_image())
+                print('In queue success')
+                #Saving only image data, metadata are lost - is it a problem?
+            else:
+                print("queue full")
+            #else:
+            #    print("frame not complete")
             cam.queue_frame(frame)
         except:
             print("comething went terribly wrong and I have no idea what")
@@ -283,6 +291,7 @@ class Camera:
         @param[in] configuration parameters of output files and possibly camera parameters
         """
         self.start_acquisition()
+        print("recording method")
         self._frame_consumer_thread = threading.Thread(target=self._frame_consumer, args=(file_path,configuration))
         self._frame_consumer_thread.start()
         self.is_recording = True
