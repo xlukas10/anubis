@@ -184,12 +184,12 @@ class Camera:
         else:
             pass
     
-    def load_parameters(self):
+    def load_config(self,path):
         """@brief load existing camera configuration
         """
         pass
     
-    def save_parameters(self,save_path, file_name):
+    def save_config(self,path, file_name):
         """!@brief saves configuration of a camera to .xml file
         @param[in] save_path A path where the file will be saved
         @todo what will happen if a file already exists
@@ -198,7 +198,7 @@ class Camera:
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras ()
                 with cams[self.active_camera] as cam:
-                    cam.save_settings(save_path + file_name + '.xml', PersistType.All)
+                    cam.save_settings(path + file_name + '.xml', PersistType.All)
     
     def start_acquisition(self,):
         """!@brief Starts continuous acquisition of image frames
@@ -310,9 +310,6 @@ class Camera:
         self.stop_acquisition()
         self.is_recording = False
     
-    def configure_recording(self,path):
-#to-do image format, extension, fps...
-        pass
     
     def set_gentl_producer(self,producer_path):
         """!@brief Add a new frame producer to the harvester object
