@@ -184,6 +184,11 @@ class Camera:
         else:
             pass
     
+    def load_parameters(self):
+        """@brief load existing camera configuration
+        """
+        pass
+    
     def save_parameters(self,save_path, file_name):
         """!@brief saves configuration of a camera to .xml file
         @param[in] save_path A path where the file will be saved
@@ -331,6 +336,9 @@ class Camera:
         """!@brief Destroys harvester object so other APIs can access cameras
         """
         self.h.reset()
+        
+    def disconnect_camera(self):
+        self.__init__()
         
 
 #---------------------------------------------------------------------------
