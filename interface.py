@@ -7,6 +7,8 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import global_camera
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -14,49 +16,76 @@ class Ui_MainWindow(object):
         MainWindow.resize(1005, 610)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+        
+        #Definition of basic layout
+        #----------------------------------------------------------------
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
+        
         self.widget_camera_control_preview = QtWidgets.QWidget(self.centralwidget)
         self.widget_camera_control_preview.setObjectName("widget_camera_control_preview")
+        
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.widget_camera_control_preview)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
+        
+        #Window with camera preview
+        #-------------------------------------------------------------------
         self.camera_preview = QtWidgets.QGraphicsView(self.widget_camera_control_preview)
         self.camera_preview.setObjectName("camera_preview")
+        
         self.verticalLayout_2.addWidget(self.camera_preview)
+        
+        #Definition of buttons to control camera (bottom right)
+        #-------------------------------------------------------------------
         self.widget_controls = QtWidgets.QWidget(self.widget_camera_control_preview)
         self.widget_controls.setObjectName("widget_controls")
+        
         self.gridLayout_4 = QtWidgets.QGridLayout(self.widget_controls)
         self.gridLayout_4.setObjectName("gridLayout_4")
+        
         self.btn_define_roi = QtWidgets.QPushButton(self.widget_controls)
         self.btn_define_roi.setObjectName("btn_define_roi")
         self.gridLayout_4.addWidget(self.btn_define_roi, 1, 3, 1, 1)
+        
         self.btn_start_recording = QtWidgets.QPushButton(self.widget_controls)
         self.btn_start_recording.setObjectName("btn_start_recording")
         self.gridLayout_4.addWidget(self.btn_start_recording, 0, 2, 1, 1)
+        
         self.btn_start_preview = QtWidgets.QPushButton(self.widget_controls)
         self.btn_start_preview.setObjectName("btn_start_preview")
         self.gridLayout_4.addWidget(self.btn_start_preview, 0, 0, 1, 1)
+        
         self.btn_single_frame = QtWidgets.QPushButton(self.widget_controls)
         self.btn_single_frame.setObjectName("btn_single_frame")
         self.gridLayout_4.addWidget(self.btn_single_frame, 1, 0, 1, 1)
+        
         self.btn_zoom_in = QtWidgets.QPushButton(self.widget_controls)
         self.btn_zoom_in.setObjectName("btn_zoom_in")
         self.gridLayout_4.addWidget(self.btn_zoom_in, 1, 1, 1, 1)
+        
         self.btn_zoom_out = QtWidgets.QPushButton(self.widget_controls)
         self.btn_zoom_out.setObjectName("btn_zoom_out")
         self.gridLayout_4.addWidget(self.btn_zoom_out, 1, 2, 1, 1)
+        
         self.btn_stop_recording = QtWidgets.QPushButton(self.widget_controls)
         self.btn_stop_recording.setObjectName("btn_stop_recording")
         self.gridLayout_4.addWidget(self.btn_stop_recording, 0, 3, 1, 1)
+        
         self.btn_stop_preview = QtWidgets.QPushButton(self.widget_controls)
         self.btn_stop_preview.setObjectName("btn_stop_preview")
         self.gridLayout_4.addWidget(self.btn_stop_preview, 0, 1, 1, 1)
+        
         self.verticalLayout_2.addWidget(self.widget_controls)
         self.gridLayout.addWidget(self.widget_camera_control_preview, 0, 2, 1, 1)
+        
+        #Definition of all the tabs on the left side of the UI
+        #--------------------------------------------------------------------
         self.tabs = QtWidgets.QTabWidget(self.centralwidget)
         self.tabs.setAccessibleName("")
         self.tabs.setAccessibleDescription("")
         self.tabs.setObjectName("tabs")
+        
+        #Tab - Connect camera
         self.tab_connect = QtWidgets.QWidget()
         self.tab_connect.setObjectName("tab_connect")
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.tab_connect)
@@ -83,6 +112,8 @@ class Ui_MainWindow(object):
         self.tip_add_cti.setObjectName("tip_add_cti")
         self.verticalLayout_4.addWidget(self.tip_add_cti)
         self.tabs.addTab(self.tab_connect, "")
+        
+        #Tab - Configure camera
         self.tab_config = QtWidgets.QWidget()
         self.tab_config.setObjectName("tab_config")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.tab_config)
@@ -122,6 +153,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.btn_load_config)
         self.verticalLayout_3.addWidget(self.widget_3)
         self.tabs.addTab(self.tab_config, "")
+        
+        #Tab - Configure recording
         self.tab_recording_config = QtWidgets.QWidget()
         self.tab_recording_config.setObjectName("tab_recording_config")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.tab_recording_config)
@@ -174,43 +207,68 @@ class Ui_MainWindow(object):
         self.btn_reset_sequence_settings.setObjectName("btn_reset_sequence_settings")
         self.verticalLayout.addWidget(self.btn_reset_sequence_settings)
         self.tabs.addTab(self.tab_recording_config, "")
+        
+        #Tab - Keras/Tensorflow/Learning,Classification
         self.tab_tensorflow = QtWidgets.QWidget()
         self.tab_tensorflow.setObjectName("tab_tensorflow")
         self.radioButton = QtWidgets.QRadioButton(self.tab_tensorflow)
         self.radioButton.setGeometry(QtCore.QRect(130, 190, 95, 20))
         self.radioButton.setObjectName("radioButton")
         self.tabs.addTab(self.tab_tensorflow, "")
+        
+        
         self.gridLayout.addWidget(self.tabs, 0, 0, 2, 1)
+        
+        #Menubar buttons
+        #-------------------------------------------------------------------
         MainWindow.setCentralWidget(self.centralwidget)
+        
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1005, 26))
         self.menubar.setObjectName("menubar")
+        
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
+        
         self.menuOptions = QtWidgets.QMenu(self.menubar)
         self.menuOptions.setObjectName("menuOptions")
+        
         self.menuHelp = QtWidgets.QMenu(self.menubar)
         self.menuHelp.setObjectName("menuHelp")
+        
         MainWindow.setMenuBar(self.menubar)
+        
+        #Define statusbar
+        #------------------------------------------------
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        
+        #Adding individual items to menus in menubar
+        #-------------------------------------------------------------
         self.actionAdd_Remove_cti_file = QtWidgets.QAction(MainWindow)
         self.actionAdd_Remove_cti_file.setObjectName("actionAdd_Remove_cti_file")
+        
         self.actionOpen_Help = QtWidgets.QAction(MainWindow)
         self.actionOpen_Help.setObjectName("actionOpen_Help")
+        
         self.actionRemove_cti_file = QtWidgets.QAction(MainWindow)
         self.actionRemove_cti_file.setObjectName("actionRemove_cti_file")
+        
         self.actionSave_frame = QtWidgets.QAction(MainWindow)
         self.actionSave_frame.setObjectName("actionSave_frame")
+        
         self.menuFile.addAction(self.actionSave_frame)
         self.menuOptions.addAction(self.actionAdd_Remove_cti_file)
         self.menuOptions.addAction(self.actionRemove_cti_file)
         self.menuHelp.addAction(self.actionOpen_Help)
+        
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuOptions.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
-
+        
+        
+        #--------------------------------------------------------------
         self.retranslateUi(MainWindow)
         self.tabs.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
