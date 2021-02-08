@@ -1,5 +1,7 @@
 harvesters >= 1.2.8
 genicam >= 1.0.0
-kivy >= 1.11.1
+#kivy >= 1.11.1
+#No longer
+pyQt5 >= 12.8.1 #Check if correct
 OpenCV
 Vimba

@@ -56,6 +56,8 @@ import threading
 
 #set maximum size defined by user (So the app does not eat all of the ram)
 
+
+'''
 class Window(QtWidgets.QMainWindow):
     def __init__(self):
         super(Window,self).__init__()
@@ -67,12 +69,13 @@ class Window(QtWidgets.QMainWindow):
     def layout(self):
         preview = CameraImage()
         self.show()
+'''
 
 
-
+'''
 if __name__ == '__main__':
     anubis_app = QtWidgets.QApplication(sys.argv)
     gui = Window()
     sys.exit(anubis_app.exec_())
-    
+    '''
     

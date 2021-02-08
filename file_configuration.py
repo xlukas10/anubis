@@ -1,3 +1,4 @@
+# this will be only a text file with settings
 
 class File:
     def set_configuration_path():
