@@ -256,12 +256,4 @@ class Ui_MainWindow(object):
         self.actionSave_frame.setText(_translate("MainWindow", "Save frame"))
 
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
 

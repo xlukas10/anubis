@@ -5,15 +5,21 @@ Created on Mon Oct 19 09:08:58 2020
 @author: Jakub Lukaszczyk
 """
 
-import sys
-from PyQt5 import QtGui, QtCore, QtWidgets
-#importing controls defined for controlling the camera.
-#used in the .kv file
 
-
-from gui_elements import CameraImage
+from PyQt5 import QtWidgets
 import threading
-#from harvesters import Harvester
+from interface import Ui_MainWindow
+
+#Start the app. UI is defined in interface.py
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
+
 
 #Determine if there is a config file present and read it.
 #If the config file is not found a new one is made
@@ -55,27 +61,3 @@ import threading
 #maybe language settings
 
 #set maximum size defined by user (So the app does not eat all of the ram)
-
-
-'''
-class Window(QtWidgets.QMainWindow):
-    def __init__(self):
-        super(Window,self).__init__()
-        self.setGeometry(50, 50, 800,450)
-        self.setWindowTitle('Anubis')
-        self.layout()
-        self.show()
-        
-    def layout(self):
-        preview = CameraImage()
-        self.show()
-'''
-
-
-'''
-if __name__ == '__main__':
-    anubis_app = QtWidgets.QApplication(sys.argv)
-    gui = Window()
-    sys.exit(anubis_app.exec_())
-    '''
-    
