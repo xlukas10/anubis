@@ -23,15 +23,27 @@ class Camera:
         self.vendor = 'Other'
         self.is_recording = False
         self.acquisition_running = False
-
+        self.devices_info = []
+        self.paths = [producer_path]
+        
     def get_camera_list(self,):
         """!@brief Connected camera discovery
         @details Uses Harvester object to discover all connected cameras
         @return List of Dictionaries cantaining informations about cameras
         @todo WHAT IS THE DICTIONARY FORMAT?
         """
+        if not self.vendor == 'Other':
+            self.set_gentl_producer(self.paths[0])
         self.h.update()
-        return self.h.device_info_list
+        self.devices_info = []
+        for device in self.h.device_info_list:
+            d = {'id_': device.id_,
+                 'model': device.model,
+                 'vendor': device.vendor}
+            self.devices_info.append(d)
+        if not self.vendor == 'Other':
+            self.disconnect_harvester()
+        return self.devices_info #["ahoj","jak","se","mas","?"]#
     
     def __translate_selected_device(self, selected_device):
         """!@brief Translates camera ID to index in a list of detected cameras
@@ -55,10 +67,15 @@ class Camera:
         @details Select camera you will be using and set Camera object accordingly
         @param[in] selected_device ID of a camera you want to connect to
         """
+        print("done")
         
+        if not self.vendor == 'Other':
+            self.set_gentl_producer(self.paths[0])
+            self.h.update()
+            print("here")
         #translate selected device to index in harvester's device info list
-        for index, camera in enumerate(self.h.device_info_list):
-                if camera.id_ == selected_device:
+        for index, camera in enumerate(self.devices_info):
+                if camera['id_'] == selected_device:
                     harvester_index = index
                     break
         if(self.h.device_info_list[harvester_index].vendor == 'Allied Vision Technologies'):
@@ -332,7 +349,7 @@ class Camera:
         
 
 #---------------------------------------------------------------------------
-
+'''
 kamera = Camera('C:/Programy/Allied Vision/Vimba_4.0/VimbaGigETL/Bin/Win64/VimbaGigETL.cti')
 l = kamera.get_camera_list()
 print(l)
@@ -377,4 +394,4 @@ time.sleep(10)
 kamera.stop_recording()
 
 kamera.save_config('c:/Users/Jakub Lukaszczyk/Documents/', 'konfigurace1')
-
+'''
