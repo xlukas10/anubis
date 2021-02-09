@@ -19,6 +19,8 @@ class Ui_MainWindow(object):
         """
         self.detected = []
         
+        self.recording = False
+        
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1005, 610)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -29,22 +31,22 @@ class Ui_MainWindow(object):
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
         
-        self.widget_camera_control_preview = QtWidgets.QWidget(self.centralwidget)
-        self.widget_camera_control_preview.setObjectName("widget_camera_control_preview")
+        self.preview_and_control = QtWidgets.QWidget(self.centralwidget)
+        self.preview_and_control.setObjectName("preview_and_control")
         
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.widget_camera_control_preview)
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.preview_and_control)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         
         #Window with camera preview
         #-------------------------------------------------------------------
-        self.camera_preview = QtWidgets.QGraphicsView(self.widget_camera_control_preview)
+        self.camera_preview = QtWidgets.QGraphicsView(self.preview_and_control)
         self.camera_preview.setObjectName("camera_preview")
         
         self.verticalLayout_2.addWidget(self.camera_preview)
         
         #Definition of buttons to control camera (bottom right)
         #-------------------------------------------------------------------
-        self.widget_controls = QtWidgets.QWidget(self.widget_camera_control_preview)
+        self.widget_controls = QtWidgets.QWidget(self.preview_and_control)
         self.widget_controls.setObjectName("widget_controls")
         
         self.gridLayout_4 = QtWidgets.QGridLayout(self.widget_controls)
@@ -53,14 +55,6 @@ class Ui_MainWindow(object):
         self.btn_define_roi = QtWidgets.QPushButton(self.widget_controls)
         self.btn_define_roi.setObjectName("btn_define_roi")
         self.gridLayout_4.addWidget(self.btn_define_roi, 1, 3, 1, 1)
-        
-        self.btn_start_recording = QtWidgets.QPushButton(self.widget_controls)
-        self.btn_start_recording.setObjectName("btn_start_recording")
-        self.gridLayout_4.addWidget(self.btn_start_recording, 0, 2, 1, 1)
-        
-        self.btn_start_preview = QtWidgets.QPushButton(self.widget_controls)
-        self.btn_start_preview.setObjectName("btn_start_preview")
-        self.gridLayout_4.addWidget(self.btn_start_preview, 0, 0, 1, 1)
         
         self.btn_single_frame = QtWidgets.QPushButton(self.widget_controls)
         self.btn_single_frame.setObjectName("btn_single_frame")
@@ -74,16 +68,17 @@ class Ui_MainWindow(object):
         self.btn_zoom_out.setObjectName("btn_zoom_out")
         self.gridLayout_4.addWidget(self.btn_zoom_out, 1, 2, 1, 1)
         
-        self.btn_stop_recording = QtWidgets.QPushButton(self.widget_controls)
-        self.btn_stop_recording.setObjectName("btn_stop_recording")
-        self.gridLayout_4.addWidget(self.btn_stop_recording, 0, 3, 1, 1)
+        self.btn_start_preview = QtWidgets.QPushButton(self.widget_controls)
+        self.btn_start_preview.setObjectName("btn_start_preview")
+        self.gridLayout_4.addWidget(self.btn_start_preview, 0, 0, 1, 2)
         
-        self.btn_stop_preview = QtWidgets.QPushButton(self.widget_controls)
-        self.btn_stop_preview.setObjectName("btn_stop_preview")
-        self.gridLayout_4.addWidget(self.btn_stop_preview, 0, 1, 1, 1)
+        self.btn_start_recording = QtWidgets.QPushButton(self.widget_controls)
+        self.btn_start_recording.setObjectName("btn_start_recording")
+        self.btn_start_recording.clicked.connect(self.record)
+        self.gridLayout_4.addWidget(self.btn_start_recording, 0, 2, 1, 2)
         
         self.verticalLayout_2.addWidget(self.widget_controls)
-        self.gridLayout.addWidget(self.widget_camera_control_preview, 0, 2, 1, 1)
+        self.gridLayout.addWidget(self.preview_and_control, 0, 2, 1, 1)
         
         #Definition of all the tabs on the left side of the UI
         #--------------------------------------------------------------------
@@ -299,13 +294,11 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.btn_define_roi.setText(_translate("MainWindow", "Define ROI"))
-        self.btn_start_recording.setText(_translate("MainWindow", "Start recording"))
-        self.btn_start_preview.setText(_translate("MainWindow", "Start preview"))
+        self.btn_start_recording.setText(_translate("MainWindow", "Start/Stop recording"))
+        self.btn_start_preview.setText(_translate("MainWindow", "Start/Stop preview"))
         self.btn_single_frame.setText(_translate("MainWindow", "Single frame"))
         self.btn_zoom_in.setText(_translate("MainWindow", "Zoom In"))
         self.btn_zoom_out.setText(_translate("MainWindow", "Zoom Out"))
-        self.btn_stop_recording.setText(_translate("MainWindow", "Stop recording"))
-        self.btn_stop_preview.setText(_translate("MainWindow", "Stop preview"))
         self.btn_connect_camera.setText(_translate("MainWindow", "Connect"))
         self.btn_refresh_cameras.setText(_translate("MainWindow", "Refresh"))
         self.btn_disconnect_camera.setText(_translate("MainWindow", "Disconnect"))
@@ -360,5 +353,13 @@ class Ui_MainWindow(object):
         cam.select_camera(self.detected[index]['id_'])
         #exception for nothing selected
         
-
+    def record(self):
+        
+        #add reading of path from config
+        if(not self.recording):
+            cam.start_recording('C:/Users/Jakub Lukaszczyk/Documents/','nic')
+        else:
+            cam.stop_recording()
+        
+        self.recording = not self.recording
 

@@ -291,6 +291,7 @@ class Camera:
         """
         num = 0
         extension = '.png'
+        print("consuming")
         while self.acquisition_running:
             if not frame_queue.empty(): 
                 frame = frame_queue.get_nowait()
@@ -306,6 +307,7 @@ class Camera:
         @param[in] file_path path where the files will be saved
         @param[in] configuration parameters of output files and possibly camera parameters
         """
+        print("starting")
         self.start_acquisition()
         self._frame_consumer_thread = threading.Thread(target=self._frame_consumer, args=(file_path,configuration))
         self._frame_consumer_thread.start()
