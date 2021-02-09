@@ -6,7 +6,7 @@ Created on Wed Dec  9 21:17:17 2020
 """
 
 #will be neccessary?
-from camera_communication import Camera
+from camera import Camera
 
 
 #Change location to be read from settings file!!!
