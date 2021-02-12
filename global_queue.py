@@ -10,3 +10,5 @@ Created on Fri Dec 18 16:04:14 2020
 from queue import Queue
 
 frame_queue = Queue()
+
+active_frame_queue = Queue()

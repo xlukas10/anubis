@@ -7,8 +7,15 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from global_camera import cam
+import threading
+import time
+import win32api #determine refresh rate
 
+#tmp 
+import cv2
+
+from global_camera import cam
+from global_queue import active_frame_queue
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -39,9 +46,13 @@ class Ui_MainWindow(object):
         
         #Window with camera preview
         #-------------------------------------------------------------------
-        self.camera_preview = QtWidgets.QGraphicsView(self.preview_and_control)
+        self.camera_preview = QtWidgets.QLabel(self.preview_and_control)
+        self.camera_preview.setAutoFillBackground(False)
+        self.camera_preview.setText("")
+        self.camera_preview.setPixmap(QtGui.QPixmap("default_preview.png"))
+        self.camera_preview.setScaledContents(True)
+        self.camera_preview.setIndent(-1)
         self.camera_preview.setObjectName("camera_preview")
-        
         self.verticalLayout_2.addWidget(self.camera_preview)
         
         #Definition of buttons to control camera (bottom right)
@@ -351,15 +362,74 @@ class Ui_MainWindow(object):
         @param[in] index index of selected camera in the list
         """
         cam.select_camera(self.detected[index]['id_'])
+        p = cam.get_parameters()
+        cam.set_parameter(p['GVSPPacketSize'],1500)
+        #above will be automated
         #exception for nothing selected
         
     def record(self):
-        
+        #will be also called by automatic recording
         #add reading of path from config
         if(not self.recording):
-            cam.start_recording('C:/Users/Jakub Lukaszczyk/Documents/','nic')
+            cam.start_recording('C:/Users/Jakub Lukaszczyk/Documents/Test/','nic')
+            
+            self.recording = True
+            
+            #self.preview_flag = threading.Event()#may be unused
+            self.show_preview_thread = threading.Thread(target=self.show_preview)
+            #self.show_preview()
+            self.show_preview_thread.start()
         else:
             cam.stop_recording()
+            self.recording = False
         
-        self.recording = not self.recording
+        
+    def show_preview(self):
+        
+        cam.preview_flag.wait()
+        print("waited")
+        
+        device = win32api.EnumDisplayDevices()
+        refresh_rate = win32api.EnumDisplaySettings(device.DeviceName, -1).DisplayFrequency
+        print(refresh_rate)
+        
+        while self.recording:
+            cam.preview_flag.wait()
+            if not active_frame_queue.qsize() == 0:
+                #image = active_frame_queue.queue[-1]
+                image = active_frame_queue.get_nowait()
+                
+                #with active_frame_queue.mutex:
+                while not active_frame_queue.qsize() == 0:
+                    active_frame_queue.get_nowait()
+                
+                '''
+                image = QtGui.QImage(image.data, image.shape[1], image.shape[0], QtGui.QImage.Format_RGB888).rgbSwapped()
+                #self.camera_preview.setPixmap(QtGui.QPixmap("test.png"))
+                '''
+                
+                h, w, ch = image.shape
+                bytes_per_line = ch * w
+                image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
+                '''
+                image = QtGui.QImage(image.data, image.shape[1], image.shape[0], QtGui.QImage.Format_RGB888).rgbSwapped()
+                '''
+                """
+                '''
+                h, w, ch = image.shape
+                bytes_per_line = ch * w
+                print(bytes_per_line)
+                image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
+                p = image.scaled(self.camera_preview.size().width(), self.camera_preview.size().height(), QtCore.Qt.KeepAspectRatio)
+                '''
+                """
+                image_scaled = image.scaled(self.camera_preview.size().width(), self.camera_preview.size().height(), QtCore.Qt.KeepAspectRatio)
+                self.camera_preview.setPixmap(QtGui.QPixmap.fromImage(image_scaled))
+                #self.camera_preview.setAlignment(QtCore.Qt.AlignCenter)
+                #self.camera_preview.setScaledContents(True)
+                #self.camera_preview.setMinimumSize(1,1)
+                self.camera_preview.show()
+            time.sleep(1/refresh_rate)
+            
+
 

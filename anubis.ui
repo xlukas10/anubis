@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1005</width>
-    <height>610</height>
+    <width>1249</width>
+    <height>687</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,63 +15,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="2">
-     <widget class="QWidget" name="preview_and_control" native="true">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QGraphicsView" name="camera_preview"/>
-       </item>
-       <item>
-        <widget class="QWidget" name="widget_controls" native="true">
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="3">
-           <widget class="QPushButton" name="btn_define_roi">
-            <property name="text">
-             <string>Define ROI</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QPushButton" name="btn_single_frame">
-            <property name="text">
-             <string>Single frame</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="btn_zoom_in">
-            <property name="text">
-             <string>Zoom In</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QPushButton" name="btn_zoom_out">
-            <property name="text">
-             <string>Zoom Out</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QPushButton" name="btn_start_preview">
-            <property name="text">
-             <string>Start/Stop preview</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2" colspan="2">
-           <widget class="QPushButton" name="btn_start_recording">
-            <property name="text">
-             <string>Start/Stop recording</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item row="0" column="0" rowspan="2">
      <widget class="QTabWidget" name="tabs">
       <property name="accessibleName">
@@ -320,6 +263,79 @@
       </widget>
      </widget>
     </item>
+    <item row="0" column="1">
+     <widget class="QWidget" name="preview_and_control" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="camera_preview">
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap>default_preview.png</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+         <property name="indent">
+          <number>-1</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QWidget" name="widget_controls" native="true">
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="2" colspan="2">
+        <widget class="QPushButton" name="btn_start_recording">
+         <property name="text">
+          <string>Start/Stop recording</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QPushButton" name="btn_start_preview">
+         <property name="text">
+          <string>Start/Stop preview</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QPushButton" name="btn_single_frame">
+         <property name="text">
+          <string>Single frame</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QPushButton" name="btn_zoom_in">
+         <property name="text">
+          <string>Zoom In</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QPushButton" name="btn_zoom_out">
+         <property name="text">
+          <string>Zoom Out</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <widget class="QPushButton" name="btn_define_roi">
+         <property name="text">
+          <string>Define ROI</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -327,7 +343,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1005</width>
+     <width>1249</width>
      <height>26</height>
     </rect>
    </property>

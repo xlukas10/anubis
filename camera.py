@@ -11,10 +11,12 @@ import queue
 import copy
 import cv2
 import os #for working with save path
+from PyQt5 import QtGui
 
 import time#tmp for testing purposes
 
 from global_queue import frame_queue
+from global_queue import active_frame_queue
 
 class Camera:
     def __init__(self, producer_path = 'ZDE VLOZIT DEFAULTNI CESTU'):
@@ -25,6 +27,8 @@ class Camera:
         self.acquisition_running = False
         self.devices_info = []
         self.paths = [producer_path]
+        self.preview_flag = threading.Event()
+        self.frame_completed = threading.Event()
         
     def get_camera_list(self,):
         """!@brief Connected camera discovery
@@ -233,12 +237,12 @@ class Camera:
     def stop_acquisition(self,):
         """!@brief Stops continuous acquisition
         @details Sets stream_stop_switch, acquisition running to false and removes inner link to queue object
-        @param[in] parameter A dictionary with mandatory keys name and value,
-                         other keys will be used in later versions
         """
         #stop threads created by start_acquisition
         if self.acquisition_running == True:
             self._stream_stop_switch.set()
+            self.frame_completed.clear()
+            self.preview_flag.clear()
             #this stops producer thread
             self.acquisition_running = False
     
@@ -268,9 +272,16 @@ class Camera:
         """
         try:
             #if frame.get_status() == FrameStatus.Complete:
-            if not frame_queue.full():
+            if not frame_queue.full() and frame.get_status() == FrameStatus.Complete:
+                print("TADYK")
                 frame_copy = copy.deepcopy(frame)
                 frame_queue.put_nowait(frame_copy.as_opencv_image())
+                active_frame_queue.put_nowait(frame_copy.as_opencv_image())
+                
+                print("handled")
+                self.preview_flag.set()
+                self.frame_completed.set()
+                #queue used for preview
                 #Saving only image data, metadata are lost - is it a problem?
             else:
                 print("queue full")
@@ -295,6 +306,8 @@ class Camera:
         while self.acquisition_running:
             if not frame_queue.empty(): 
                 frame = frame_queue.get_nowait()
+                
+                #tranform image to format for ui show
                 cv2.imwrite(file_path + str(num) + extension, frame)
                 #because th __frame_handler saves only image data, I can save frame directly here without conversions
 #use rather os.path.join method
