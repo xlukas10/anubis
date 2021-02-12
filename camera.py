@@ -27,8 +27,6 @@ class Camera:
         self.acquisition_running = False
         self.devices_info = []
         self.paths = [producer_path]
-        self.preview_flag = threading.Event()
-        self.frame_completed = threading.Event()
         
     def get_camera_list(self,):
         """!@brief Connected camera discovery
@@ -273,14 +271,10 @@ class Camera:
         try:
             #if frame.get_status() == FrameStatus.Complete:
             if not frame_queue.full() and frame.get_status() == FrameStatus.Complete:
-                print("TADYK")
+                
                 frame_copy = copy.deepcopy(frame)
                 frame_queue.put_nowait(frame_copy.as_opencv_image())
                 active_frame_queue.put_nowait(frame_copy.as_opencv_image())
-                
-                print("handled")
-                self.preview_flag.set()
-                self.frame_completed.set()
                 #queue used for preview
                 #Saving only image data, metadata are lost - is it a problem?
             else:

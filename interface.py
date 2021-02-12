@@ -385,8 +385,6 @@ class Ui_MainWindow(object):
         
         
     def show_preview(self):
-        
-        cam.preview_flag.wait()
         print("waited")
         
         device = win32api.EnumDisplayDevices()
@@ -394,7 +392,6 @@ class Ui_MainWindow(object):
         print(refresh_rate)
         
         while self.recording:
-            cam.preview_flag.wait()
             if not active_frame_queue.qsize() == 0:
                 #image = active_frame_queue.queue[-1]
                 image = active_frame_queue.get_nowait()
