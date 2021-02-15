@@ -27,6 +27,8 @@ class Camera:
         self.acquisition_running = False
         self.devices_info = []
         self.paths = [producer_path]
+        self.active_camera = 0
+        self.ia = None #image acquifier
         
     def get_camera_list(self,):
         """!@brief Connected camera discovery
@@ -87,7 +89,7 @@ class Camera:
         else:
             self.active_camera = harvester_index
             self.vendor = 'Other'
-            self.cam = self.h.create_image_acquirer(harvester_index)
+            self.ia = self.h.create_image_acquirer(harvester_index)
     
     def get_single_frame(self,):
         """!@brief grab single frame from camera
@@ -100,11 +102,17 @@ class Camera:
                 cams = vimba.get_all_cameras()
                 with cams [self.active_camera] as cam:
                     frame = cam.get_frame()
-                    return frame
+                    return frame.as_opencv_image()
         else:
-#to do
-            self.buffer = self.cam.fetch_buffer().payload.components[0]
-            return self.buffer.data
+    #to do
+            with Vimba.get_instance() as vimba:
+                cams = vimba.get_all_cameras()
+                with cams [self.active_camera] as cam:
+                    frame = cam.get_frame()
+                    return frame.as_opencv_image()
+            #whole block above is temporary REMOVE IT
+            #self.buffer = self.ia.fetch_buffer().payload.components[0]
+            #return self.buffer.data
     
     
     
@@ -189,7 +197,7 @@ class Camera:
                         
                     return features_out
         else:
-            return dir(self.cam.remote_device.node_map)
+            return dir(self.ia.remote_device.node_map)
     
     def read_param_values(self,):
         """@brief Is not used for now, will be probably removed

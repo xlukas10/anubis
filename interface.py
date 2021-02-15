@@ -72,6 +72,7 @@ class Ui_MainWindow(object):
         
         self.btn_single_frame = QtWidgets.QPushButton(self.widget_controls)
         self.btn_single_frame.setObjectName("btn_single_frame")
+        self.btn_single_frame.clicked.connect(self.single_frame)
         self.gridLayout_4.addWidget(self.btn_single_frame, 1, 0, 1, 1)
         
         self.btn_zoom_in = QtWidgets.QPushButton(self.widget_controls)
@@ -407,7 +408,17 @@ class Ui_MainWindow(object):
             cam.stop_acquisition()
             self.preview_live = False
         
-        
+    def single_frame(self):
+        image = cam.get_single_frame()
+        h, w, ch = image.shape
+        bytes_per_line = ch * w
+        image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
+        image_scaled = image.scaled(self.camera_preview.size().width(), 
+                                    self.camera_preview.size().height(), 
+                                    QtCore.Qt.KeepAspectRatio)
+        self.camera_preview.setPixmap(QtGui.QPixmap.fromImage(image_scaled))
+        self.camera_preview.show()
+                
     def show_preview(self):
         device = win32api.EnumDisplayDevices()
         refresh_rate = win32api.EnumDisplaySettings(device.DeviceName, -1).DisplayFrequency
