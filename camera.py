@@ -271,7 +271,8 @@ class Camera:
             if not frame_queue.full() and frame.get_status() == FrameStatus.Complete:
                 
                 frame_copy = copy.deepcopy(frame)
-                frame_queue.put_nowait(frame_copy.as_opencv_image())
+                if self.is_recording:
+                    frame_queue.put_nowait(frame_copy.as_opencv_image())
                 active_frame_queue.put_nowait(frame_copy.as_opencv_image())
                 #queue used for preview
                 #Saving only image data, metadata are lost - is it a problem?

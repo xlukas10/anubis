@@ -27,6 +27,7 @@ class Ui_MainWindow(object):
         self.detected = []
         
         self.recording = False
+        self.preview_live = False
         
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1005, 610)
@@ -83,6 +84,7 @@ class Ui_MainWindow(object):
         
         self.btn_start_preview = QtWidgets.QPushButton(self.widget_controls)
         self.btn_start_preview.setObjectName("btn_start_preview")
+        self.btn_start_preview.clicked.connect(self.preview)
         self.gridLayout_4.addWidget(self.btn_start_preview, 0, 0, 1, 2)
         
         self.btn_start_recording = QtWidgets.QPushButton(self.widget_controls)
@@ -389,6 +391,21 @@ class Ui_MainWindow(object):
         else:
             cam.stop_recording()
             self.recording = False
+            
+    def preview(self):
+        #add reading of path from config
+        if(not self.preview_live):
+            cam.start_acquisition()
+            
+            self.preview_live = True
+            
+            #self.preview_flag = threading.Event()#may be unused
+            self.show_preview_thread = threading.Thread(target=self.show_preview)
+            #self.show_preview()
+            self.show_preview_thread.start()
+        else:
+            cam.stop_acquisition()
+            self.preview_live = False
         
         
     def show_preview(self):
@@ -396,7 +413,7 @@ class Ui_MainWindow(object):
         refresh_rate = win32api.EnumDisplaySettings(device.DeviceName, -1).DisplayFrequency
         print(refresh_rate)
         
-        while self.recording:
+        while self.recording or self.preview_live:
             if not active_frame_queue.qsize() == 0:
                 image = active_frame_queue.get_nowait()
                 
