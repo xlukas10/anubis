@@ -239,8 +239,6 @@ class Camera:
         #stop threads created by start_acquisition
         if self.acquisition_running == True:
             self._stream_stop_switch.set()
-            self.frame_completed.clear()
-            self.preview_flag.clear()
             #this stops producer thread
             self.acquisition_running = False
     
@@ -354,7 +352,12 @@ class Camera:
         self.h.reset()
         
     def disconnect_camera(self):
-        self.__init__()
+        print("disconnecting")
+        
+        self.stop_recording()
+        self.disconnect_harvester()
+        self.__init__(self.paths[0]) #Zmenit pro obecne cesty
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         
 
 #---------------------------------------------------------------------------

@@ -134,6 +134,8 @@ class Ui_MainWindow(object):
             lambda: self.connect_camera(self.list_detected_cameras.currentRow()))
         #možná lambda s indexem itemu
         
+        self.btn_disconnect_camera.clicked.connect(cam.disconnect_camera)
+        
         
         
         self.verticalLayout_4.addWidget(self.list_detected_cameras)
