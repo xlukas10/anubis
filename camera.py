@@ -157,7 +157,9 @@ class Camera:
                         
                         #Get feature's type if it exists
                         try:
-                            attr = feature.get_type()
+                            attr = str(feature.get_type())
+                            attr = attr.replace("<class 'vimba.feature.", '')
+                            attr = attr.replace("'>","")
                         except (AttributeError, VimbaFeatureError):
                             attr = None
                         
