@@ -245,16 +245,17 @@ class Camera:
         """
         pass
     
-    def save_config(self,path, file_name):
+    def save_config(self,path):#="", filename="config"):
         """!@brief saves configuration of a camera to .xml file
-        @param[in] save_path A path where the file will be saved
-        @todo what will happen if a file already exists
+        @param[in] path A path where the file will be saved
+        @todo what will happen if the file already exists
         """
         if self.vendor=='Allied Vision Technologies':
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras ()
-                with cams[self.active_camera] as cam:
-                    cam.save_settings(path + file_name + '.xml', PersistType.NoLUT)
+                with cams[self.active_camera] as c:
+                    #cam.save_settings(path + file_name + '.xml', PersistType.NoLUT)
+                    c.save_settings(path, PersistType.NoLUT)
     
     def start_acquisition(self,):
         """!@brief Starts continuous acquisition of image frames

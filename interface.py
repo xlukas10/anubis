@@ -180,6 +180,7 @@ class Ui_MainWindow(object):
         
         self.btn_save_config = QtWidgets.QPushButton(self.widget_3)
         self.btn_save_config.setObjectName("btn_save_config")
+        self.btn_save_config.clicked.connect(self.save_cam_config)
         self.horizontalLayout_2.addWidget(self.btn_save_config)
         
         self.btn_load_config = QtWidgets.QPushButton(self.widget_3)
@@ -478,6 +479,8 @@ class Ui_MainWindow(object):
                 validator = QtGui.QIntValidator()
                 widget.setValidator(validator)
                 widget.setText(str(param["attr_value"]))
+                
+                widget.returnPressed.connect(lambda: cam.set_parameter(param,int(widget.text())))
             elif param["attr_type"] == "FloatFeature":
                 widget = QtWidgets.QLineEdit(self.tab_config)
                 validator = QtGui.QDoubleValidator()
@@ -515,5 +518,10 @@ class Ui_MainWindow(object):
                         #new valie = max value
                         
                         
-        
+    def save_cam_config(self):
+        name = QtWidgets.QFileDialog.getSaveFileName(self.centralwidget,
+                                                     "Save Configuration",
+                                                     filter="XML files (*.xml)",
+                                                     directory="config.xml")
+        cam.save_config(name[0])
 
