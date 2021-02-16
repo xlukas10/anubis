@@ -500,8 +500,6 @@ class Ui_MainWindow(object):
                 self.feat_widgets[param["name"]] = QtWidgets.QCheckBox(self.tab_config)
                 self.feat_widgets[param["name"]].setChecked(param["attr_value"])
                 
-                #state changed sends new state to connected function
-                #self.feat_widgets[param["name"]].stateChanged.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].isChecked()))
                 self.feat_widgets[param["name"]].stateChanged.connect(lambda state, param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].isChecked()))
             elif param["attr_type"] == "EnumFeature":
                 self.feat_widgets[param["name"]] = QtWidgets.QComboBox(self.tab_config)
@@ -511,6 +509,9 @@ class Ui_MainWindow(object):
                 if index >= 0:
                     self.feat_widgets[param["name"]].setCurrentIndex(index)
                 #add reamining options
+                
+                self.feat_widgets[param["name"]].activated.connect(lambda state, param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].currentText()))
+            
             else:
                 self.feat_widgets[param["name"]] = QtWidgets.QLabel(self.tab_config)
                 self.feat_widgets[param["name"]].setText("Error")
