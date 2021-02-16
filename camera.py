@@ -155,6 +155,9 @@ class Camera:
                         features_out[name] = {}
                         features_out[name]['name'] = name
                         
+                        disp_name = feature.get_display_name()
+                        features_out[name]['attr_name'] = disp_name
+                        
                         #Get feature's type if it exists
                         try:
                             attr = str(feature.get_type())
@@ -167,7 +170,7 @@ class Camera:
                         
                         #Get feature's value if it exists
                         try:
-                            attr = feature.get_value()
+                            attr = feature.get()
                         except (AttributeError, VimbaFeatureError):
                             attr = None
                         
@@ -197,6 +200,21 @@ class Camera:
                         
                         features_out[name]['attr_max_length'] = attr
                         
+                        try:
+                            attr = feature.get_tooltip()
+                        except (AttributeError, VimbaFeatureError):
+                            attr = None
+                        
+                        features_out[name]['attr_tooltip'] = attr
+                        '''
+                        try:
+                            attr = feature.get_unit()
+                            print(attr)
+                        except (AttributeError, VimbaFeatureError):
+                            attr = None
+                        
+                        features_out[name]['attr_unit'] = attr
+                        '''
                     return features_out
         else:
             return dir(self.ia.remote_device.node_map)

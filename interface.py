@@ -149,43 +149,43 @@ class Ui_MainWindow(object):
         self.tabs.addTab(self.tab_connect, "")
         
         #Tab - Configure camera
+    #read present parameters on tab change and when read parameters button (To be added) is pressed
+        
+    
         self.tab_config = QtWidgets.QWidget()
         self.tab_config.setObjectName("tab_config")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.tab_config)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-        self.formLayout = QtWidgets.QFormLayout()
-        self.formLayout.setObjectName("formLayout")
-        self.label_test_parameter1 = QtWidgets.QLabel(self.tab_config)
-        self.label_test_parameter1.setObjectName("label_test_parameter1")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_test_parameter1)
-        self.combo_box_test_parameter1 = QtWidgets.QComboBox(self.tab_config)
-        self.combo_box_test_parameter1.setObjectName("combo_box_test_parameter1")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.combo_box_test_parameter1)
-        self.label_test_parameter2 = QtWidgets.QLabel(self.tab_config)
-        self.label_test_parameter2.setObjectName("label_test_parameter2")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_test_parameter2)
-        self.combo_box_test_parameter3 = QtWidgets.QComboBox(self.tab_config)
-        self.combo_box_test_parameter3.setObjectName("combo_box_test_parameter3")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.combo_box_test_parameter3)
-        self.label_test_parameter3 = QtWidgets.QLabel(self.tab_config)
-        self.label_test_parameter3.setObjectName("label_test_parameter3")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.label_test_parameter3)
-        self.combo_box_test_parameter2 = QtWidgets.QComboBox(self.tab_config)
-        self.combo_box_test_parameter2.setObjectName("combo_box_test_parameter2")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.combo_box_test_parameter2)
-        self.verticalLayout_3.addLayout(self.formLayout)
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_3.addItem(spacerItem)
+        
+        
+        self.parameters_scroll = QtWidgets.QScrollArea(self.tab_config)
+        self.parameters_scroll.setWidgetResizable(True)
+        self.parameters_scroll.setObjectName("parameters_scroll")
+        
+        self.parameters_layout_widget = QtWidgets.QWidget()
+        self.parameters_layout_widget.setGeometry(QtCore.QRect(0, 0, 580, 504))
+        self.parameters_layout_widget.setObjectName("parameters_layout_widget")
+        
+        self.parameters_layout = QtWidgets.QFormLayout(self.parameters_layout_widget)
+        self.parameters_layout.setObjectName("parameters_layout")
+        
+        self.parameters_scroll.setWidget(self.parameters_layout_widget)
+        self.verticalLayout_3.addWidget(self.parameters_scroll)
+        
+        
         self.widget_3 = QtWidgets.QWidget(self.tab_config)
         self.widget_3.setObjectName("widget_3")
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.widget_3)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        
         self.btn_save_config = QtWidgets.QPushButton(self.widget_3)
         self.btn_save_config.setObjectName("btn_save_config")
         self.horizontalLayout_2.addWidget(self.btn_save_config)
+        
         self.btn_load_config = QtWidgets.QPushButton(self.widget_3)
         self.btn_load_config.setObjectName("btn_load_config")
         self.horizontalLayout_2.addWidget(self.btn_load_config)
+        
         self.verticalLayout_3.addWidget(self.widget_3)
         self.tabs.addTab(self.tab_config, "")
         
@@ -253,7 +253,8 @@ class Ui_MainWindow(object):
         
         
         self.gridLayout.addWidget(self.tabs, 0, 0, 2, 1)
-        
+        #methods to call on tab change
+        self.tabs.currentChanged.connect(self.tab_changed)
         #Menubar buttons
         #-------------------------------------------------------------------
         MainWindow.setCentralWidget(self.centralwidget)
@@ -322,9 +323,6 @@ class Ui_MainWindow(object):
         self.btn_disconnect_camera.setText(_translate("MainWindow", "Disconnect"))
         self.tip_add_cti.setText(_translate("MainWindow", "Tip: If you can\'t detect your camera try adding new .cti file from your camera vendor (Options->Add .cti file)"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_connect), _translate("MainWindow", "Connect Camera"))
-        self.label_test_parameter1.setText(_translate("MainWindow", "TextLabel"))
-        self.label_test_parameter2.setText(_translate("MainWindow", "TextLabel"))
-        self.label_test_parameter3.setText(_translate("MainWindow", "TextLabel"))
         self.btn_save_config.setText(_translate("MainWindow", "Save Configuration"))
         self.btn_load_config.setText(_translate("MainWindow", "Load Configuration"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_config), _translate("MainWindow", "Camera Configuration"))
@@ -444,5 +442,74 @@ class Ui_MainWindow(object):
                 #self.camera_preview.setMinimumSize(1,1)
                 self.camera_preview.show()
             time.sleep(1/refresh_rate)
+    
+    def tab_changed(self):
+        index = self.tabs.currentIndex()
+        
+        if index == 0:
+            pass
+        if index == 1:
+            #Connect tab change to configure to trigger parameter refresh
+            print("showing")
+            self.show_parameters()
+        
+    def show_parameters(self):
+        #FeatureTypes = Union[IntFeature, FloatFeature, StringFeature, BoolFeature, EnumFeature,CommandFeature, RawFeature]
+        params = cam.get_parameters()
+        num = 0
+        for param_name, param in params.items():
+            label = QtWidgets.QLabel(self.tab_config)
+            label.setObjectName(param["name"])
+            #if(param["attr_unit"] != None):
+            #    label.setText(param["attr_name"] + "[" + param["attr_unit"] + "]")
+            #else:
+            #    label.setText(param["attr_name"])
+            label.setText(param["attr_name"])
+            try:
+                label.setToolTip(param["attr_tooltip"])
+            finally:
+                pass
+            self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.LabelRole, label)
+            widget = None
+            if param["attr_value"] == None:
+                param["attr_value"] = 0
+            if param["attr_type"] == "IntFeature":
+                widget = QtWidgets.QLineEdit(self.tab_config)
+                validator = QtGui.QIntValidator()
+                widget.setValidator(validator)
+                widget.setText(str(param["attr_value"]))
+            elif param["attr_type"] == "FloatFeature":
+                widget = QtWidgets.QLineEdit(self.tab_config)
+                validator = QtGui.QDoubleValidator()
+                widget.setValidator(validator)
+                widget.setText(str(param["attr_value"]))
+            elif param["attr_type"] == "StringFeature":
+                widget = QtWidgets.QLineEdit(self.tab_config)
+                widget.setText(param["attr_value"])
+            elif param["attr_type"] == "BoolFeature":
+                widget = QtWidgets.QCheckBox(self.tab_config)
+                widget.setChecked(param["attr_value"])
+            elif param["attr_type"] == "EnumFeature":
+                widget = QtWidgets.QComboBox(self.tab_config)
+                widget.addItem(str(param["attr_value"]))
+                #add reamining options
+            else:
+                widget = QtWidgets.QLabel(self.tab_config)
+                widget.setText("Error")
+            self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.FieldRole, widget)
+            num = num + 1
+        
             
+            #self.parameters_layout
+            #param["name"] label
+            #if param type bool
+                #param["value"] combo box 
+                    #options - param["možne hodnoty"]
+            #else if param type int
+                #param[value] number box?
+                    #if new value > max value
+                        #new valie = max value
+                        
+                        
+        
 
