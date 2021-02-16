@@ -132,8 +132,6 @@ class Camera:
                         getattr(cam, parameter['name']).set(new_value)
                     except (AttributeError, VimbaFeatureError):
                         pass
-        else:                
-            return 42
     
     def get_parameters(self,):
         """!@brief Read parameters from camera

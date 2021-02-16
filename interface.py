@@ -458,6 +458,7 @@ class Ui_MainWindow(object):
         #FeatureTypes = Union[IntFeature, FloatFeature, StringFeature, BoolFeature, EnumFeature,CommandFeature, RawFeature]
         params = cam.get_parameters()
         num = 0
+        self.feat_widgets = {}
         for param_name, param in params.items():
             label = QtWidgets.QLabel(self.tab_config)
             label.setObjectName(param["name"])
@@ -471,41 +472,50 @@ class Ui_MainWindow(object):
             finally:
                 pass
             self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.LabelRole, label)
+            
+            
             widget = None
             if param["attr_value"] == None:
                 param["attr_value"] = 0
             if param["attr_type"] == "IntFeature":
-                widget = QtWidgets.QLineEdit(self.tab_config)
+                self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
                 validator = QtGui.QIntValidator()
-                widget.setValidator(validator)
-                widget.setText(str(param["attr_value"]))
+                self.feat_widgets[param["name"]].setValidator(validator)
+                self.feat_widgets[param["name"]].setText(str(param["attr_value"]))
                 
-                widget.returnPressed.connect(lambda: cam.set_parameter(param,int(widget.text())))
+                self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,int(self.feat_widgets[param["name"]].text())))
             elif param["attr_type"] == "FloatFeature":
-                widget = QtWidgets.QLineEdit(self.tab_config)
+                self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
                 validator = QtGui.QDoubleValidator()
-                widget.setValidator(validator)
-                widget.setText(str(param["attr_value"]))
+                self.feat_widgets[param["name"]].setValidator(validator)
+                self.feat_widgets[param["name"]].setText(str(param["attr_value"]))
+                
+                self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,float(self.feat_widgets[param["name"]].text())))
             elif param["attr_type"] == "StringFeature":
-                widget = QtWidgets.QLineEdit(self.tab_config)
-                widget.setText(param["attr_value"])
+                self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
+                self.feat_widgets[param["name"]].setText(param["attr_value"])
+                
+                self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].text()))            
             elif param["attr_type"] == "BoolFeature":
-                widget = QtWidgets.QCheckBox(self.tab_config)
-                widget.setChecked(param["attr_value"])
+                self.feat_widgets[param["name"]] = QtWidgets.QCheckBox(self.tab_config)
+                self.feat_widgets[param["name"]].setChecked(param["attr_value"])
+                
+                #state changed sends new state to connected function
+                #self.feat_widgets[param["name"]].stateChanged.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].isChecked()))
+                self.feat_widgets[param["name"]].stateChanged.connect(lambda state, param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].isChecked()))
             elif param["attr_type"] == "EnumFeature":
-                widget = QtWidgets.QComboBox(self.tab_config)
+                self.feat_widgets[param["name"]] = QtWidgets.QComboBox(self.tab_config)
                 for enum in param["attr_enums"]:
-                    widget.addItem(str(enum))
-                index = widget.findText(str(param["attr_value"]), QtCore.Qt.MatchFixedString)
+                    self.feat_widgets[param["name"]].addItem(str(enum))
+                index = self.feat_widgets[param["name"]].findText(str(param["attr_value"]), QtCore.Qt.MatchFixedString)
                 if index >= 0:
-                    widget.setCurrentIndex(index)
+                    self.feat_widgets[param["name"]].setCurrentIndex(index)
                 #add reamining options
             else:
-                widget = QtWidgets.QLabel(self.tab_config)
-                widget.setText("Error")
-            self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.FieldRole, widget)
+                self.feat_widgets[param["name"]] = QtWidgets.QLabel(self.tab_config)
+                self.feat_widgets[param["name"]].setText("Error")
+            self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.FieldRole, self.feat_widgets[param["name"]])
             num = num + 1
-        
             
             #self.parameters_layout
             #param["name"] label
@@ -516,7 +526,7 @@ class Ui_MainWindow(object):
                 #param[value] number box?
                     #if new value > max value
                         #new valie = max value
-                        
+    
                         
     def save_cam_config(self):
         name = QtWidgets.QFileDialog.getSaveFileName(self.centralwidget,
@@ -524,4 +534,8 @@ class Ui_MainWindow(object):
                                                      filter="XML files (*.xml)",
                                                      directory="config.xml")
         cam.save_config(name[0])
+        
+    def sss(self, param):
+        
+        print(param)
 
