@@ -491,7 +491,11 @@ class Ui_MainWindow(object):
                 widget.setChecked(param["attr_value"])
             elif param["attr_type"] == "EnumFeature":
                 widget = QtWidgets.QComboBox(self.tab_config)
-                widget.addItem(str(param["attr_value"]))
+                for enum in param["attr_enums"]:
+                    widget.addItem(str(enum))
+                index = widget.findText(str(param["attr_value"]), QtCore.Qt.MatchFixedString)
+                if index >= 0:
+                    widget.setCurrentIndex(index)
                 #add reamining options
             else:
                 widget = QtWidgets.QLabel(self.tab_config)

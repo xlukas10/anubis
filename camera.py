@@ -168,6 +168,15 @@ class Camera:
                         
                         features_out[name]['attr_type'] = attr
                         
+                        #Get availible enums for enum feature type
+                        if(features_out[name]['attr_type'] == "EnumFeature"):
+                            try:
+                                attr = feature.get_available_entries()
+                            except (AttributeError, VimbaFeatureError):
+                                attr = None
+                        
+                            features_out[name]['attr_enums'] = attr
+                            
                         #Get feature's value if it exists
                         try:
                             attr = feature.get()
