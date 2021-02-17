@@ -598,6 +598,7 @@ class Ui_MainWindow(object):
             #reading configuration for recording
             for line in config:
                 #reading configuration for recording
+                line = line.rstrip('\n')
                 if(line.startswith("filename=")):
                     self.line_edit_sequence_name.setText(line.replace("filename=", "", 1))
                 elif(line.startswith("save_location=")):
@@ -608,13 +609,25 @@ class Ui_MainWindow(object):
             
                 
     def reset_seq_settings(self):
-        pass
+        file_contents = []
+        with open("config.ini", 'r') as config:
+            file_contents = config.readlines()
+        end_of_rec_conf = file_contents.index("CTI_FILES_PATHS\n")
+            
+        with open("config.ini", 'w') as config:
+            config.write("RECORDING\n")
+            config.write("filename=img(%n)\n")
+            config.write("save_location=Recording\n")#maybe se to the documents folder
+            config.write("sequence_duration=0\n")
+            if(end_of_rec_conf):
+                for line in file_contents[end_of_rec_conf:]:
+                    config.write(line)
+        self.read_config()
     
     def save_seq_settings(self):
         file_contents = []
         with open("config.ini", 'r') as config:
             file_contents = config.readlines()
-            print(file_contents)
             
         with open("config.ini", 'w') as config:
             #reading configuration for recording
