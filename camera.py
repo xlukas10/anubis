@@ -31,6 +31,8 @@ class Camera:
         self.active_camera = 0
         self.ia = None #image acquifier
         
+        
+        
     def get_camera_list(self,):
         """!@brief Connected camera discovery
         @details Uses Harvester object to discover all connected cameras

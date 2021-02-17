@@ -30,6 +30,8 @@ class Ui_MainWindow(object):
         self.recording = False
         self.preview_live = False
         
+        
+        
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1005, 610)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -331,7 +333,8 @@ class Ui_MainWindow(object):
         
         #--------------------------------------------------------------
         self.retranslateUi(MainWindow)
-        self.tabs.setCurrentIndex(2)
+        self.read_config()
+        self.tabs.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -588,3 +591,14 @@ class Ui_MainWindow(object):
         self.line_edit_save_location.setText(name)
         
         #cam.save_config(name[0])
+    def read_config(self):
+        config = open("config.ini", 'r')
+        for line in config:
+            if(line.startswith("filename=")):
+                self.line_edit_sequence_name.setText(line.replace("filename=", "", 1))
+            elif(line.startswith("save_location=")):
+                self.line_edit_save_location.setText(line.replace("save_location=", "", 1))
+            elif(line.startswith("sequence_duration=")):
+                self.line_edit_sequence_duration.setText(line.replace("sequence_duration=", "", 1))
+                
+                
