@@ -262,10 +262,12 @@ class Ui_MainWindow(object):
         
         self.btn_save_sequence_settings = QtWidgets.QPushButton(self.tab_recording_config)
         self.btn_save_sequence_settings.setObjectName("btn_save_sequence_settings")
+        self.btn_save_sequence_settings.clicked.connect(self.save_seq_settings)
         self.verticalLayout.addWidget(self.btn_save_sequence_settings)
         
         self.btn_reset_sequence_settings = QtWidgets.QPushButton(self.tab_recording_config)
         self.btn_reset_sequence_settings.setObjectName("btn_reset_sequence_settings")
+        self.btn_reset_sequence_settings.clicked.connect(self.reset_seq_settings)
         self.verticalLayout.addWidget(self.btn_reset_sequence_settings)
         
         self.tabs.addTab(self.tab_recording_config, "")
@@ -592,13 +594,39 @@ class Ui_MainWindow(object):
         
         #cam.save_config(name[0])
     def read_config(self):
-        config = open("config.ini", 'r')
-        for line in config:
-            if(line.startswith("filename=")):
-                self.line_edit_sequence_name.setText(line.replace("filename=", "", 1))
-            elif(line.startswith("save_location=")):
-                self.line_edit_save_location.setText(line.replace("save_location=", "", 1))
-            elif(line.startswith("sequence_duration=")):
-                self.line_edit_sequence_duration.setText(line.replace("sequence_duration=", "", 1))
+        with open("config.ini", 'r') as config:
+            #reading configuration for recording
+            for line in config:
+                #reading configuration for recording
+                if(line.startswith("filename=")):
+                    self.line_edit_sequence_name.setText(line.replace("filename=", "", 1))
+                elif(line.startswith("save_location=")):
+                    self.line_edit_save_location.setText(line.replace("save_location=", "", 1))
+                elif(line.startswith("sequence_duration=")):
+                    self.line_edit_sequence_duration.setText(line.replace("sequence_duration=", "", 1))
+                #reading and adding cti files
+            
                 
-                
+    def reset_seq_settings(self):
+        pass
+    
+    def save_seq_settings(self):
+        file_contents = []
+        with open("config.ini", 'r') as config:
+            file_contents = config.readlines()
+            print(file_contents)
+            
+        with open("config.ini", 'w') as config:
+            #reading configuration for recording
+            for line in file_contents:
+                #reading configuration for recording
+                if(line.startswith("filename=")):
+                    config.write("filename=" + self.line_edit_sequence_name.text() + "\n")
+                elif(line.startswith("save_location=")):
+                    config.write("save_location=" + self.line_edit_save_location.text() + "\n")
+                elif(line.startswith("sequence_duration=")):
+                    config.write("sequence_duration=" + self.line_edit_sequence_duration.text() + "\n")
+                else:
+                    config.write(line)
+                #reading and adding cti files
+        
