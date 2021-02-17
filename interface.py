@@ -162,6 +162,9 @@ class Ui_MainWindow(object):
         
         
         self.parameters_scroll = QtWidgets.QScrollArea(self.tab_config)
+        
+        self.parameters_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #self.parameters_scroll.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
         self.parameters_scroll.setWidgetResizable(True)
         self.parameters_scroll.setObjectName("parameters_scroll")
         
@@ -171,6 +174,12 @@ class Ui_MainWindow(object):
         
         self.parameters_layout = QtWidgets.QFormLayout(self.parameters_layout_widget)
         self.parameters_layout.setObjectName("parameters_layout")
+        l =self.parameters_layout.contentsMargins().left()
+        r =self.parameters_layout.contentsMargins().right()
+        geom = self.parameters_scroll.geometry()
+        geom.adjust(l,0,r,0)
+        self.parameters_layout.setGeometry(geom)
+        
         
         self.parameters_scroll.setWidget(self.parameters_layout_widget)
         self.verticalLayout_3.addWidget(self.parameters_scroll)
