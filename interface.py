@@ -26,6 +26,7 @@ class Ui_MainWindow(object):
         """
         self.detected = []
         
+        self.interupt_flag = threading.Event()
         self.recording = False
         self.preview_live = False
         
@@ -195,53 +196,76 @@ class Ui_MainWindow(object):
         self.tab_recording_config.setObjectName("tab_recording_config")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.tab_recording_config)
         self.verticalLayout.setObjectName("verticalLayout")
+        
         self.widget_sequence_name = QtWidgets.QWidget(self.tab_recording_config)
         self.widget_sequence_name.setObjectName("widget_sequence_name")
+        
         self.formLayout_4 = QtWidgets.QFormLayout(self.widget_sequence_name)
         self.formLayout_4.setObjectName("formLayout_4")
+        
         self.label_file_name_recording = QtWidgets.QLabel(self.widget_sequence_name)
         self.label_file_name_recording.setObjectName("label_file_name_recording")
         self.formLayout_4.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_file_name_recording)
+        
         self.line_edit_sequence_name = QtWidgets.QLineEdit(self.widget_sequence_name)
         self.line_edit_sequence_name.setObjectName("line_edit_sequence_name")
         self.formLayout_4.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.line_edit_sequence_name)
+        
         self.verticalLayout.addWidget(self.widget_sequence_name)
+        
         self.label_sequence_name = QtWidgets.QLabel(self.tab_recording_config)
         self.label_sequence_name.setObjectName("label_sequence_name")
         self.verticalLayout.addWidget(self.label_sequence_name)
+        
         self.widget_sequence_save = QtWidgets.QWidget(self.tab_recording_config)
         self.widget_sequence_save.setObjectName("widget_sequence_save")
         self.formLayout_3 = QtWidgets.QFormLayout(self.widget_sequence_save)
         self.formLayout_3.setObjectName("formLayout_3")
+        
         self.file_manager_save_location = QtWidgets.QPushButton(self.widget_sequence_save)
         self.file_manager_save_location.setObjectName("file_manager_save_location")
+        self.file_manager_save_location.clicked.connect(self.set_record_path)
         self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.file_manager_save_location)
+        
         self.line_edit_save_location = QtWidgets.QLineEdit(self.widget_sequence_save)
         self.line_edit_save_location.setObjectName("line_edit_save_location")
         self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.line_edit_save_location)
+        
         self.verticalLayout.addWidget(self.widget_sequence_save)
+        
         self.widget_duration = QtWidgets.QWidget(self.tab_recording_config)
         self.widget_duration.setObjectName("widget_duration")
         self.formLayout_2 = QtWidgets.QFormLayout(self.widget_duration)
         self.formLayout_2.setObjectName("formLayout_2")
+        
         self.label_sequence_duration = QtWidgets.QLabel(self.widget_duration)
         self.label_sequence_duration.setObjectName("label_sequence_duration")
         self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_sequence_duration)
+        
         self.line_edit_sequence_duration = QtWidgets.QLineEdit(self.widget_duration)
         self.line_edit_sequence_duration.setObjectName("line_edit_sequence_duration")
+        #accept only numbers
+        validator = QtGui.QDoubleValidator()
+        self.line_edit_sequence_duration.setValidator(validator)
         self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.line_edit_sequence_duration)
+        
         self.verticalLayout.addWidget(self.widget_duration)
+        
         self.label_sequence_duration_tip = QtWidgets.QLabel(self.tab_recording_config)
         self.label_sequence_duration_tip.setObjectName("label_sequence_duration_tip")
         self.verticalLayout.addWidget(self.label_sequence_duration_tip)
+        
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem1)
+        
         self.btn_save_sequence_settings = QtWidgets.QPushButton(self.tab_recording_config)
         self.btn_save_sequence_settings.setObjectName("btn_save_sequence_settings")
         self.verticalLayout.addWidget(self.btn_save_sequence_settings)
+        
         self.btn_reset_sequence_settings = QtWidgets.QPushButton(self.tab_recording_config)
         self.btn_reset_sequence_settings.setObjectName("btn_reset_sequence_settings")
         self.verticalLayout.addWidget(self.btn_reset_sequence_settings)
+        
         self.tabs.addTab(self.tab_recording_config, "")
         
         #Tab - Keras/Tensorflow/Learning,Classification
@@ -380,18 +404,38 @@ class Ui_MainWindow(object):
         #will be also called by automatic recording
         #add reading of path from config
         if(not self.recording):
-            cam.start_recording('C:/Users/Jakub Lukaszczyk/Documents/Test/','nic')
+            cam.start_recording(self.line_edit_save_location.text(),
+                                self.line_edit_sequence_name.text(),
+                                'nic')
             
             self.recording = True
             
-            #self.preview_flag = threading.Event()#may be unused
+            if(float(self.line_edit_sequence_duration.text()) > 0):
+                print("starting automated seq")
+                self.interupt_flag.clear()
+                self.seq_duration_thread = threading.Thread(target=self.seq_duration_wait)
+                self.seq_duration_thread.start()
+            
             self.show_preview_thread = threading.Thread(target=self.show_preview)
-            #self.show_preview()
             self.show_preview_thread.start()
+            
+            
         else:
+            self.interupt_flag.set()
             cam.stop_recording()
             self.recording = False
-            
+    
+    def seq_duration_wait(self):
+        print("waiting on dur")
+        #wait for acquisitiioon to truly begin
+        while active_frame_queue.empty():
+            time.sleep(0.001)
+        self.interupt_flag.wait(float(self.line_edit_sequence_duration.text()))
+        print("timeout or interupt")
+        if(self.recording):
+            print("should be only timeout")
+            self.record()
+    
     def preview(self):
         #add reading of path from config
         if(not self.preview_live):
@@ -536,7 +580,11 @@ class Ui_MainWindow(object):
                                                      directory="config.xml")
         cam.save_config(name[0])
         
-    def sss(self, param):
+    def set_record_path(self):
+        name = QtWidgets.QFileDialog.getExistingDirectory(self.centralwidget,
+                                                     "Select Folder",
+                                                     )
+        print(name)
+        self.line_edit_save_location.setText(name)
         
-        print(param)
-
+        #cam.save_config(name[0])
