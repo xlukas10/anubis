@@ -462,109 +462,165 @@ class Ui_MainWindow(object):
             #exception for nothing selected
         
     def record(self):
-        #will be also called by automatic recording
-        #add reading of path from config
+        """!@brief Starts and stops recording
+        @details Is called by start/stop button. Recording is always started 
+        manually. Recording ends with another button click or after time set 
+        in self.line_edit_sequence_duration passes. Save location and name is 
+        determined by the text in self.line_edit_save_location and 
+        self.line_edit_sequence_name.
+        @TODO method in camera default save location if nothing is defined
+        """
         if self.connected:
             if(not self.recording):
                 
+                #Change status icon and print status message
                 self.camera_icon.setPixmap(self.icon_busy)
                 self.set_status_msg("Starting recording")
+                
+                #Start new recording with defined name and save path
                 cam.start_recording(self.line_edit_save_location.text(),
                                     self.line_edit_sequence_name.text(),
-                                    'nic')
+                                    'nothing')
                 
                 self.recording = True
                 
+                #If automatic sequence duration is set, create thread that will
+                #automatically terminate the recording
                 if(float(self.line_edit_sequence_duration.text()) > 0):
-                    print("starting automated seq")
                     self.interupt_flag.clear()
                     self.seq_duration_thread = threading.Thread(target=self.seq_duration_wait)
                     self.seq_duration_thread.start()
                 
+                #Start live preview in a new thread
                 self.show_preview_thread = threading.Thread(target=self.show_preview)
                 self.show_preview_thread.start()
-                
-                
             else:
+                #Set status message and standby icon
                 self.camera_icon.setPixmap(self.icon_standby)
                 self.set_status_msg("Stopping recording")
+                
+                #Tell automatic sequence duration thread to end
                 self.interupt_flag.set()
+                
+                #End recording
                 cam.stop_recording()
                 self.recording = False
     
     def seq_duration_wait(self):
-        print("waiting on dur")
-        #wait for acquisitiioon to truly begin
+        """!@brief Automatic recording interrupt
+        @details Let camera record for defined time and if the recording is not
+        manually terminated stop the recording
+        """
+        #wait for the first frame to be received
         while active_frame_queue.empty():
             time.sleep(0.001)
+        
+        #print status message
+        self.set_status_msg("Recording for "+self.line_edit_sequence_duration.text()+"s started")
+        
+        #wait either for manual recording stop or wait for defined time
         self.interupt_flag.wait(float(self.line_edit_sequence_duration.text()))
-        print("timeout or interupt")
+        
+        #If the recording is still running (not terminated manually), stop 
+        #the recording.
         if(self.recording):
-            print("should be only timeout")
             self.record()
     
     def preview(self):
-        #add reading of path from config
+        """!@brief Starts live preview
+        @details Unlike recording method, this method does not save frames to 
+        drive. Preview picture is rendered in separate thread.
+        """
+        #continue only if camera is connected
         if self.connected:
             if(not self.preview_live):
-                
+                #Set status message and icon
                 self.camera_icon.setPixmap(self.icon_busy)
                 self.set_status_msg("Starting preview")
+                
+                #Start camera frame acquisition (not recording)
                 cam.start_acquisition()
                 
                 self.preview_live = True
                 
-                #self.preview_flag = threading.Event()#may be unused
+                #Create and run thread to draw frames to gui
                 self.show_preview_thread = threading.Thread(target=self.show_preview)
-                #self.show_preview()
                 self.show_preview_thread.start()
             else:
+                #Reset status icon and print message
                 self.camera_icon.setPixmap(self.icon_standby)
                 self.set_status_msg("Stopping preview")
+                
+                #Stop receiving frames
                 cam.stop_acquisition()
+                
                 self.preview_live = False
         
     def single_frame(self):
+        """!@brief Acquire and draw a single frame.
+        @details Acquire and draw a single frame.
+        """
+        #Method runs only if camera is connected
         if self.connected:
+            #Set status icon and message
             self.set_status_msg("Receiving single frame")
-            
             self.camera_icon.setPixmap(self.icon_busy)
+            
+            #Get image
             image = cam.get_single_frame()
+            
+            #Convert image to proper format fo PyQt
             h, w, ch = image.shape
             bytes_per_line = ch * w
             image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
+#TODO Get color format dynamically
             image_scaled = image.scaled(self.camera_preview.size().width(), 
                                         self.camera_preview.size().height(), 
                                         QtCore.Qt.KeepAspectRatio)
+            
+            #Set image to gui
             self.camera_preview.setPixmap(QtGui.QPixmap.fromImage(image_scaled))
             self.camera_preview.show()
             
+            #Reset status icon
             self.camera_icon.setPixmap(self.icon_standby)
                 
     def show_preview(self):
+        """!@brief Draws image from camera in real time.
+        @details Acquires images from camera and draws them in real time at 
+        the same rate as is display refresh_rate. If the frames come too fast,
+        only one at the time is drawn and the rest is dumped
+        """
+        #Determine refresh rate of used display. This way the method will not
+        #run too slowly or redundantly fast.
         device = win32api.EnumDisplayDevices()
         refresh_rate = win32api.EnumDisplaySettings(device.DeviceName, -1).DisplayFrequency
-        print(refresh_rate)
         
+        #runs as long as the camera is recording or preview is active
         while self.recording or self.preview_live:
+            #Draw only if thre is at least 1 frame to draw
             if not active_frame_queue.qsize() == 0:
                 image = active_frame_queue.get_nowait()
                 
+                #Dump all remaining frames (If frames are received faster than 
+                #refresh_rate).
                 while not active_frame_queue.qsize() == 0:
                     active_frame_queue.get_nowait()
                 
+                #Convert image to proper format fo PyQt
                 h, w, ch = image.shape
                 bytes_per_line = ch * w
                 image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
-                
+#TODO Get color format dynamically
+
                 image_scaled = image.scaled(self.camera_preview.size().width(), 
                                             self.camera_preview.size().height(), 
                                             QtCore.Qt.KeepAspectRatio)
+                
+                #Set image to gui
                 self.camera_preview.setPixmap(QtGui.QPixmap.fromImage(image_scaled))
-                #self.camera_preview.setAlignment(QtCore.Qt.AlignCenter)
-                #self.camera_preview.setScaledContents(True)
-                #self.camera_preview.setMinimumSize(1,1)
                 self.camera_preview.show()
+            #Wait for next display frame
             time.sleep(1/refresh_rate)
     
     def tab_changed(self):
@@ -731,9 +787,22 @@ class Ui_MainWindow(object):
             cam.disconnect_camera()
         
     
-    def set_status_msg(self, message):
+    def set_status_msg(self, message, timeout=1500):
+        """!@brief Shows message in status bar
+        @details Method is called when other methods need to send the user 
+        some confrimation or status update.
+        @param[in] message Contains text to be displayed in the status bar
+        @param[in] timeout For how long should the message be displayed. 
+        Defaults to 1.5sec.
+        """
         self.status_label.setText(message)
-        self.status_timer.start(1500)
+        
+        #When time out is reached, connected method 
+        #(self.clear_status) is called.
+        self.status_timer.start(timeout)
         
     def clear_status(self):
+        """!@brief Empties self.status_label in self.statusbar.
+        @details Method is called after active message times out.
+        """
         self.status_label.setText("")
