@@ -31,8 +31,8 @@ class Ui_MainWindow(object):
         self.preview_live = False
         
         self.icon_offline = QtGui.QPixmap("./icons/icon_offline.png")
-        self.icon_standby = QtGui.QPixmap("./icons/icon_standby.bmp")
-        self.icon_busy = QtGui.QPixmap("./icons/icon_busy.bmp")
+        self.icon_standby = QtGui.QPixmap("./icons/icon_standby.png")
+        self.icon_busy = QtGui.QPixmap("./icons/icon_busy.png")
         
         self.status_timer = QtCore.QTimer()
         self.status_timer.timeout.connect(self.clear_status)
