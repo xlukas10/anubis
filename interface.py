@@ -449,6 +449,10 @@ class Ui_MainWindow(object):
         cam.select_camera(self.detected[index]['id_'])
         p = cam.get_parameters()
         cam.set_parameter(p['GVSPPacketSize'],1500)
+        
+        
+        self.camera_icon.setPixmap(self.icon_standby)
+        self.camera_status.setText("Camera: "+self.detected[index]['model'])
         #above will be automated
         #exception for nothing selected
         
@@ -457,6 +461,7 @@ class Ui_MainWindow(object):
         #add reading of path from config
         if(not self.recording):
             
+            self.camera_icon.setPixmap(self.icon_busy)
             self.set_status_msg("Starting recording")
             cam.start_recording(self.line_edit_save_location.text(),
                                 self.line_edit_sequence_name.text(),
@@ -475,6 +480,7 @@ class Ui_MainWindow(object):
             
             
         else:
+            self.camera_icon.setPixmap(self.icon_standby)
             self.set_status_msg("Stopping recording")
             self.interupt_flag.set()
             cam.stop_recording()
@@ -496,6 +502,7 @@ class Ui_MainWindow(object):
         
         if(not self.preview_live):
             
+            self.camera_icon.setPixmap(self.icon_busy)
             self.set_status_msg("Starting preview")
             cam.start_acquisition()
             
@@ -506,6 +513,7 @@ class Ui_MainWindow(object):
             #self.show_preview()
             self.show_preview_thread.start()
         else:
+            self.camera_icon.setPixmap(self.icon_standby)
             self.set_status_msg("Stopping preview")
             cam.stop_acquisition()
             self.preview_live = False
@@ -513,6 +521,7 @@ class Ui_MainWindow(object):
     def single_frame(self):
         self.set_status_msg("Receiving single frame")
         
+        self.camera_icon.setPixmap(self.icon_busy)
         image = cam.get_single_frame()
         h, w, ch = image.shape
         bytes_per_line = ch * w
@@ -522,6 +531,8 @@ class Ui_MainWindow(object):
                                     QtCore.Qt.KeepAspectRatio)
         self.camera_preview.setPixmap(QtGui.QPixmap.fromImage(image_scaled))
         self.camera_preview.show()
+        
+        self.camera_icon.setPixmap(self.icon_standby)
                 
     def show_preview(self):
         device = win32api.EnumDisplayDevices()
