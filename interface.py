@@ -30,6 +30,12 @@ class Ui_MainWindow(object):
         self.recording = False
         self.preview_live = False
         
+        self.icon_offline = QtGui.QPixmap("./icons/icon_offline.png")
+        self.icon_standby = QtGui.QPixmap("./icons/icon_standby.bmp")
+        self.icon_busy = QtGui.QPixmap("./icons/icon_busy.bmp")
+        
+        self.status_timer = QtCore.QTimer()
+        self.status_timer.timeout.connect(self.clear_status)
         
         
         MainWindow.setObjectName("MainWindow")
@@ -140,7 +146,7 @@ class Ui_MainWindow(object):
             lambda: self.connect_camera(self.list_detected_cameras.currentRow()))
         #možná lambda s indexem itemu
         
-        self.btn_disconnect_camera.clicked.connect(cam.disconnect_camera)
+        self.btn_disconnect_camera.clicked.connect(self.disconnect_camera)
         
         
         
@@ -316,6 +322,29 @@ class Ui_MainWindow(object):
         #------------------------------------------------
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
+        
+        #added manually
+        self.status_label = QtWidgets.QLabel()
+        self.status_label.setObjectName("status_label")
+        self.statusbar.addWidget(self.status_label,stretch=40)
+        
+        self.camera_icon = QtWidgets.QLabel()
+        self.camera_icon.setObjectName("camera_icon")
+        self.camera_icon.setScaledContents(True)
+        self.statusbar.addPermanentWidget(self.camera_icon)
+        
+        self.camera_status = QtWidgets.QLabel()
+        self.camera_status.setObjectName("camera_status")
+        self.statusbar.addPermanentWidget(self.camera_status,stretch=30)
+        
+        self.fps_status = QtWidgets.QLabel()
+        self.fps_status.setObjectName("fps_status")
+        self.statusbar.addPermanentWidget(self.fps_status,stretch=10)
+        
+        self.receive_status = QtWidgets.QLabel()
+        self.receive_status.setObjectName("receive_status")
+        self.statusbar.addPermanentWidget(self.receive_status,stretch=20)
+        
         MainWindow.setStatusBar(self.statusbar)
         
         #Adding individual items to menus in menubar
@@ -340,13 +369,14 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuOptions.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
-        
+        #----------------------------------------------------------------
         
         #--------------------------------------------------------------
         self.retranslateUi(MainWindow)
         self.read_config()
         self.tabs.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -382,7 +412,11 @@ class Ui_MainWindow(object):
         self.actionOpen_Help.setText(_translate("MainWindow", "Open Help"))
         self.actionRemove_cti_file.setText(_translate("MainWindow", "Remove .cti file"))
         self.actionSave_frame.setText(_translate("MainWindow", "Save frame"))
-        print("dszfsu")
+        #added manually
+        self.camera_status.setText("Camera: Not connected")
+        self.receive_status.setText("Received frames: 0")
+        self.fps_status.setText("FPS: 0")
+        self.camera_icon.setPixmap(self.icon_offline)
         
     
     
@@ -394,6 +428,8 @@ class Ui_MainWindow(object):
         detected, all previous item are cleared and cameras detected in this call
         are printed.
         """
+        
+        self.set_status_msg("Searching for cameras")
         self.list_detected_cameras.clear()
         self.detected = cam.get_camera_list()
         for device in self.detected:
@@ -408,6 +444,8 @@ class Ui_MainWindow(object):
         list or by pressing connect button
         @param[in] index index of selected camera in the list
         """
+        
+        self.set_status_msg("Connecting camera")
         cam.select_camera(self.detected[index]['id_'])
         p = cam.get_parameters()
         cam.set_parameter(p['GVSPPacketSize'],1500)
@@ -418,6 +456,8 @@ class Ui_MainWindow(object):
         #will be also called by automatic recording
         #add reading of path from config
         if(not self.recording):
+            
+            self.set_status_msg("Starting recording")
             cam.start_recording(self.line_edit_save_location.text(),
                                 self.line_edit_sequence_name.text(),
                                 'nic')
@@ -435,6 +475,7 @@ class Ui_MainWindow(object):
             
             
         else:
+            self.set_status_msg("Stopping recording")
             self.interupt_flag.set()
             cam.stop_recording()
             self.recording = False
@@ -452,7 +493,10 @@ class Ui_MainWindow(object):
     
     def preview(self):
         #add reading of path from config
+        
         if(not self.preview_live):
+            
+            self.set_status_msg("Starting preview")
             cam.start_acquisition()
             
             self.preview_live = True
@@ -462,10 +506,13 @@ class Ui_MainWindow(object):
             #self.show_preview()
             self.show_preview_thread.start()
         else:
+            self.set_status_msg("Stopping preview")
             cam.stop_acquisition()
             self.preview_live = False
         
     def single_frame(self):
+        self.set_status_msg("Receiving single frame")
+        
         image = cam.get_single_frame()
         h, w, ch = image.shape
         bytes_per_line = ch * w
@@ -514,6 +561,8 @@ class Ui_MainWindow(object):
         
     def show_parameters(self):
         #FeatureTypes = Union[IntFeature, FloatFeature, StringFeature, BoolFeature, EnumFeature,CommandFeature, RawFeature]
+        
+        self.set_status_msg("Reading features")
         params = cam.get_parameters()
         num = 0
         self.feat_widgets = {}
@@ -615,7 +664,7 @@ class Ui_MainWindow(object):
                 elif(line.startswith("sequence_duration=")):
                     self.line_edit_sequence_duration.setText(line.replace("sequence_duration=", "", 1))
                 #reading and adding cti files
-            
+        self.set_status_msg("Configuration loaded")
                 
     def reset_seq_settings(self):
         file_contents = []
@@ -632,6 +681,7 @@ class Ui_MainWindow(object):
                 for line in file_contents[end_of_rec_conf:]:
                     config.write(line)
         self.read_config()
+        self.set_status_msg("Configuration restored")
     
     def save_seq_settings(self):
         file_contents = []
@@ -652,3 +702,18 @@ class Ui_MainWindow(object):
                     config.write(line)
                 #reading and adding cti files
         
+        self.set_status_msg("Configuration saved")
+                
+    def disconnect_camera(self):
+        self.camera_icon.setPixmap(self.icon_offline)
+        self.camera_status.setText("Camera: Not connected")
+        self.set_status_msg("Disconnecting camera")
+        cam.disconnect_camera()
+        
+    
+    def set_status_msg(self, message):
+        self.status_label.setText(message)
+        self.status_timer.start(1500)
+        
+    def clear_status(self):
+        self.status_label.setText("")
