@@ -25,6 +25,7 @@ class Ui_MainWindow(object):
         !@brief Variable used to store device information of detected cameras
         """
         self.detected = []
+        self.connected = False
         
         self.interupt_flag = threading.Event()
         self.recording = False
@@ -444,6 +445,8 @@ class Ui_MainWindow(object):
         list or by pressing connect button
         @param[in] index index of selected camera in the list
         """
+        if self.connected:
+            self.disconnect_camera()
         
         self.set_status_msg("Connecting camera")
         cam.select_camera(self.detected[index]['id_'])
@@ -453,38 +456,40 @@ class Ui_MainWindow(object):
         
         self.camera_icon.setPixmap(self.icon_standby)
         self.camera_status.setText("Camera: "+self.detected[index]['model'])
+        self.connected = True
         #above will be automated
         #exception for nothing selected
         
     def record(self):
         #will be also called by automatic recording
         #add reading of path from config
-        if(not self.recording):
-            
-            self.camera_icon.setPixmap(self.icon_busy)
-            self.set_status_msg("Starting recording")
-            cam.start_recording(self.line_edit_save_location.text(),
-                                self.line_edit_sequence_name.text(),
-                                'nic')
-            
-            self.recording = True
-            
-            if(float(self.line_edit_sequence_duration.text()) > 0):
-                print("starting automated seq")
-                self.interupt_flag.clear()
-                self.seq_duration_thread = threading.Thread(target=self.seq_duration_wait)
-                self.seq_duration_thread.start()
-            
-            self.show_preview_thread = threading.Thread(target=self.show_preview)
-            self.show_preview_thread.start()
-            
-            
-        else:
-            self.camera_icon.setPixmap(self.icon_standby)
-            self.set_status_msg("Stopping recording")
-            self.interupt_flag.set()
-            cam.stop_recording()
-            self.recording = False
+        if self.connected:
+            if(not self.recording):
+                
+                self.camera_icon.setPixmap(self.icon_busy)
+                self.set_status_msg("Starting recording")
+                cam.start_recording(self.line_edit_save_location.text(),
+                                    self.line_edit_sequence_name.text(),
+                                    'nic')
+                
+                self.recording = True
+                
+                if(float(self.line_edit_sequence_duration.text()) > 0):
+                    print("starting automated seq")
+                    self.interupt_flag.clear()
+                    self.seq_duration_thread = threading.Thread(target=self.seq_duration_wait)
+                    self.seq_duration_thread.start()
+                
+                self.show_preview_thread = threading.Thread(target=self.show_preview)
+                self.show_preview_thread.start()
+                
+                
+            else:
+                self.camera_icon.setPixmap(self.icon_standby)
+                self.set_status_msg("Stopping recording")
+                self.interupt_flag.set()
+                cam.stop_recording()
+                self.recording = False
     
     def seq_duration_wait(self):
         print("waiting on dur")
@@ -499,40 +504,41 @@ class Ui_MainWindow(object):
     
     def preview(self):
         #add reading of path from config
-        
-        if(not self.preview_live):
-            
-            self.camera_icon.setPixmap(self.icon_busy)
-            self.set_status_msg("Starting preview")
-            cam.start_acquisition()
-            
-            self.preview_live = True
-            
-            #self.preview_flag = threading.Event()#may be unused
-            self.show_preview_thread = threading.Thread(target=self.show_preview)
-            #self.show_preview()
-            self.show_preview_thread.start()
-        else:
-            self.camera_icon.setPixmap(self.icon_standby)
-            self.set_status_msg("Stopping preview")
-            cam.stop_acquisition()
-            self.preview_live = False
+        if self.connected:
+            if(not self.preview_live):
+                
+                self.camera_icon.setPixmap(self.icon_busy)
+                self.set_status_msg("Starting preview")
+                cam.start_acquisition()
+                
+                self.preview_live = True
+                
+                #self.preview_flag = threading.Event()#may be unused
+                self.show_preview_thread = threading.Thread(target=self.show_preview)
+                #self.show_preview()
+                self.show_preview_thread.start()
+            else:
+                self.camera_icon.setPixmap(self.icon_standby)
+                self.set_status_msg("Stopping preview")
+                cam.stop_acquisition()
+                self.preview_live = False
         
     def single_frame(self):
-        self.set_status_msg("Receiving single frame")
-        
-        self.camera_icon.setPixmap(self.icon_busy)
-        image = cam.get_single_frame()
-        h, w, ch = image.shape
-        bytes_per_line = ch * w
-        image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
-        image_scaled = image.scaled(self.camera_preview.size().width(), 
-                                    self.camera_preview.size().height(), 
-                                    QtCore.Qt.KeepAspectRatio)
-        self.camera_preview.setPixmap(QtGui.QPixmap.fromImage(image_scaled))
-        self.camera_preview.show()
-        
-        self.camera_icon.setPixmap(self.icon_standby)
+        if self.connected:
+            self.set_status_msg("Receiving single frame")
+            
+            self.camera_icon.setPixmap(self.icon_busy)
+            image = cam.get_single_frame()
+            h, w, ch = image.shape
+            bytes_per_line = ch * w
+            image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
+            image_scaled = image.scaled(self.camera_preview.size().width(), 
+                                        self.camera_preview.size().height(), 
+                                        QtCore.Qt.KeepAspectRatio)
+            self.camera_preview.setPixmap(QtGui.QPixmap.fromImage(image_scaled))
+            self.camera_preview.show()
+            
+            self.camera_icon.setPixmap(self.icon_standby)
                 
     def show_preview(self):
         device = win32api.EnumDisplayDevices()
@@ -572,79 +578,79 @@ class Ui_MainWindow(object):
         
     def show_parameters(self):
         #FeatureTypes = Union[IntFeature, FloatFeature, StringFeature, BoolFeature, EnumFeature,CommandFeature, RawFeature]
-        
-        self.set_status_msg("Reading features")
-        params = cam.get_parameters()
-        num = 0
-        self.feat_widgets = {}
-        for param_name, param in params.items():
-            label = QtWidgets.QLabel(self.tab_config)
-            label.setObjectName(param["name"])
-            #if(param["attr_unit"] != None):
-            #    label.setText(param["attr_name"] + "[" + param["attr_unit"] + "]")
-            #else:
-            #    label.setText(param["attr_name"])
-            label.setText(param["attr_name"])
-            try:
-                label.setToolTip(param["attr_tooltip"])
-            finally:
-                pass
-            self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.LabelRole, label)
-            
-            
-            widget = None
-            if param["attr_value"] == None:
-                param["attr_value"] = 0
-            if param["attr_type"] == "IntFeature":
-                self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
-                validator = QtGui.QIntValidator()
-                self.feat_widgets[param["name"]].setValidator(validator)
-                self.feat_widgets[param["name"]].setText(str(param["attr_value"]))
+        if self.connected:
+            self.set_status_msg("Reading features")
+            params = cam.get_parameters()
+            num = 0
+            self.feat_widgets = {}
+            for param_name, param in params.items():
+                label = QtWidgets.QLabel(self.tab_config)
+                label.setObjectName(param["name"])
+                #if(param["attr_unit"] != None):
+                #    label.setText(param["attr_name"] + "[" + param["attr_unit"] + "]")
+                #else:
+                #    label.setText(param["attr_name"])
+                label.setText(param["attr_name"])
+                try:
+                    label.setToolTip(param["attr_tooltip"])
+                finally:
+                    pass
+                self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.LabelRole, label)
                 
-                self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,int(self.feat_widgets[param["name"]].text())))
-            elif param["attr_type"] == "FloatFeature":
-                self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
-                validator = QtGui.QDoubleValidator()
-                self.feat_widgets[param["name"]].setValidator(validator)
-                self.feat_widgets[param["name"]].setText(str(param["attr_value"]))
                 
-                self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,float(self.feat_widgets[param["name"]].text())))
-            elif param["attr_type"] == "StringFeature":
-                self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
-                self.feat_widgets[param["name"]].setText(param["attr_value"])
+                widget = None
+                if param["attr_value"] == None:
+                    param["attr_value"] = 0
+                if param["attr_type"] == "IntFeature":
+                    self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
+                    validator = QtGui.QIntValidator()
+                    self.feat_widgets[param["name"]].setValidator(validator)
+                    self.feat_widgets[param["name"]].setText(str(param["attr_value"]))
+                    
+                    self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,int(self.feat_widgets[param["name"]].text())))
+                elif param["attr_type"] == "FloatFeature":
+                    self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
+                    validator = QtGui.QDoubleValidator()
+                    self.feat_widgets[param["name"]].setValidator(validator)
+                    self.feat_widgets[param["name"]].setText(str(param["attr_value"]))
+                    
+                    self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,float(self.feat_widgets[param["name"]].text())))
+                elif param["attr_type"] == "StringFeature":
+                    self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
+                    self.feat_widgets[param["name"]].setText(param["attr_value"])
+                    
+                    self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].text()))            
+                elif param["attr_type"] == "BoolFeature":
+                    self.feat_widgets[param["name"]] = QtWidgets.QCheckBox(self.tab_config)
+                    self.feat_widgets[param["name"]].setChecked(param["attr_value"])
+                    
+                    self.feat_widgets[param["name"]].stateChanged.connect(lambda state, param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].isChecked()))
+                elif param["attr_type"] == "EnumFeature":
+                    self.feat_widgets[param["name"]] = QtWidgets.QComboBox(self.tab_config)
+                    for enum in param["attr_enums"]:
+                        self.feat_widgets[param["name"]].addItem(str(enum))
+                    index = self.feat_widgets[param["name"]].findText(str(param["attr_value"]), QtCore.Qt.MatchFixedString)
+                    if index >= 0:
+                        self.feat_widgets[param["name"]].setCurrentIndex(index)
+                    #add reamining options
+                    
+                    self.feat_widgets[param["name"]].activated.connect(lambda state, param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].currentText()))
                 
-                self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].text()))            
-            elif param["attr_type"] == "BoolFeature":
-                self.feat_widgets[param["name"]] = QtWidgets.QCheckBox(self.tab_config)
-                self.feat_widgets[param["name"]].setChecked(param["attr_value"])
+                else:
+                    self.feat_widgets[param["name"]] = QtWidgets.QLabel(self.tab_config)
+                    self.feat_widgets[param["name"]].setText("Error")
+                self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.FieldRole, self.feat_widgets[param["name"]])
+                num = num + 1
                 
-                self.feat_widgets[param["name"]].stateChanged.connect(lambda state, param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].isChecked()))
-            elif param["attr_type"] == "EnumFeature":
-                self.feat_widgets[param["name"]] = QtWidgets.QComboBox(self.tab_config)
-                for enum in param["attr_enums"]:
-                    self.feat_widgets[param["name"]].addItem(str(enum))
-                index = self.feat_widgets[param["name"]].findText(str(param["attr_value"]), QtCore.Qt.MatchFixedString)
-                if index >= 0:
-                    self.feat_widgets[param["name"]].setCurrentIndex(index)
-                #add reamining options
-                
-                self.feat_widgets[param["name"]].activated.connect(lambda state, param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].currentText()))
-            
-            else:
-                self.feat_widgets[param["name"]] = QtWidgets.QLabel(self.tab_config)
-                self.feat_widgets[param["name"]].setText("Error")
-            self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.FieldRole, self.feat_widgets[param["name"]])
-            num = num + 1
-            
-            #self.parameters_layout
-            #param["name"] label
-            #if param type bool
-                #param["value"] combo box 
-                    #options - param["možne hodnoty"]
-            #else if param type int
-                #param[value] number box?
-                    #if new value > max value
-                        #new valie = max value
+                #self.parameters_layout
+                #param["name"] label
+                #if param type bool
+                    #param["value"] combo box 
+                        #options - param["možne hodnoty"]
+                #else if param type int
+                    #param[value] number box?
+                        #if new value > max value
+                            #new valie = max value
     
                         
     def save_cam_config(self):
@@ -716,10 +722,12 @@ class Ui_MainWindow(object):
         self.set_status_msg("Configuration saved")
                 
     def disconnect_camera(self):
-        self.camera_icon.setPixmap(self.icon_offline)
-        self.camera_status.setText("Camera: Not connected")
-        self.set_status_msg("Disconnecting camera")
-        cam.disconnect_camera()
+        if self.connected:
+            self.connected = False
+            self.camera_icon.setPixmap(self.icon_offline)
+            self.camera_status.setText("Camera: Not connected")
+            self.set_status_msg("Disconnecting camera")
+            cam.disconnect_camera()
         
     
     def set_status_msg(self, message):
