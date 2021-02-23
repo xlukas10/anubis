@@ -624,110 +624,170 @@ class Ui_MainWindow(object):
             time.sleep(1/refresh_rate)
     
     def tab_changed(self):
+        """!@brief Called when tab changes
+        @details Used to do actions when entering specific tab.
+        """
         index = self.tabs.currentIndex()
         
         if index == 0:
             pass
-        if index == 1:
-            #Connect tab change to configure to trigger parameter refresh
-            print("showing")
+        if index == 1:#Camera configuration tab
+            #Request parameters from camera and show them in gui
             self.show_parameters()
         
     def show_parameters(self):
-        #FeatureTypes = Union[IntFeature, FloatFeature, StringFeature, BoolFeature, EnumFeature,CommandFeature, RawFeature]
+        """!@brief Fills layout with feature name and value pairs
+        @details Based on the feature type a new label, text area, checkbox or
+        combo box is created. In this version all available parameters are shown.
+        TODO config level and command feature type
+        """
+        #Start filling features in only on connected camera
         if self.connected:
+            #Status message
             self.set_status_msg("Reading features")
+            
             params = cam.get_parameters()
+            
+            #Keeps track of line in the layout
             num = 0
+            
+            #Contains all dynamically created widgets
             self.feat_widgets = {}
+            
             for param_name, param in params.items():
+                
+                #Create a new label with name of the feature
                 label = QtWidgets.QLabel(self.tab_config)
                 label.setObjectName(param["name"])
-                #if(param["attr_unit"] != None):
-                #    label.setText(param["attr_name"] + "[" + param["attr_unit"] + "]")
-                #else:
-                #    label.setText(param["attr_name"])
                 label.setText(param["attr_name"])
+                
+                #If the feature has a tooltip, set it.
                 try:
                     label.setToolTip(param["attr_tooltip"])
                 finally:
                     pass
+                
+                #Place the label on the num line of the layout
                 self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.LabelRole, label)
                 
-                
-                widget = None
+                #If the feature does not have a value, set it to 0
                 if param["attr_value"] == None:
                     param["attr_value"] = 0
+                    
+                #Based on the feature type, right widget is chosen to hold the
+                #feature's value
+                
                 if param["attr_type"] == "IntFeature":
+                    #For int feature a Line edit field is created, but only 
+                    #integers can be written in.
                     self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
                     validator = QtGui.QIntValidator()
                     self.feat_widgets[param["name"]].setValidator(validator)
+                    
+                    #Set text to the current value of the feature
                     self.feat_widgets[param["name"]].setText(str(param["attr_value"]))
                     
+                    #Call feature change for this feature when enter is pressed in this field.
+                    #Text is the value that will be set to the feature.
                     self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,int(self.feat_widgets[param["name"]].text())))
                 elif param["attr_type"] == "FloatFeature":
+                    #For float feature a Line edit field is created, but only 
+                    #real numbers can be written in.
                     self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
                     validator = QtGui.QDoubleValidator()
                     self.feat_widgets[param["name"]].setValidator(validator)
+                    
+                    #Set text to the current value of the feature
                     self.feat_widgets[param["name"]].setText(str(param["attr_value"]))
                     
+                    #Call feature change for this feature when enter is pressed in this field.
+                    #Text is the value that will be set to the feature.
                     self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,float(self.feat_widgets[param["name"]].text())))
                 elif param["attr_type"] == "StringFeature":
+                    #For string feature a Line edit field is created.
                     self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
+                    
+                    #Set text to the current value of the feature
                     self.feat_widgets[param["name"]].setText(param["attr_value"])
                     
+                    #Call feature change for this feature when enter is pressed in this field.
+                    #Text is the value that will be set to the feature.
                     self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].text()))            
                 elif param["attr_type"] == "BoolFeature":
+                    #For bool feature a checkbox is created.
                     self.feat_widgets[param["name"]] = QtWidgets.QCheckBox(self.tab_config)
+                    
+                    #If value is true the checkbox is ticked otherwise remains empty
                     self.feat_widgets[param["name"]].setChecked(param["attr_value"])
                     
+                    #When state of the checkbox change, the feature is sent to 
+                    #the camera and changed to the new state
                     self.feat_widgets[param["name"]].stateChanged.connect(lambda state, param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].isChecked()))
                 elif param["attr_type"] == "EnumFeature":
+                    #For enum feature a combo box is created.
                     self.feat_widgets[param["name"]] = QtWidgets.QComboBox(self.tab_config)
+                    
+                    #All available enum states are added as options to the
+                    #combo box.
                     for enum in param["attr_enums"]:
                         self.feat_widgets[param["name"]].addItem(str(enum))
+                    
+                    #Search the options and find the index of the active value
                     index = self.feat_widgets[param["name"]].findText(str(param["attr_value"]), QtCore.Qt.MatchFixedString)
+                    
+                    #Set found index to be the active one
                     if index >= 0:
                         self.feat_widgets[param["name"]].setCurrentIndex(index)
-                    #add reamining options
                     
+                    #When different option is selected change the given enum in
+                    #the camera
                     self.feat_widgets[param["name"]].activated.connect(lambda state, param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].currentText()))
-                
                 else:
+                    #If the feature type is not recognized, create a label with 
+                    #the text error
                     self.feat_widgets[param["name"]] = QtWidgets.QLabel(self.tab_config)
                     self.feat_widgets[param["name"]].setText("Error")
+                    
+                #Add newly created widget to the layout on the num line
                 self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.FieldRole, self.feat_widgets[param["name"]])
                 num = num + 1
-                
-                #self.parameters_layout
-                #param["name"] label
-                #if param type bool
-                    #param["value"] combo box 
-                        #options - param["možne hodnoty"]
-                #else if param type int
-                    #param[value] number box?
-                        #if new value > max value
-                            #new valie = max value
-    
                         
     def save_cam_config(self):
+        """!@brief Opens file dialog for user to select where to save camera 
+        configuration.
+        @details Called by Save configuration button. Configuration is saved 
+        as an .xml file and its contents are dependent on module used in Camera 
+        class to save the config.
+        """
+        #Open file dialog for choosing a save location and name
         name = QtWidgets.QFileDialog.getSaveFileName(self.centralwidget,
                                                      "Save Configuration",
                                                      filter="XML files (*.xml)",
                                                      directory="config.xml")
+        
+        #Save camera config to path specified in name (0 index)
         cam.save_config(name[0])
         
     def set_record_path(self):
+        """!@brief Opens file dialog for user to set path to save frames.
+        @details Method is called by Save Location button. Path is written to 
+        the label next to the button and can be further modified.
+        """
+        #Open file dialog for choosing a folder
         name = QtWidgets.QFileDialog.getExistingDirectory(self.centralwidget,
                                                      "Select Folder",
                                                      )
-        print(name)
+        
+        #Set label text to chosen folder path
         self.line_edit_save_location.setText(name)
         
-        #cam.save_config(name[0])
     def read_config(self):
+        """!@brief Loads configuration from config.ini file
+        @details This method is called on startup and loads all modifications
+        user made to applications default state.
+        @TODO load cti files from config
+        """
         with open("config.ini", 'r') as config:
-            #reading configuration for recording
             for line in config:
                 #reading configuration for recording
                 line = line.rstrip('\n')
@@ -737,35 +797,61 @@ class Ui_MainWindow(object):
                     self.line_edit_save_location.setText(line.replace("save_location=", "", 1))
                 elif(line.startswith("sequence_duration=")):
                     self.line_edit_sequence_duration.setText(line.replace("sequence_duration=", "", 1))
-                #reading and adding cti files
-        self.set_status_msg("Configuration loaded")
+#TODO reading and adding cti files
+        
+        #Set status update
+        self.set_status_msg("Configuration loaded",500)
                 
     def reset_seq_settings(self):
+        """!@brief Restores default recording settings
+        @details Settings are saved to config.ini file. Defaults are hard-coded
+        in this method.
+        """
         file_contents = []
+        
+        #Open config file and load its contents
         with open("config.ini", 'r') as config:
             file_contents = config.readlines()
+        
+        #Find end of Recording config part of the file
         end_of_rec_conf = file_contents.index("CTI_FILES_PATHS\n")
             
         with open("config.ini", 'w') as config:
+            #Write default states to the file
             config.write("RECORDING\n")
             config.write("filename=img(%n)\n")
-            config.write("save_location=Recording\n")#maybe se to the documents folder
+            config.write("save_location=Recording\n")
+#maybe set to the documents folder
             config.write("sequence_duration=0\n")
+            
+            #When at the end of recording config part, just copy the rest of
+            #the initial file.
             if(end_of_rec_conf):
                 for line in file_contents[end_of_rec_conf:]:
                     config.write(line)
+        
+        #Fill the Recording tab with updated values
         self.read_config()
+        
+        #Print status msg
         self.set_status_msg("Configuration restored")
     
     def save_seq_settings(self):
+        """!@brief Saves recording settings
+        @details Settings are saved to config.ini file. Parameters saved are:
+        file name, save, location and sequence duration.
+        """
         file_contents = []
+        
+        #Open config file and load its contents
         with open("config.ini", 'r') as config:
             file_contents = config.readlines()
-            
+        
+        #Open config file for writing
         with open("config.ini", 'w') as config:
-            #reading configuration for recording
+            
             for line in file_contents:
-                #reading configuration for recording
+                #Reading configuration for recording
                 if(line.startswith("filename=")):
                     config.write("filename=" + self.line_edit_sequence_name.text() + "\n")
                 elif(line.startswith("save_location=")):
@@ -773,17 +859,24 @@ class Ui_MainWindow(object):
                 elif(line.startswith("sequence_duration=")):
                     config.write("sequence_duration=" + self.line_edit_sequence_duration.text() + "\n")
                 else:
+                    #All content not concerning recording is written back without change
                     config.write(line)
-                #reading and adding cti files
-        
         self.set_status_msg("Configuration saved")
                 
     def disconnect_camera(self):
+        """!@brief Disconnect current camera
+        @details Method disconnects camera and setts all statusbar items to 
+        their default state.
+        """
+        #Disconnect only if already connected
         if self.connected:
+            #Det default states
             self.connected = False
             self.camera_icon.setPixmap(self.icon_offline)
             self.camera_status.setText("Camera: Not connected")
             self.set_status_msg("Disconnecting camera")
+            
+            #Disconnect camera
             cam.disconnect_camera()
         
     
