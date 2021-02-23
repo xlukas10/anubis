@@ -429,15 +429,19 @@ class Ui_MainWindow(object):
         detected, all previous item are cleared and cameras detected in this call
         are printed.
         """
-        
+        #set status message
         self.set_status_msg("Searching for cameras")
+        
+        #clear the list so the cameras won't appear twice or more
         self.list_detected_cameras.clear()
+        
+        #Get a list of cameras and inser each one to the interface as an 
+        #entry in the list.
         self.detected = cam.get_camera_list()
         for device in self.detected:
-            output = device['model'] #"Model: " + device.model + "Vendor: " + device.vendor
-            #in future maybe add icon based on interface type
+            output = device['model']
+#in  the future maybe add icon based on interface type
             self.list_detected_cameras.addItem(output)
-        #change format
     
     def connect_camera(self, index):
         """!@brief Connect to selected camera
@@ -445,21 +449,27 @@ class Ui_MainWindow(object):
         list or by pressing connect button
         @param[in] index index of selected camera in the list
         """
+        #Something must be selected
         if index != -1:
+            #If some camera is connected, disconnect it first
             if self.connected:
                 self.disconnect_camera()
             
+            #Print status message
             self.set_status_msg("Connecting camera")
+            
+            #Connect camera
             cam.select_camera(self.detected[index]['id_'])
+            
+            #Change packet size for ethernet camera
+#In the future this will happen only for ethernet cameras
             p = cam.get_parameters()
             cam.set_parameter(p['GVSPPacketSize'],1500)
-             #above will be automated
             
+            #Set up the status bar
             self.camera_icon.setPixmap(self.icon_standby)
             self.camera_status.setText("Camera: "+self.detected[index]['model'])
             self.connected = True
-           
-            #exception for nothing selected
         
     def record(self):
         """!@brief Starts and stops recording
@@ -472,7 +482,6 @@ class Ui_MainWindow(object):
         """
         if self.connected:
             if(not self.recording):
-                
                 #Change status icon and print status message
                 self.camera_icon.setPixmap(self.icon_busy)
                 self.set_status_msg("Starting recording")
