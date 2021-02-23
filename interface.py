@@ -445,20 +445,21 @@ class Ui_MainWindow(object):
         list or by pressing connect button
         @param[in] index index of selected camera in the list
         """
-        if self.connected:
-            self.disconnect_camera()
-        
-        self.set_status_msg("Connecting camera")
-        cam.select_camera(self.detected[index]['id_'])
-        p = cam.get_parameters()
-        cam.set_parameter(p['GVSPPacketSize'],1500)
-        
-        
-        self.camera_icon.setPixmap(self.icon_standby)
-        self.camera_status.setText("Camera: "+self.detected[index]['model'])
-        self.connected = True
-        #above will be automated
-        #exception for nothing selected
+        if index != -1:
+            if self.connected:
+                self.disconnect_camera()
+            
+            self.set_status_msg("Connecting camera")
+            cam.select_camera(self.detected[index]['id_'])
+            p = cam.get_parameters()
+            cam.set_parameter(p['GVSPPacketSize'],1500)
+             #above will be automated
+            
+            self.camera_icon.setPixmap(self.icon_standby)
+            self.camera_status.setText("Camera: "+self.detected[index]['model'])
+            self.connected = True
+           
+            #exception for nothing selected
         
     def record(self):
         #will be also called by automatic recording
