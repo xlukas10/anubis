@@ -35,6 +35,9 @@ class Ui_MainWindow(object):
         self.icon_standby = QtGui.QPixmap("./icons/icon_standby.png")
         self.icon_busy = QtGui.QPixmap("./icons/icon_busy.png")
         
+        self.fps = 0.0
+        self.received = 0
+        
         self.status_timer = QtCore.QTimer()
         self.status_timer.timeout.connect(self.clear_status)
         
@@ -451,6 +454,9 @@ class Ui_MainWindow(object):
         """
         #Something must be selected
         if index != -1:
+            #set green background to the selected camera
+            self.list_detected_cameras.item(index).setBackground(QtGui.QColor('#70BF4E'))
+            
             #If some camera is connected, disconnect it first
             if self.connected:
                 self.disconnect_camera()
@@ -578,6 +584,10 @@ class Ui_MainWindow(object):
             #Get image
             image = cam.get_single_frame()
             
+            #Set up a new value of received frames in the statusbar
+            self.received = self.received + 1
+            self.receive_status.setText("Received frames: " + str(self.received))
+            
             #Convert image to proper format fo PyQt
             h, w, ch = image.shape
             bytes_per_line = ch * w
@@ -605,16 +615,38 @@ class Ui_MainWindow(object):
         device = win32api.EnumDisplayDevices()
         refresh_rate = win32api.EnumDisplaySettings(device.DeviceName, -1).DisplayFrequency
         
+        #Auxiliary variables for fps calculation
+        frames = 0
+        cycles = 0
         #runs as long as the camera is recording or preview is active
         while self.recording or self.preview_live:
+            cycles = cycles + 1
+            
             #Draw only if thre is at least 1 frame to draw
             if not active_frame_queue.qsize() == 0:
                 image = active_frame_queue.get_nowait()
+                self.received = self.received + 1
+                
+                frames = frames + 1
                 
                 #Dump all remaining frames (If frames are received faster than 
                 #refresh_rate).
                 while not active_frame_queue.qsize() == 0:
+                    frames = frames + 1
+                    self.received = self.received + 1
                     active_frame_queue.get_nowait()
+                
+                #Set up a new value of received frames in the statusbar
+                self.receive_status.setText("Received frames: " + str(self.received))
+                
+                #More cycles -> more exact fps calculation (value is more stable in gui)
+                if cycles > 10:
+                    #[frames*Hz/c] -> [frames/s]
+                    self.fps = round(frames*(refresh_rate/cycles),1)
+                    self.fps_status.setText("FPS: " + str(self.fps))
+                    
+                    cycles = 0
+                    frames = 0
                 
                 #Convert image to proper format fo PyQt
                 h, w, ch = image.shape
@@ -631,6 +663,10 @@ class Ui_MainWindow(object):
                 self.camera_preview.show()
             #Wait for next display frame
             time.sleep(1/refresh_rate)
+        
+        #When recording stops, change fps to 0
+        self.fps = 0.0
+        self.fps_status.setText("FPS: " + str(self.fps))
     
     def tab_changed(self):
         """!@brief Called when tab changes
@@ -881,12 +917,20 @@ class Ui_MainWindow(object):
         if self.connected:
             #Det default states
             self.connected = False
+            self.received = 0
+            self.fps = 0.0
             self.camera_icon.setPixmap(self.icon_offline)
             self.camera_status.setText("Camera: Not connected")
+            
+            self.receive_status.setText("Received frames: " + str(self.received))
+            self.fps_status.setText("FPS: " + str(self.fps))
             self.set_status_msg("Disconnecting camera")
             
             #Disconnect camera
             cam.disconnect_camera()
+            
+            #Imidiately search for new cameras
+            self.refresh_cameras()
         
     
     def set_status_msg(self, message, timeout=1500):
@@ -894,8 +938,7 @@ class Ui_MainWindow(object):
         @details Method is called when other methods need to send the user 
         some confrimation or status update.
         @param[in] message Contains text to be displayed in the status bar
-        @param[in] timeout For how long should the message be displayed. 
-        Defaults to 1.5sec.
+        @param[in] timeout For how long should the message be displayed. Defaults to 1.5sec.
         """
         self.status_label.setText(message)
         
