@@ -61,11 +61,14 @@ class Ui_MainWindow(object):
         #Window with camera preview
         #-------------------------------------------------------------------
         self.preview_area = QtWidgets.QScrollArea(self.preview_and_control)
+        self.preview_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.preview_area.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        
         self.camera_preview = QtWidgets.QLabel(self.preview_area)
         self.camera_preview.setAutoFillBackground(False)
         self.camera_preview.setText("")
         self.camera_preview.setPixmap(QtGui.QPixmap("default_preview.png"))
-        self.camera_preview.setScaledContents(True)
+        self.camera_preview.setScaledContents(False)
         self.camera_preview.setIndent(-1)
         self.camera_preview.setObjectName("camera_preview")
         self.preview_area.setWidget(self.camera_preview)
@@ -593,11 +596,13 @@ class Ui_MainWindow(object):
             bytes_per_line = ch * w
             image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
 #TODO Get color format dynamically
-            image_scaled = image.scaled(self.camera_preview.size().width(), 
-                                        self.camera_preview.size().height(), 
+            image_scaled = image.scaled(self.preview_area.size().width(), 
+                                        self.preview_area.size().height(), 
                                         QtCore.Qt.KeepAspectRatio)
             
             #Set image to gui
+            self.camera_preview.resize(self.preview_area.size().width(),
+                                       self.preview_area.size().height())
             self.camera_preview.setPixmap(QtGui.QPixmap.fromImage(image_scaled))
             self.camera_preview.show()
             
@@ -653,12 +658,13 @@ class Ui_MainWindow(object):
                 bytes_per_line = ch * w
                 image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
 #TODO Get color format dynamically
-
-                image_scaled = image.scaled(self.camera_preview.size().width(), 
-                                            self.camera_preview.size().height(), 
+                image_scaled = image.scaled(self.preview_area.size().width(), 
+                                            self.preview_area.size().height(), 
                                             QtCore.Qt.KeepAspectRatio)
-                
+            
                 #Set image to gui
+                self.camera_preview.resize(self.preview_area.size().width(),
+                                           self.preview_area.size().height())
                 self.camera_preview.setPixmap(QtGui.QPixmap.fromImage(image_scaled))
                 self.camera_preview.show()
             #Wait for next display frame
