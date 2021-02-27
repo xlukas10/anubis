@@ -943,7 +943,7 @@ class Ui_MainWindow(object):
     
     def load_model(self):
         #Open file dialog for choosing a folder
-        name = QtWidgets.QFileDialog.getOpenFileName(self.centralwidget,
+        name = QtWidgets.QFileDialog.getExistingDirectory(self.centralwidget,
                                                      "Select Model",
                                                      filter="Keras model files (*.model)",
                                                      )
@@ -958,7 +958,7 @@ class Ui_MainWindow(object):
         #Open file dialog for choosing a folder
         name = QtWidgets.QFileDialog.getSaveFileName(self.centralwidget,
                                                      "Save Model",
-                                                     filter="Keras model files (*.model)",
+                                                     filter="Keras model folder (*.model)",
                                                      )
         
         #Set label text to chosen folder path
