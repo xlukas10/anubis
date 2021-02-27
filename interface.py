@@ -697,7 +697,7 @@ class Ui_MainWindow(object):
                     self.received = self.received + 1
                     active_frame_queue.get_nowait()
                 
-                #Try to run prediction
+                #Try to run a prediction
                 self.predict(image)
                 
                 #Set up a new value of received frames in the statusbar
