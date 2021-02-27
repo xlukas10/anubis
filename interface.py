@@ -32,7 +32,6 @@ class Ui_MainWindow(object):
         self.prediction_flag = threading.Event()
         
         self.interupt_flag = threading.Event()
-        self.resize_flag = threading.Event()
         self.recording = False
         self.preview_live = False
         
@@ -720,11 +719,8 @@ class Ui_MainWindow(object):
 #TODO Get color format dynamically
                 
                 #get size of preview window
-                print('a')
                 w_preview = self.preview_area.size().width()
-                print('b')
                 h_preview = self.preview_area.size().height()
-                print('c')
                 image_scaled = image.scaled(w_preview, 
                                             h_preview, 
                                             QtCore.Qt.KeepAspectRatio)
@@ -732,9 +728,7 @@ class Ui_MainWindow(object):
                 #Resize preview label if preview window size changed
                 if(w_preview != self.camera_preview.size().width() or
                    h_preview != self.camera_preview.size().height()):
-                    self.resize_preview(w_preview,h_preview)
-                    self.resize_flag.wait()
-                    self.resize_flag.clear()
+                    self.camera_preview.resize(w_preview,h_preview)
                 
                 #Set image to gui
                 self.camera_preview.setPixmap(QtGui.QPixmap.fromImage(image_scaled))
@@ -757,10 +751,6 @@ class Ui_MainWindow(object):
                 self.prediction_thread.start()
                 
     
-    def resize_preview(self,width,height):
-        self.camera_preview.resize(width,height)
-        self.resize_flag.set()
-        
     
     def tab_changed(self):
         """!@brief Called when tab changes
@@ -944,13 +934,12 @@ class Ui_MainWindow(object):
     def load_model(self):
         #Open file dialog for choosing a folder
         name = QtWidgets.QFileDialog.getExistingDirectory(self.centralwidget,
-                                                     "Select Model",
-                                                     filter="Keras model files (*.model)",
+                                                     "Select Model"
                                                      )
         
         #Set label text to chosen folder path
-        self.line_edit_model_name.setText(name[0])
-        self.vision.load_model(name[0])
+        self.line_edit_model_name.setText(name)
+        self.vision.load_model(name)
         
         self.set_status_msg("Model loaded")
         
