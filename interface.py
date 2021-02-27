@@ -14,8 +14,10 @@ import win32api #determine refresh rate
 #tmp 
 import cv2
 
+from prediction_graph import Prediction_graph
 from global_camera import cam
 from global_queue import active_frame_queue
+from computer_vision import Computer_vision
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -27,7 +29,10 @@ class Ui_MainWindow(object):
         self.detected = []
         self.connected = False
         
+        self.prediction_flag = threading.Event()
+        
         self.interupt_flag = threading.Event()
+        self.resize_flag = threading.Event()
         self.recording = False
         self.preview_live = False
         
@@ -67,6 +72,7 @@ class Ui_MainWindow(object):
         self.camera_preview = QtWidgets.QLabel(self.preview_area)
         self.camera_preview.setAutoFillBackground(False)
         self.camera_preview.setText("")
+        self.camera_preview.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
         self.camera_preview.setPixmap(QtGui.QPixmap("default_preview.png"))
         self.camera_preview.setScaledContents(False)
         self.camera_preview.setIndent(-1)
@@ -297,9 +303,45 @@ class Ui_MainWindow(object):
         #Tab - Keras/Tensorflow/Learning,Classification
         self.tab_tensorflow = QtWidgets.QWidget()
         self.tab_tensorflow.setObjectName("tab_tensorflow")
-        self.radioButton = QtWidgets.QRadioButton(self.tab_tensorflow)
-        self.radioButton.setGeometry(QtCore.QRect(130, 190, 95, 20))
-        self.radioButton.setObjectName("radioButton")
+        
+        self.gridLayout_3 = QtWidgets.QGridLayout(self.tab_tensorflow)
+        self.gridLayout_3.setObjectName("gridLayout_3")
+        
+        self.btn_save_model = QtWidgets.QPushButton(self.tab_tensorflow)
+        self.btn_save_model.setObjectName("btn_save_model")
+        self.btn_save_model.clicked.connect(self.save_model)
+        self.gridLayout_3.addWidget(self.btn_save_model, 0, 1, 1, 1)
+        
+        self.line_edit_model_name = QtWidgets.QLineEdit(self.tab_tensorflow)
+        self.line_edit_model_name.setObjectName("line_edit_model_name")
+        self.line_edit_model_name.setEnabled(False)
+        self.gridLayout_3.addWidget(self.line_edit_model_name, 1, 0, 1, 2)
+        
+        self.btn_load_model = QtWidgets.QPushButton(self.tab_tensorflow)
+        self.btn_load_model.setObjectName("btn_load_model")
+        self.btn_load_model.clicked.connect(self.load_model)
+        self.gridLayout_3.addWidget(self.btn_load_model, 0, 0, 1, 1)
+        
+        self.tabWidget = QtWidgets.QTabWidget(self.tab_tensorflow)
+        self.tabWidget.setObjectName("tabWidget")
+        
+        self.tab_classify = QtWidgets.QWidget()
+        self.tab_classify.setObjectName("tab_classify")
+        self.gridLayout_5 = QtWidgets.QGridLayout(self.tab_classify)
+        self.gridLayout_5.setObjectName("gridLayout_5")
+        
+        self.predictions = Prediction_graph()
+        
+        self.gridLayout_5.addWidget(self.predictions, 0, 0, 1, 1)
+        
+        self.tabWidget.addTab(self.tab_classify, "")
+        
+        self.tab_learn = QtWidgets.QWidget()
+        self.tab_learn.setObjectName("tab_learn")
+        
+        self.tabWidget.addTab(self.tab_learn, "")
+        
+        self.gridLayout_3.addWidget(self.tabWidget, 2, 0, 1, 2)
         self.tabs.addTab(self.tab_tensorflow, "")
         
         
@@ -384,6 +426,9 @@ class Ui_MainWindow(object):
         self.tabs.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
+        
+        self.vision = Computer_vision(self.predictions)
+        
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -410,8 +455,12 @@ class Ui_MainWindow(object):
         self.btn_save_sequence_settings.setText(_translate("MainWindow", "Save settings"))
         self.btn_reset_sequence_settings.setText(_translate("MainWindow", "Default settings"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_recording_config), _translate("MainWindow", "Recording Configuration"))
-        self.radioButton.setText(_translate("MainWindow", "Not ready"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_tensorflow), _translate("MainWindow", "Tensorflow"))
+        self.btn_save_model.setText(_translate("MainWindow", "Save model"))
+        self.line_edit_model_name.setText(_translate("MainWindow", "Loaded model - not changable"))
+        self.btn_load_model.setText(_translate("MainWindow", "Load model"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_classify), _translate("MainWindow", "Classify"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_learn), _translate("MainWindow", "Learn"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuOptions.setTitle(_translate("MainWindow", "Options"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
@@ -587,6 +636,9 @@ class Ui_MainWindow(object):
             #Get image
             image = cam.get_single_frame()
             
+            #Try to run prediction
+            self.predict(image)
+            
             #Set up a new value of received frames in the statusbar
             self.received = self.received + 1
             self.receive_status.setText("Received frames: " + str(self.received))
@@ -596,13 +648,18 @@ class Ui_MainWindow(object):
             bytes_per_line = ch * w
             image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
 #TODO Get color format dynamically
-            image_scaled = image.scaled(self.preview_area.size().width(), 
-                                        self.preview_area.size().height(), 
+            
+            #get size of preview window
+            w_preview = self.preview_area.size().width()
+            h_preview = self.preview_area.size().height()
+            
+            image_scaled = image.scaled(w_preview, 
+                                        h_preview, 
                                         QtCore.Qt.KeepAspectRatio)
             
             #Set image to gui
-            self.camera_preview.resize(self.preview_area.size().width(),
-                                       self.preview_area.size().height())
+            self.camera_preview.resize(w_preview,
+                                       h_preview)
             self.camera_preview.setPixmap(QtGui.QPixmap.fromImage(image_scaled))
             self.camera_preview.show()
             
@@ -641,6 +698,9 @@ class Ui_MainWindow(object):
                     self.received = self.received + 1
                     active_frame_queue.get_nowait()
                 
+                #Try to run prediction
+                self.predict(image)
+                
                 #Set up a new value of received frames in the statusbar
                 self.receive_status.setText("Received frames: " + str(self.received))
                 
@@ -658,13 +718,25 @@ class Ui_MainWindow(object):
                 bytes_per_line = ch * w
                 image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
 #TODO Get color format dynamically
-                image_scaled = image.scaled(self.preview_area.size().width(), 
-                                            self.preview_area.size().height(), 
+                
+                #get size of preview window
+                print('a')
+                w_preview = self.preview_area.size().width()
+                print('b')
+                h_preview = self.preview_area.size().height()
+                print('c')
+                image_scaled = image.scaled(w_preview, 
+                                            h_preview, 
                                             QtCore.Qt.KeepAspectRatio)
-            
+                
+                #Resize preview label if preview window size changed
+                if(w_preview != self.camera_preview.size().width() or
+                   h_preview != self.camera_preview.size().height()):
+                    self.resize_preview(w_preview,h_preview)
+                    self.resize_flag.wait()
+                    self.resize_flag.clear()
+                
                 #Set image to gui
-                self.camera_preview.resize(self.preview_area.size().width(),
-                                           self.preview_area.size().height())
                 self.camera_preview.setPixmap(QtGui.QPixmap.fromImage(image_scaled))
                 self.camera_preview.show()
             #Wait for next display frame
@@ -673,6 +745,22 @@ class Ui_MainWindow(object):
         #When recording stops, change fps to 0
         self.fps = 0.0
         self.fps_status.setText("FPS: " + str(self.fps))
+    
+    def predict(self,frame):
+        #Tensorflow index is 3, if the gui changes, this may need to chage as well
+        if(self.tabs.currentIndex()==3):
+            if(not self.prediction_flag.is_set()):
+                self.prediction_flag.set()
+                
+                self.prediction_thread = threading.Thread(
+                    target=self.vision.classify(frame,self.prediction_flag))
+                self.prediction_thread.start()
+                
+    
+    def resize_preview(self,width,height):
+        self.camera_preview.resize(width,height)
+        self.resize_flag.set()
+        
     
     def tab_changed(self):
         """!@brief Called when tab changes
@@ -852,7 +940,32 @@ class Ui_MainWindow(object):
         
         #Set status update
         self.set_status_msg("Configuration loaded",500)
-                
+    
+    def load_model(self):
+        #Open file dialog for choosing a folder
+        name = QtWidgets.QFileDialog.getOpenFileName(self.centralwidget,
+                                                     "Select Model",
+                                                     filter="Keras model files (*.model)",
+                                                     )
+        
+        #Set label text to chosen folder path
+        self.line_edit_model_name.setText(name[0])
+        self.vision.load_model(name[0])
+        
+        self.set_status_msg("Model loaded")
+        
+    def save_model(self):
+        #Open file dialog for choosing a folder
+        name = QtWidgets.QFileDialog.getSaveFileName(self.centralwidget,
+                                                     "Save Model",
+                                                     filter="Keras model files (*.model)",
+                                                     )
+        
+        #Set label text to chosen folder path
+        self.vision.save_model(name)
+        
+        self.set_status_msg("Model saved")
+    
     def reset_seq_settings(self):
         """!@brief Restores default recording settings
         @details Settings are saved to config.ini file. Defaults are hard-coded
