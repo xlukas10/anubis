@@ -19,6 +19,7 @@ class Prediction_graph(FigureCanvasQTAgg):
         self.categories = []
         self.probability = []
         self.w = 1
+        self.axes.set_ylim(-1,1)
         #self.indent = np.arange(self.N)
         
         self.axes.bar(self.categories,self.probability,self.w)
@@ -33,8 +34,6 @@ class Prediction_graph(FigureCanvasQTAgg):
     
     def write_probability(self, probability = []):
         self.probability = probability[0]#test with multiple output classes
-        print(f"probab {self.probability}")
-        print(self.categories)
         self.figure.canvas.axes.clear()
         
         self.axes.bar(self.categories,self.probability,self.w)
