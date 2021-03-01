@@ -253,7 +253,7 @@ class Ui_MainWindow(object):
         
         self.file_manager_save_location = QtWidgets.QPushButton(self.widget_sequence_save)
         self.file_manager_save_location.setObjectName("file_manager_save_location")
-        self.file_manager_save_location.clicked.connect(self.set_record_path)
+        self.file_manager_save_location.clicked.connect(lambda: self.get_directory(self.line_edit_save_location))
         self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.file_manager_save_location)
         
         self.line_edit_save_location = QtWidgets.QLineEdit(self.widget_sequence_save)
@@ -359,6 +359,7 @@ class Ui_MainWindow(object):
         
         self.btn_load_dataset = QtWidgets.QPushButton(self.frame_train_preprocess)
         self.btn_load_dataset.setObjectName("btn_load_dataset")
+        self.btn_load_dataset.clicked.connect(lambda: self.get_directory(self.line_edit_dataset_path))
         self.gridLayout_7.addWidget(self.btn_load_dataset, 1, 0, 1, 1)
         
         self.label_val_split = QtWidgets.QLabel(self.frame_train_preprocess)
@@ -1075,7 +1076,8 @@ class Ui_MainWindow(object):
         #Save camera config to path specified in name (0 index)
         cam.save_config(name[0])
         
-    def set_record_path(self):
+    def get_directory(self, line_output):
+        #set_record_path
         """!@brief Opens file dialog for user to set path to save frames.
         @details Method is called by Save Location button. Path is written to 
         the label next to the button and can be further modified.
@@ -1086,7 +1088,8 @@ class Ui_MainWindow(object):
                                                      )
         
         #Set label text to chosen folder path
-        self.line_edit_save_location.setText(name)
+        line_output.setText(name)
+        return name
         
     def read_config(self):
         """!@brief Loads configuration from config.ini file
@@ -1111,12 +1114,9 @@ class Ui_MainWindow(object):
     
     def load_model(self):
         #Open file dialog for choosing a folder
-        name = QtWidgets.QFileDialog.getExistingDirectory(self.centralwidget,
-                                                     "Select Model"
-                                                     )
+        name = self.get_directory(self.line_edit_model_name)
         
         #Set label text to chosen folder path
-        self.line_edit_model_name.setText(name)
         self.vision.load_model(name)
         
         self.set_status_msg("Model loaded")
