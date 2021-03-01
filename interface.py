@@ -10,6 +10,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import threading
 import time
 import win32api #determine refresh rate
+import os #working with some paths
 
 #tmp 
 import cv2
@@ -368,6 +369,7 @@ class Ui_MainWindow(object):
         
         self.btn_preprocess = QtWidgets.QPushButton(self.frame_train_preprocess)
         self.btn_preprocess.setObjectName("btn_preprocess")
+        self.btn_preprocess.clicked.connect(self.preprocess_dataset)
         self.gridLayout_7.addWidget(self.btn_preprocess, 6, 0, 1, 1)
         
         self.btn_save_preprocess = QtWidgets.QPushButton(self.frame_train_preprocess)
@@ -1218,7 +1220,45 @@ class Ui_MainWindow(object):
             #Imidiately search for new cameras
             self.refresh_cameras()
         
-    
+    def preprocess_dataset(self):
+        width_str = self.line_edit_res_width.text()
+        height_str = self.line_edit_res_height.text()
+        
+        width = 0
+        height = 0
+        
+        if(width_str == '' or width_str == '0'):
+            width_str = - 1
+        else:
+            width = int(self.line_edit_res_width.text())
+            
+        if(height_str == '' or height_str == '0'):
+            width_str = - 1
+        else:
+            height = int(self.line_edit_res_height.text())
+            
+        path = self.line_edit_dataset_path.text()
+        split = float(self.line_edit_val_split_2.text())/100
+        files = os.scandir(path)
+        categories = []
+        
+        for file in files:
+            if file.is_dir():
+                print(file)
+                categories.append(file.name)
+        print(categories)
+        
+        self.preprocess_thread = threading.Thread(
+                    target=self.vision.process_dataset(width=width,
+                                                        height=height,
+                                                        path=path,
+                                                        split=split,
+                                                        categories=categories))
+        self.preprocess_thread.start()
+        
+        
+        
+        
     def set_status_msg(self, message, timeout=1500):
         """!@brief Shows message in status bar
         @details Method is called when other methods need to send the user 

@@ -49,6 +49,17 @@ class Computer_vision():
             
             
             prediction_flag.clear()
+    
+    def process_dataset(self, path, width=50, height=50, split=0, categories=[]):
+        if width == -1:
+            width = 50
+        if height == -1:
+            height = 50
+            
         
-    def learn(self):
+        if(path != None):
+            pass
+        
+        
+    def train(self):
         pass
