@@ -321,10 +321,10 @@
         <string>Tensorflow</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="1">
-         <widget class="QPushButton" name="btn_save_model">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="btn_load_model">
           <property name="text">
-           <string>Save model</string>
+           <string>Load model</string>
           </property>
          </widget>
         </item>
@@ -338,15 +338,15 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QPushButton" name="btn_load_model">
+        <item row="0" column="1">
+         <widget class="QPushButton" name="btn_save_model">
           <property name="text">
-           <string>Load model</string>
+           <string>Save model</string>
           </property>
          </widget>
         </item>
         <item row="2" column="0" colspan="2">
-         <widget class="QTabWidget" name="tabWidget">
+         <widget class="QTabWidget" name="tensorflow_tabs">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -367,10 +367,260 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_learn">
+          <widget class="QWidget" name="tab_train">
            <attribute name="title">
-            <string>Learn</string>
+            <string>Train</string>
            </attribute>
+           <layout class="QGridLayout" name="gridLayout_9">
+            <item row="0" column="0">
+             <widget class="QFrame" name="frame_train_preprocess">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_7">
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_img_resize">
+                 <property name="text">
+                  <string>Image resize</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_model_arch">
+                 <property name="text">
+                  <string>Model architecture</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QPushButton" name="btn_load_dataset">
+                 <property name="text">
+                  <string>Select Dataset</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QLabel" name="label_val_split">
+                 <property name="text">
+                  <string>Validation split [%]</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="0">
+                <widget class="QPushButton" name="btn_preprocess">
+                 <property name="text">
+                  <string>Preprocess Data</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="1">
+                <widget class="QPushButton" name="btn_save_preprocess">
+                 <property name="text">
+                  <string>Save preprocessed data</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QFrame" name="frame_train_val_split">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout">
+                  <item>
+                   <widget class="QLineEdit" name="line_edit_val_split_1">
+                    <property name="maximumSize">
+                     <size>
+                      <width>186</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="inputMethodHints">
+                     <set>Qt::ImhDigitsOnly</set>
+                    </property>
+                    <property name="text">
+                     <string>70</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_colon">
+                    <property name="text">
+                     <string>:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="line_edit_val_split_2">
+                    <property name="inputMethodHints">
+                     <set>Qt::ImhDigitsOnly</set>
+                    </property>
+                    <property name="text">
+                     <string>30</string>
+                    </property>
+                    <property name="frame">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item row="4" column="0" colspan="2">
+                <widget class="QFrame" name="frame_train_resize">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_4">
+                  <item>
+                   <widget class="QLabel" name="label_res_width">
+                    <property name="text">
+                     <string>Width</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="line_edit_res_width">
+                    <property name="inputMethodHints">
+                     <set>Qt::ImhDigitsOnly</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_res_height">
+                    <property name="text">
+                     <string>Height</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="line_edit_res_height">
+                    <property name="inputMethodHints">
+                     <set>Qt::ImhDigitsOnly</set>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QComboBox" name="combo_model_arch">
+                 <item>
+                  <property name="text">
+                   <string>Use loaded model</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="line_edit_dataset_path"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QFrame" name="frame_train_stats">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_8">
+               <item row="5" column="3">
+                <widget class="QLineEdit" name="line_edit_val_acc">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0" colspan="4">
+                <widget class="QFrame" name="frame_train_progress">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_6">
+                  <item row="2" column="0">
+                   <widget class="QProgressBar" name="progress_bar_train">
+                    <property name="value">
+                     <number>24</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QPushButton" name="btn_train_cancel">
+                    <property name="text">
+                     <string>Train</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="line_edit_loss">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="2">
+                <widget class="QLabel" name="label_val_acc">
+                 <property name="text">
+                  <string>Validation Accuracy</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_loss">
+                 <property name="text">
+                  <string>Loss</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLabel" name="label_val_loss">
+                 <property name="text">
+                  <string>Validation Loss</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QLineEdit" name="line_edit_acc">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QLabel" name="label_acc">
+                 <property name="text">
+                  <string>Accuracy</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QLineEdit" name="line_edit_val_loss">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </widget>
         </item>
