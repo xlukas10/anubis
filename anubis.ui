@@ -554,7 +554,7 @@
                   <item row="2" column="0">
                    <widget class="QProgressBar" name="progress_bar_train">
                     <property name="value">
-                     <number>24</number>
+                     <number>0</number>
                     </property>
                    </widget>
                   </item>
