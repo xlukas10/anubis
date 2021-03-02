@@ -29,6 +29,7 @@ class Ui_MainWindow(object):
         """
         self.detected = []
         self.connected = False
+        self.training_flag = threading.Event()
         
         self.prediction_flag = threading.Event()
         
@@ -466,6 +467,7 @@ class Ui_MainWindow(object):
         
         self.btn_train_cancel = QtWidgets.QPushButton(self.frame_train_progress)
         self.btn_train_cancel.setObjectName("btn_train_cancel")
+        self.btn_train_cancel.clicked.connect(self.train_model)
         self.gridLayout_6.addWidget(self.btn_train_cancel, 0, 0, 1, 1)
         
         self.gridLayout_8.addWidget(self.frame_train_progress, 0, 0, 1, 4)
@@ -928,7 +930,7 @@ class Ui_MainWindow(object):
                 self.prediction_flag.set()
                 
                 self.prediction_thread = threading.Thread(
-                    target=self.vision.classify(frame,self.prediction_flag))
+                    target=self.vision.classify, kwargs={'frame': frame, 'prediction_flag': self.prediction_flag})
                 self.prediction_thread.start()
                 
     
@@ -1244,20 +1246,25 @@ class Ui_MainWindow(object):
         
         for file in files:
             if file.is_dir():
-                print(file)
                 categories.append(file.name)
-        print(categories)
         
-        self.preprocess_thread = threading.Thread(
-                    target=self.vision.process_dataset(width=width,
-                                                        height=height,
-                                                        path=path,
-                                                        split=split,
-                                                        categories=categories))
+        self.preprocess_thread = threading.Thread(target=self.vision.process_dataset, kwargs={'width': width, 'height': height, 'path': path, 'split': split, 'categories': categories})
         self.preprocess_thread.start()
-        
-        
-        
+   
+    def train_model(self):
+        if(not self.training_flag.is_set()):
+            self.training_flag.set()
+            print("hola hola")
+            self.train_thread = threading.Thread(target=self.vision.train, kwargs={
+                'progress_bar': self.progress_bar_train,
+                'loss_label': self.line_edit_loss,
+                'acc_label': self.line_edit_acc,
+                'val_loss_label': self.line_edit_val_loss,
+                'val_acc_label': self.line_edit_val_acc,
+                'training_flag': self.training_flag})
+            self.train_thread.start()
+        else:
+            self.training_flag.clear()
         
     def set_status_msg(self, message, timeout=1500):
         """!@brief Shows message in status bar
