@@ -152,47 +152,39 @@ class Gui_callback(keras.callbacks.Callback):
         self._called_in_fit = True
 
 #done
-    def on_test_begin(self, logs=None):
-        if not self._called_in_fit:
-            self._reset_progbar()
 
-#done
-    def on_predict_begin(self, logs=None):
-        self._reset_progbar()
 
 #Pass in label for epochs
     def on_epoch_begin(self, epoch, logs=None):
-        self._reset_progbar()
         self.active_epoch = epoch
         if self.verbose and self.epochs > 1:
             print('Epoch %d/%d' % (epoch + 1, self.epochs))
 
     def on_train_batch_end(self, batch, logs=None):
-        self._batch_update_progbar(batch, logs)
+        self._update_progbar(batch, logs)
 
     def on_test_batch_end(self, batch, logs=None):
         if not self._called_in_fit:
-            self._batch_update_progbar(batch, logs)
+            self._update_progbar(batch, logs)
 
     def on_predict_batch_end(self, batch, logs=None):
     # Don't pass prediction results.
-        self._batch_update_progbar(batch, None)
+        self._update_progbar(batch, None)
 
     def on_epoch_end(self, epoch, logs=None):
-        self._finalize_progbar(logs)
+        self._update_progbar(logs=logs)
 
     def on_test_end(self, logs=None):
         if not self._called_in_fit:
-            self._finalize_progbar(logs)
+            self._update_progbar(logs=logs)
 
     def on_predict_end(self, logs=None):
-        self._finalize_progbar(logs)
+        self._update_progbar(logs=logs)
 
 #CHNG
     def _reset_progbar(self):
-        print("reseting")
-        #ššself.gui.progress_bar_train.reset()
-        print("success")
+        self.train_vals['progress'] = 0
+        self.progress_flag.set()
         self.seen = 0
 
     def _maybe_init_progbar(self):
@@ -201,39 +193,36 @@ class Gui_callback(keras.callbacks.Callback):
                 self.stateful_metrics = (set(m.name for m in self.model.metrics))
         else:
             self.stateful_metrics = set()
-
         
 
-    def _batch_update_progbar(self, batch, logs=None):
+    def _update_progbar(self, batch=None, logs=None):
         """Updates the progbar."""
         logs = logs or {}
         self._maybe_init_progbar()
         self.seen += 1
-        '''if self.use_steps:
-            self.seen = batch + 1  # One-indexed.
-        else:
-            # v1 path only.
-            #logs = copy.copy(logs)
-            batch_size = logs.pop('size', 0)
-            num_steps = logs.pop('num_steps', 1)
-            logs.pop('batch', None)
-            add_seen = num_steps * batch_size
-            self.seen += add_seen
-        '''
-        if self.verbose == 1:
-            # Only block async when verbose = 1.
-            if(self.target == None):
-                self.target = 0
-            
-            
-            percentage = int( (self.seen + self.target*(self.active_epoch))/((self.target*self.epochs)/100))
-            if(percentage != self.train_vals['progress']):
-                self.train_vals['progress'] = percentage
-                self.progress_flag.set()
-
-    def _finalize_progbar(self, logs):
-        logs = logs or {}
-        self._maybe_init_progbar()
-        if self.target is None:
-            self.target = self.seen
         logs = tf_utils.to_numpy_or_python_type(logs)
+        
+        # Only block async when verbose = 1.
+        if(self.target == None):
+            self.target = 0
+        
+        
+        percentage = int( (self.seen)/((self.target*self.epochs)/100))
+        try:
+            self.train_vals['loss'] = format(float(logs['loss']),'.3f')
+        except:
+            pass
+        try:
+            self.train_vals['val_loss'] = format(float(logs['val_loss']),'.3f')
+        except:
+            pass
+        try:
+            self.train_vals['acc'] = format(float(logs['accuracy']),'.3f')
+        except:
+            pass
+        try:
+            self.train_vals['val_acc'] = format(float(logs['val_accuracy']),'.3f')
+        except:
+            pass
+        self.train_vals['progress'] = percentage
+        self.progress_flag.set()
