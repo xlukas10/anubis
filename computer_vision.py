@@ -6,6 +6,7 @@ Created on Sat Feb 27 09:00:50 2021
 """
 
 from tensorflow import keras
+from tensorflow.python.keras.utils import tf_utils
 import numpy as np
 import cv2
 import os
@@ -69,8 +70,11 @@ class Computer_vision():
                 
             self.split = split
             
-            self.x.clear()
-            self.y.clear()
+            del self.x
+            del self.y
+            
+            self.x = []
+            self.y = []
             
             self.__create_training_data(path,categories, width, height)
             
@@ -101,16 +105,23 @@ class Computer_vision():
         random.shuffle(self.training_data)
 
         
-    def train(self, progress_bar, loss_label, acc_label, val_loss_label, val_acc_label, training_flag):
+    def train(self,  train_vals, progress_flag, training_flag):
         print("strat training")
-        keras.callbacks.ProgbarLogger(count_mode="samples", )#stateful_metrics=None)
-        self.model.fit(self.x,self.y,batch_size=32,validation_split=self.split,epochs=5,)
+        
+        callback = Gui_callback(train_vals,progress_flag)
+       
+        self.model.fit(self.x,self.y,batch_size=32,validation_split=self.split,epochs=5, callbacks=[callback])
         training_flag.clear()
         print('trained')
-'''WIP - currently just copied progbar callback for studying
+        
+        
 class Gui_callback(keras.callbacks.Callback):
-    def __init__(self, count_mode='samples', stateful_metrics=None):
+    def __init__(self, train_vals, progress_flag, count_mode='samples', stateful_metrics=None):
         super(Gui_callback, self).__init__()
+        
+        self.train_vals = train_vals
+        self.progress_flag = progress_flag
+        
         self._supports_tf_logs = True
         if count_mode == 'samples':
           self.use_steps = False
@@ -122,6 +133,7 @@ class Gui_callback(keras.callbacks.Callback):
         self.stateful_metrics = set(stateful_metrics) if stateful_metrics else None
     
         self.seen = 0
+        self.active_epoch = 0
         self.progbar = None
         self.target = None
         self.verbose = 1
@@ -132,26 +144,26 @@ class Gui_callback(keras.callbacks.Callback):
     def set_params(self, params):
         self.verbose = params['verbose']
         self.epochs = params['epochs']
-        if self.use_steps and 'steps' in params:
-          self.target = params['steps']
-        elif not self.use_steps and 'samples' in params:
-          self.target = params['samples']
-        else:
-          self.target = None  # Will be inferred at the end of the first epoch.
-   
+        self.target = params['steps']
+
+#done
     def on_train_begin(self, logs=None):
         # When this logger is called inside `fit`, validation is silent.
         self._called_in_fit = True
 
+#done
     def on_test_begin(self, logs=None):
         if not self._called_in_fit:
             self._reset_progbar()
 
+#done
     def on_predict_begin(self, logs=None):
         self._reset_progbar()
 
+#Pass in label for epochs
     def on_epoch_begin(self, epoch, logs=None):
         self._reset_progbar()
+        self.active_epoch = epoch
         if self.verbose and self.epochs > 1:
             print('Epoch %d/%d' % (epoch + 1, self.epochs))
 
@@ -176,9 +188,12 @@ class Gui_callback(keras.callbacks.Callback):
     def on_predict_end(self, logs=None):
         self._finalize_progbar(logs)
 
+#CHNG
     def _reset_progbar(self):
+        print("reseting")
+        #ššself.gui.progress_bar_train.reset()
+        print("success")
         self.seen = 0
-        self.progbar = None
 
     def _maybe_init_progbar(self):
         if self.stateful_metrics is None:
@@ -187,39 +202,38 @@ class Gui_callback(keras.callbacks.Callback):
         else:
             self.stateful_metrics = set()
 
-        if self.progbar is None:
-            self.progbar = Progbar(
-                target=self.target,
-                verbose=self.verbose,
-                stateful_metrics=self.stateful_metrics,
-                unit_name='step' if self.use_steps else 'sample')
+        
 
     def _batch_update_progbar(self, batch, logs=None):
         """Updates the progbar."""
         logs = logs or {}
         self._maybe_init_progbar()
-        if self.use_steps:
+        self.seen += 1
+        '''if self.use_steps:
             self.seen = batch + 1  # One-indexed.
         else:
             # v1 path only.
-            logs = copy.copy(logs)
+            #logs = copy.copy(logs)
             batch_size = logs.pop('size', 0)
             num_steps = logs.pop('num_steps', 1)
             logs.pop('batch', None)
             add_seen = num_steps * batch_size
             self.seen += add_seen
-
+        '''
         if self.verbose == 1:
             # Only block async when verbose = 1.
-            logs = tf_utils.to_numpy_or_python_type(logs)
-            self.progbar.update(self.seen, list(logs.items()), finalize=False)
+            if(self.target == None):
+                self.target = 0
+            
+            
+            percentage = int( (self.seen + self.target*(self.active_epoch))/((self.target*self.epochs)/100))
+            if(percentage != self.train_vals['progress']):
+                self.train_vals['progress'] = percentage
+                self.progress_flag.set()
 
     def _finalize_progbar(self, logs):
         logs = logs or {}
         self._maybe_init_progbar()
         if self.target is None:
             self.target = self.seen
-            self.progbar.target = self.seen
         logs = tf_utils.to_numpy_or_python_type(logs)
-        self.progbar.update(self.seen, list(logs.items()), finalize=True)
-'''
