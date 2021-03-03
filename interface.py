@@ -31,6 +31,16 @@ class Ui_MainWindow(object):
         self.connected = False
         self.training_flag = threading.Event()
         
+        self.callback_signal = QtWidgets.QLineEdit()
+        self.callback_signal.textChanged.connect(self.update_training)
+        
+        self.progress_flag = threading.Event()
+        self.train_vals = {'progress': 0,
+                           'loss': 0,
+                           'acc': 0,
+                           'val_loss': 0,
+                           'val_acc': 0}
+        
         self.prediction_flag = threading.Event()
         
         self.interupt_flag = threading.Event()
@@ -1256,16 +1266,38 @@ class Ui_MainWindow(object):
             self.training_flag.set()
             print("hola hola")
             self.train_thread = threading.Thread(target=self.vision.train, kwargs={
-                'progress_bar': self.progress_bar_train,
-                'loss_label': self.line_edit_loss,
-                'acc_label': self.line_edit_acc,
-                'val_loss_label': self.line_edit_val_loss,
-                'val_acc_label': self.line_edit_val_acc,
+                'train_vals': self.train_vals,
+                'progress_flag': self.progress_flag,
                 'training_flag': self.training_flag})
+            
+            self.callback_thread = threading.Thread(target=self.training_callback)
+            
+            self.callback_thread.start()
             self.train_thread.start()
         else:
+            #stop training prematurely
             self.training_flag.clear()
+    
+    def training_callback(self):
+        while(self.training_flag.is_set()):
+            self.progress_flag.wait()
+            self.progress_flag.clear()
+            if(self.callback_signal.text() != "A"):
+                self.callback_signal.setText("A")
+            else:
+                self.callback_signal.setText("B")
+            
+            
+            
+        print('callback ended')
         
+    def update_training(self):
+        self.progress_bar_train.setValue(self.train_vals['progress'])
+        self.line_edit_loss.setText(str(self.train_vals['loss']))
+        self.line_edit_acc.setText(str(self.train_vals['acc']))
+        self.line_edit_val_loss.setText(str(self.train_vals['val_loss']))
+        self.line_edit_val_acc.setText(str(self.train_vals['val_acc']))
+            
     def set_status_msg(self, message, timeout=1500):
         """!@brief Shows message in status bar
         @details Method is called when other methods need to send the user 
