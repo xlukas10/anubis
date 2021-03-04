@@ -120,7 +120,7 @@
        <string/>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_connect">
        <attribute name="title">
@@ -175,6 +175,44 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
+         <widget class="QFrame" name="frame_config_level">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QLabel" name="label_config_level">
+             <property name="text">
+              <string>Configuration level</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="combo_config_level">
+             <item>
+              <property name="text">
+               <string>Beginner</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Expert</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Guru</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <widget class="QScrollArea" name="parameters_scroll">
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -191,7 +229,7 @@
              <x>0</x>
              <y>0</y>
              <width>580</width>
-             <height>504</height>
+             <height>451</height>
             </rect>
            </property>
            <layout class="QFormLayout" name="parameters_layout"/>
