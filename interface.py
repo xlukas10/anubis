@@ -190,6 +190,23 @@ class Ui_MainWindow(object):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.tab_config)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         
+        self.frame_config_level = QtWidgets.QFrame(self.tab_config)
+        self.frame_config_level.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_config_level.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_config_level.setObjectName("frame_config_level")
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.frame_config_level)
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.label_config_level = QtWidgets.QLabel(self.frame_config_level)
+        self.label_config_level.setObjectName("label_config_level")
+        self.horizontalLayout_5.addWidget(self.label_config_level)
+        self.combo_config_level = QtWidgets.QComboBox(self.frame_config_level)
+        self.combo_config_level.setObjectName("combo_config_level")
+        self.combo_config_level.addItem("")
+        self.combo_config_level.addItem("")
+        self.combo_config_level.addItem("")
+        self.horizontalLayout_5.addWidget(self.combo_config_level)
+        self.verticalLayout_3.addWidget(self.frame_config_level)
+        
         
         self.parameters_scroll = QtWidgets.QScrollArea(self.tab_config)
         
@@ -619,6 +636,11 @@ class Ui_MainWindow(object):
         self.btn_disconnect_camera.setText(_translate("MainWindow", "Disconnect"))
         self.tip_add_cti.setText(_translate("MainWindow", "Tip: If you can\'t detect your camera try adding new .cti file from your camera vendor (Options->Add .cti file)"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_connect), _translate("MainWindow", "Connect Camera"))
+        
+        self.label_config_level.setText(_translate("MainWindow", "Configuration level"))
+        self.combo_config_level.setItemText(0, _translate("MainWindow", "Beginner"))
+        self.combo_config_level.setItemText(1, _translate("MainWindow", "Expert"))
+        self.combo_config_level.setItemText(2, _translate("MainWindow", "Guru"))
         self.btn_save_config.setText(_translate("MainWindow", "Save Configuration"))
         self.btn_load_config.setText(_translate("MainWindow", "Load Configuration"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_config), _translate("MainWindow", "Camera Configuration"))
