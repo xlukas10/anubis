@@ -157,7 +157,8 @@ class Camera:
                     features = cam.get_all_features()
                     features_out = {}
                     for feature in features:
-                        if(int(feature.get_visibility()) <= visibility):
+                        feat_vis = int(feature.get_visibility())
+                        if(feat_vis > 0 and feat_vis <= visibility ):
                             name = feature.get_name()
                             features_out[name] = {}
                             features_out[name]['name'] = name
