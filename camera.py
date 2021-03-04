@@ -13,13 +13,16 @@ import cv2
 import os #for working with save path
 from PyQt5 import QtGui
 from datetime import datetime
-
+import enum
 import time#tmp for testing purposes
 
 from global_queue import frame_queue
 from global_queue import active_frame_queue
 
+from config_level import Config_level
+
 class Camera:
+    
     def __init__(self, producer_path = 'ZDE VLOZIT DEFAULTNI CESTU'):
         self.h = Harvester()
         self.set_gentl_producer(producer_path)
@@ -136,7 +139,7 @@ class Camera:
                     except (AttributeError, VimbaFeatureError):
                         pass
     
-    def get_parameters(self,):
+    def get_parameters(self, visibility = Config_level.Unknown):
         """!@brief Read parameters from camera
         @details Based on self.vendor and self.active_camera chooses right API and
             loads all available camera parameters
@@ -145,86 +148,89 @@ class Camera:
             value, type, range, increment and max_length 
             if given information exist for the parameter
         """
+#categories are defined by GenICam SFNC
         if(self.vendor == 'Allied Vision Technologies'):
+            #Establishing communication
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras ()
                 with cams[self.active_camera] as cam:
                     features = cam.get_all_features()
                     features_out = {}
                     for feature in features:
-                        name = feature.get_name()
-                        features_out[name] = {}
-                        features_out[name]['name'] = name
-                        
-                        disp_name = feature.get_display_name()
-                        features_out[name]['attr_name'] = disp_name
-                        
-                        #Get feature's type if it exists
-                        try:
-                            attr = str(feature.get_type())
-                            attr = attr.replace("<class 'vimba.feature.", '')
-                            attr = attr.replace("'>","")
-                        except (AttributeError, VimbaFeatureError):
-                            attr = None
-                        
-                        features_out[name]['attr_type'] = attr
-                        
-                        #Get availible enums for enum feature type
-                        if(features_out[name]['attr_type'] == "EnumFeature"):
+                        if(int(feature.get_visibility()) <= visibility):
+                            name = feature.get_name()
+                            features_out[name] = {}
+                            features_out[name]['name'] = name
+                            
+                            disp_name = feature.get_display_name()
+                            features_out[name]['attr_name'] = disp_name
+                            
+                            #Get feature's type if it exists
                             try:
-                                attr = feature.get_available_entries()
+                                attr = str(feature.get_type())
+                                attr = attr.replace("<class 'vimba.feature.", '')
+                                attr = attr.replace("'>","")
                             except (AttributeError, VimbaFeatureError):
                                 attr = None
-                        
-                            features_out[name]['attr_enums'] = attr
                             
-                        #Get feature's value if it exists
-                        try:
-                            attr = feature.get()
-                        except (AttributeError, VimbaFeatureError):
-                            attr = None
-                        
-                        features_out[name]['attr_value'] = attr
-                        
-                        #Get feature's range if it exists
-                        try:
-                            attr = feature.get_range()
-                        except (AttributeError, VimbaFeatureError):
-                            attr = None
-                        
-                        features_out[name]['attr_range'] = attr
-                        
-                        #Get feature's increment if it exists
-                        try:
-                            attr = feature.get_increment()
-                        except (AttributeError, VimbaFeatureError):
-                            attr = None
-                        
-                        features_out[name]['attr_increment'] = attr
-                        
-                        #Get feature's max length if it exists
-                        try:
-                            attr = feature.get_max_length()
-                        except (AttributeError, VimbaFeatureError):
-                            attr = None
-                        
-                        features_out[name]['attr_max_length'] = attr
-                        
-                        try:
-                            attr = feature.get_tooltip()
-                        except (AttributeError, VimbaFeatureError):
-                            attr = None
-                        
-                        features_out[name]['attr_tooltip'] = attr
-                        '''
-                        try:
-                            attr = feature.get_unit()
-                            print(attr)
-                        except (AttributeError, VimbaFeatureError):
-                            attr = None
-                        
-                        features_out[name]['attr_unit'] = attr
-                        '''
+                            features_out[name]['attr_type'] = attr
+                            
+                            #Get availible enums for enum feature type
+                            if(features_out[name]['attr_type'] == "EnumFeature"):
+                                try:
+                                    attr = feature.get_available_entries()
+                                except (AttributeError, VimbaFeatureError):
+                                    attr = None
+                            
+                                features_out[name]['attr_enums'] = attr
+                                
+                            #Get feature's value if it exists
+                            try:
+                                attr = feature.get()
+                            except (AttributeError, VimbaFeatureError):
+                                attr = None
+                            
+                            features_out[name]['attr_value'] = attr
+                            
+                            #Get feature's range if it exists
+                            try:
+                                attr = feature.get_range()
+                            except (AttributeError, VimbaFeatureError):
+                                attr = None
+                            
+                            features_out[name]['attr_range'] = attr
+                            
+                            #Get feature's increment if it exists
+                            try:
+                                attr = feature.get_increment()
+                            except (AttributeError, VimbaFeatureError):
+                                attr = None
+                            
+                            features_out[name]['attr_increment'] = attr
+                            
+                            #Get feature's max length if it exists
+                            try:
+                                attr = feature.get_max_length()
+                            except (AttributeError, VimbaFeatureError):
+                                attr = None
+                            
+                            features_out[name]['attr_max_length'] = attr
+                            
+                            try:
+                                attr = feature.get_tooltip()
+                            except (AttributeError, VimbaFeatureError):
+                                attr = None
+                            
+                            features_out[name]['attr_tooltip'] = attr
+                            '''
+                            try:
+                                attr = feature.get_unit()
+                                print(attr)
+                            except (AttributeError, VimbaFeatureError):
+                                attr = None
+                            
+                            features_out[name]['attr_unit'] = attr
+                            '''
                     return features_out
         else:
             return dir(self.ia.remote_device.node_map)
@@ -457,3 +463,4 @@ kamera.stop_recording()
 
 kamera.save_config('c:/Users/Jakub Lukaszczyk/Documents/', 'konfigurace1')
 '''
+
