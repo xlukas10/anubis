@@ -19,6 +19,7 @@ from prediction_graph import Prediction_graph
 from global_camera import cam
 from global_queue import active_frame_queue
 from computer_vision import Computer_vision
+from config_level import Config_level
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -27,6 +28,12 @@ class Ui_MainWindow(object):
         """
         !@brief Variable used to store device information of detected cameras
         """
+        
+        
+        #Contains all dynamically created widgets
+        self.feat_widgets = {}
+        self.feat_labels = {}
+        
         self.detected = []
         self.connected = False
         self.training_flag = threading.Event()
@@ -204,6 +211,7 @@ class Ui_MainWindow(object):
         self.combo_config_level.addItem("")
         self.combo_config_level.addItem("")
         self.combo_config_level.addItem("")
+        self.combo_config_level.currentIndexChanged.connect(self.show_parameters)
         self.horizontalLayout_5.addWidget(self.combo_config_level)
         self.verticalLayout_3.addWidget(self.frame_config_level)
         
@@ -735,7 +743,7 @@ class Ui_MainWindow(object):
             
             #Change packet size for ethernet camera
 #In the future this will happen only for ethernet cameras
-            p = cam.get_parameters()
+            p = cam.get_parameters(Config_level.Guru)
             cam.set_parameter(p['GVSPPacketSize'],1500)
             
             #Set up the status bar
@@ -990,29 +998,37 @@ class Ui_MainWindow(object):
             #Status message
             self.set_status_msg("Reading features")
             
-            params = cam.get_parameters()
+            print(str(Config_level(self.combo_config_level.currentIndex()+1)))
+            params = cam.get_parameters(Config_level(self.combo_config_level.currentIndex()+1))
             
             #Keeps track of line in the layout
             num = 0
             
-            #Contains all dynamically created widgets
-            self.feat_widgets = {}
+            for name in self.feat_widgets:
+                self.feat_widgets[name].setParent(None)
+                
+            for name in self.feat_labels:
+                self.feat_labels[name].setParent(None)
+            
+            self.feat_widgets.clear()
+            self.feat_labels.clear()
+            
             
             for param_name, param in params.items():
                 
                 #Create a new label with name of the feature
-                label = QtWidgets.QLabel(self.tab_config)
-                label.setObjectName(param["name"])
-                label.setText(param["attr_name"])
                 
+                self.feat_labels[param["name"]] = QtWidgets.QLabel(self.tab_config)
+                self.feat_labels[param["name"]].setObjectName(param["name"])
+                self.feat_labels[param["name"]].setText(param["attr_name"])
                 #If the feature has a tooltip, set it.
                 try:
-                    label.setToolTip(param["attr_tooltip"])
-                finally:
+                    self.feat_labels[param["name"]].setToolTip(param["attr_tooltip"])
+                except:
                     pass
                 
                 #Place the label on the num line of the layout
-                self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.LabelRole, label)
+                self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.LabelRole, self.feat_labels[param["name"]])
                 
                 #If the feature does not have a value, set it to 0
                 if param["attr_value"] == None:
@@ -1094,7 +1110,8 @@ class Ui_MainWindow(object):
                     
                 #Add newly created widget to the layout on the num line
                 self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.FieldRole, self.feat_widgets[param["name"]])
-                num = num + 1
+                num += 1
+                
                         
     def save_cam_config(self):
         """!@brief Opens file dialog for user to select where to save camera 
