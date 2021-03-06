@@ -15,6 +15,7 @@ from PyQt5 import QtGui
 from datetime import datetime
 import enum
 import time#tmp for testing purposes
+from queue import Queue
 
 from global_queue import frame_queue
 from global_queue import active_frame_queue
@@ -139,7 +140,7 @@ class Camera:
                     except (AttributeError, VimbaFeatureError):
                         pass
     
-    def get_parameters(self, visibility = Config_level.Unknown):
+    def get_parameters(self,feature_queue, flag, visibility = Config_level.Unknown):
         """!@brief Read parameters from camera
         @details Based on self.vendor and self.active_camera chooses right API and
             loads all available camera parameters
@@ -155,16 +156,16 @@ class Camera:
                 cams = vimba.get_all_cameras ()
                 with cams[self.active_camera] as cam:
                     features = cam.get_all_features()
-                    features_out = {}
                     for feature in features:
                         feat_vis = int(feature.get_visibility())
                         if(feat_vis > 0 and feat_vis <= visibility ):
                             name = feature.get_name()
-                            features_out[name] = {}
-                            features_out[name]['name'] = name
+                            
+                            features_out = {}
+                            features_out['name'] = name
                             
                             disp_name = feature.get_display_name()
-                            features_out[name]['attr_name'] = disp_name
+                            features_out['attr_name'] = disp_name
                             
                             #Get feature's type if it exists
                             try:
@@ -174,16 +175,16 @@ class Camera:
                             except (AttributeError, VimbaFeatureError):
                                 attr = None
                             
-                            features_out[name]['attr_type'] = attr
+                            features_out['attr_type'] = attr
                             
                             #Get availible enums for enum feature type
-                            if(features_out[name]['attr_type'] == "EnumFeature"):
+                            if(features_out['attr_type'] == "EnumFeature"):
                                 try:
                                     attr = feature.get_available_entries()
                                 except (AttributeError, VimbaFeatureError):
                                     attr = None
                             
-                                features_out[name]['attr_enums'] = attr
+                                features_out['attr_enums'] = attr
                                 
                             #Get feature's value if it exists
                             try:
@@ -191,7 +192,7 @@ class Camera:
                             except (AttributeError, VimbaFeatureError):
                                 attr = None
                             
-                            features_out[name]['attr_value'] = attr
+                            features_out['attr_value'] = attr
                             
                             #Get feature's range if it exists
                             try:
@@ -199,7 +200,7 @@ class Camera:
                             except (AttributeError, VimbaFeatureError):
                                 attr = None
                             
-                            features_out[name]['attr_range'] = attr
+                            features_out['attr_range'] = attr
                             
                             #Get feature's increment if it exists
                             try:
@@ -207,7 +208,7 @@ class Camera:
                             except (AttributeError, VimbaFeatureError):
                                 attr = None
                             
-                            features_out[name]['attr_increment'] = attr
+                            features_out['attr_increment'] = attr
                             
                             #Get feature's max length if it exists
                             try:
@@ -215,14 +216,14 @@ class Camera:
                             except (AttributeError, VimbaFeatureError):
                                 attr = None
                             
-                            features_out[name]['attr_max_length'] = attr
+                            features_out['attr_max_length'] = attr
                             
                             try:
                                 attr = feature.get_tooltip()
                             except (AttributeError, VimbaFeatureError):
                                 attr = None
                             
-                            features_out[name]['attr_tooltip'] = attr
+                            features_out['attr_tooltip'] = attr
                             '''
                             try:
                                 attr = feature.get_unit()
@@ -232,7 +233,11 @@ class Camera:
                             
                             features_out[name]['attr_unit'] = attr
                             '''
-                    return features_out
+                            feature_queue.put(features_out)
+                            print('put')
+                    flag.set()
+                    
+                    #return features_out
         else:
             return dir(self.ia.remote_device.node_map)
     
@@ -315,7 +320,6 @@ class Camera:
         try:
             #if frame.get_status() == FrameStatus.Complete:
             if not frame_queue.full() and frame.get_status() == FrameStatus.Complete:
-                
                 frame_copy = copy.deepcopy(frame)
                 if self.is_recording:
                     frame_queue.put_nowait(frame_copy.as_opencv_image())

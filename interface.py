@@ -11,6 +11,7 @@ import threading
 import time
 import win32api #determine refresh rate
 import os #working with some paths
+from queue import Queue
 
 #tmp 
 import cv2
@@ -33,13 +34,19 @@ class Ui_MainWindow(object):
         #Contains all dynamically created widgets
         self.feat_widgets = {}
         self.feat_labels = {}
+        self.feat_queue = Queue()
         
         self.detected = []
         self.connected = False
         self.training_flag = threading.Event()
+        self.param_flag = threading.Event()
+        self.param_flag = threading.Event()
         
         self.callback_signal = QtWidgets.QLineEdit()
         self.callback_signal.textChanged.connect(self.update_training)
+        
+        self.parameters_signal = QtWidgets.QLineEdit()
+        self.parameters_signal.textChanged.connect(self.show_parameters)
         
         self.progress_flag = threading.Event()
         self.train_vals = {'progress': 0,
@@ -211,7 +218,7 @@ class Ui_MainWindow(object):
         self.combo_config_level.addItem("")
         self.combo_config_level.addItem("")
         self.combo_config_level.addItem("")
-        self.combo_config_level.currentIndexChanged.connect(self.show_parameters)
+        self.combo_config_level.currentIndexChanged.connect(self.load_parameters)
         self.horizontalLayout_5.addWidget(self.combo_config_level)
         self.verticalLayout_3.addWidget(self.frame_config_level)
         
@@ -743,8 +750,9 @@ class Ui_MainWindow(object):
             
             #Change packet size for ethernet camera
 #In the future this will happen only for ethernet cameras
-            p = cam.get_parameters(Config_level.Guru)
-            cam.set_parameter(p['GVSPPacketSize'],1500)
+            #p = cam.get_parameters(Config_level.Guru)
+            #cam.set_parameter(p['GVSPPacketSize'],1500)
+#THIS IS NOT WORKING NOW!!! FIX IT
             
             #Set up the status bar
             self.camera_icon.setPixmap(self.icon_standby)
@@ -985,39 +993,34 @@ class Ui_MainWindow(object):
             pass
         if index == 1:#Camera configuration tab
             #Request parameters from camera and show them in gui
-            self.show_parameters()
+            self.load_parameters()
+        
+    def callback_parameters(self):
+        self.param_flag.wait()
+        self.param_flag.clear()
+        if(self.parameters_signal.text() != "A"):
+            self.parameters_signal.setText("A")
+        else:
+            self.parameters_signal.setText("B")
         
     def show_parameters(self):
-        """!@brief Fills layout with feature name and value pairs
-        @details Based on the feature type a new label, text area, checkbox or
-        combo box is created. In this version all available parameters are shown.
-        TODO config level and command feature type
-        """
-        #Start filling features in only on connected camera
-        if self.connected:
-            #Status message
-            self.set_status_msg("Reading features")
+        #Keeps track of line in the layout
+        num = 0
+        
+        for name in self.feat_widgets:
+            self.feat_widgets[name].setParent(None)
             
-            print(str(Config_level(self.combo_config_level.currentIndex()+1)))
-            params = cam.get_parameters(Config_level(self.combo_config_level.currentIndex()+1))
+        for name in self.feat_labels:
+            self.feat_labels[name].setParent(None)
+        
+        self.feat_widgets.clear()
+        self.feat_labels.clear()
+        while not self.feat_queue.empty():
+            try:
+                param = self.feat_queue.get()
             
-            #Keeps track of line in the layout
-            num = 0
+            #Create a new label with name of the feature
             
-            for name in self.feat_widgets:
-                self.feat_widgets[name].setParent(None)
-                
-            for name in self.feat_labels:
-                self.feat_labels[name].setParent(None)
-            
-            self.feat_widgets.clear()
-            self.feat_labels.clear()
-            
-            
-            for param_name, param in params.items():
-                
-                #Create a new label with name of the feature
-                
                 self.feat_labels[param["name"]] = QtWidgets.QLabel(self.tab_config)
                 self.feat_labels[param["name"]].setObjectName(param["name"])
                 self.feat_labels[param["name"]].setText(param["attr_name"])
@@ -1111,7 +1114,35 @@ class Ui_MainWindow(object):
                 #Add newly created widget to the layout on the num line
                 self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.FieldRole, self.feat_widgets[param["name"]])
                 num += 1
-                
+            except:
+                pass
+                #we'll get here when queue is empty
+        
+    def load_parameters(self):
+        """!@brief Fills layout with feature name and value pairs
+        @details Based on the feature type a new label, text area, checkbox or
+        combo box is created. In this version all available parameters are shown.
+        TODO config level and command feature type
+        """
+        #Start filling features in only on connected camera
+        if self.connected and not self.param_flag.is_set():
+            #Status message
+            self.set_status_msg("Reading features")
+            
+            #empty feature queue
+            
+            self.get_params_thread = threading.Thread(
+                target=cam.get_parameters,
+                kwargs={'feature_queue': self.feat_queue,
+                        'flag': self.param_flag,
+                        'visibility': Config_level(self.combo_config_level.currentIndex()+1)})
+            #implementovat frontu pro komunikaci mezi vlákny
+            self.param_callback_thread = threading.Thread(target=self.callback_parameters)
+            
+            self.get_params_thread.start()
+            self.param_callback_thread.start()
+            
+            
                         
     def save_cam_config(self):
         """!@brief Opens file dialog for user to select where to save camera 
@@ -1328,7 +1359,6 @@ class Ui_MainWindow(object):
             
             
             
-        print('callback ended')
         
     def update_training(self):
         self.progress_bar_train.setValue(self.train_vals['progress'])
