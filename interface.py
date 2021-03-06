@@ -751,8 +751,8 @@ class Ui_MainWindow(object):
             
             #Change packet size for ethernet camera
 #In the future this will happen only for ethernet cameras
-            #p = cam.get_parameters(Config_level.Guru)
-            #cam.set_parameter(p['GVSPPacketSize'],1500)
+            p = {'name': 'GVSPPacketSize'}
+            cam.set_parameter(p,1500)
 #THIS IS NOT WORKING NOW!!! FIX IT
             
             #Set up the status bar
