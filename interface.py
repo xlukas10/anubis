@@ -735,12 +735,13 @@ class Ui_MainWindow(object):
         """
         #Something must be selected
         if index != -1:
-            #set green background to the selected camera
-            self.list_detected_cameras.item(index).setBackground(QtGui.QColor('#70BF4E'))
             
             #If some camera is connected, disconnect it first
             if self.connected:
                 self.disconnect_camera()
+            
+            #set green background to the selected camera
+            self.list_detected_cameras.item(index).setBackground(QtGui.QColor('#70BF4E'))
             
             #Print status message
             self.set_status_msg("Connecting camera")
