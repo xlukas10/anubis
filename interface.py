@@ -228,6 +228,7 @@ class Ui_MainWindow(object):
         
         self.tree_features = QtWidgets.QTreeWidget(self.tab_config)
         self.tree_features.setObjectName("tree_features")
+        self.tree_features.setColumnWidth(0,250)
         self.verticalLayout_3.addWidget(self.tree_features)
         
         
