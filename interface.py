@@ -644,7 +644,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.btn_zoom_100.setText(_translate("MainWindow", "Reset zoom"))
+        self.btn_zoom_100.setText(_translate("MainWindow", "Zoom to 100%"))
         self.btn_zoom_fit.setText(_translate("MainWindow", "Fit to window"))
         self.btn_start_recording.setText(_translate("MainWindow", "Start/Stop recording"))
         self.btn_start_preview.setText(_translate("MainWindow", "Start/Stop preview"))
