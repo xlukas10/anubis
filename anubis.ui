@@ -213,27 +213,17 @@
          </widget>
         </item>
         <item>
-         <widget class="QScrollArea" name="parameters_scroll">
-          <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
-          </property>
-          <property name="sizeAdjustPolicy">
-           <enum>QAbstractScrollArea::AdjustToContents</enum>
-          </property>
-          <property name="widgetResizable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="parameters_layout_widget">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>580</width>
-             <height>451</height>
-            </rect>
+         <widget class="QTreeWidget" name="tree_features">
+          <column>
+           <property name="text">
+            <string>Feature</string>
            </property>
-           <layout class="QFormLayout" name="parameters_layout"/>
-          </widget>
+          </column>
+          <column>
+           <property name="text">
+            <string>Value</string>
+           </property>
+          </column>
          </widget>
         </item>
         <item>

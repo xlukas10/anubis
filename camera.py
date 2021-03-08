@@ -185,6 +185,14 @@ class Camera:
                                     attr = None
                             
                                 features_out['attr_enums'] = attr
+                            
+                            #Get category for the feature
+                            try:
+                                attr = feature.get_category()
+                            except (AttributeError, VimbaFeatureError):
+                                attr = None
+                        
+                            features_out['attr_cat'] = attr
                                 
                             #Get feature's value if it exists
                             try:
@@ -234,7 +242,6 @@ class Camera:
                             features_out[name]['attr_unit'] = attr
                             '''
                             feature_queue.put(features_out)
-                            print('put')
                     flag.set()
                     
                     #return features_out

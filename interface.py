@@ -32,6 +32,9 @@ class Ui_MainWindow(object):
         
         
         #Contains all dynamically created widgets
+        
+        self.top_items = {}
+        self.children_items = {}
         self.feat_widgets = {}
         self.feat_labels = {}
         self.feat_queue = Queue()
@@ -223,28 +226,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addWidget(self.frame_config_level)
         
         
-        self.parameters_scroll = QtWidgets.QScrollArea(self.tab_config)
-        
-        self.parameters_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        #self.parameters_scroll.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
-        self.parameters_scroll.setWidgetResizable(True)
-        self.parameters_scroll.setObjectName("parameters_scroll")
-        
-        self.parameters_layout_widget = QtWidgets.QWidget()
-        self.parameters_layout_widget.setGeometry(QtCore.QRect(0, 0, 580, 504))
-        self.parameters_layout_widget.setObjectName("parameters_layout_widget")
-        
-        self.parameters_layout = QtWidgets.QFormLayout(self.parameters_layout_widget)
-        self.parameters_layout.setObjectName("parameters_layout")
-        l =self.parameters_layout.contentsMargins().left()
-        r =self.parameters_layout.contentsMargins().right()
-        geom = self.parameters_scroll.geometry()
-        geom.adjust(l,0,r,0)
-        self.parameters_layout.setGeometry(geom)
-        
-        
-        self.parameters_scroll.setWidget(self.parameters_layout_widget)
-        self.verticalLayout_3.addWidget(self.parameters_scroll)
+        self.tree_features = QtWidgets.QTreeWidget(self.tab_config)
+        self.tree_features.setObjectName("tree_features")
+        self.verticalLayout_3.addWidget(self.tree_features)
         
         
         self.widget_3 = QtWidgets.QWidget(self.tab_config)
@@ -656,6 +640,8 @@ class Ui_MainWindow(object):
         self.combo_config_level.setItemText(0, _translate("MainWindow", "Beginner"))
         self.combo_config_level.setItemText(1, _translate("MainWindow", "Expert"))
         self.combo_config_level.setItemText(2, _translate("MainWindow", "Guru"))
+        self.tree_features.headerItem().setText(0, _translate("MainWindow", "Feature"))
+        self.tree_features.headerItem().setText(1, _translate("MainWindow", "Value"))
         self.btn_save_config.setText(_translate("MainWindow", "Save Configuration"))
         self.btn_load_config.setText(_translate("MainWindow", "Load Configuration"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_config), _translate("MainWindow", "Camera Configuration"))
@@ -1008,6 +994,10 @@ class Ui_MainWindow(object):
         #Keeps track of line in the layout
         num = 0
         
+        categories = []
+        self.top_items = {}
+        self.children_items = {}
+#clear top level items        
         for name in self.feat_widgets:
             self.feat_widgets[name].setParent(None)
             
@@ -1016,10 +1006,16 @@ class Ui_MainWindow(object):
         
         self.feat_widgets.clear()
         self.feat_labels.clear()
+        
         while not self.feat_queue.empty():
             try:
                 param = self.feat_queue.get()
-            
+                if(param['attr_cat'] in categories):
+                    pass
+                else:
+                    categories.append(param['attr_cat'])
+                    self.top_items[param['attr_cat']] = QtWidgets.QTreeWidgetItem([param['attr_cat']])
+                    self.tree_features.addTopLevelItem(self.top_items[param['attr_cat']])
             #Create a new label with name of the feature
             
                 self.feat_labels[param["name"]] = QtWidgets.QLabel(self.tab_config)
@@ -1032,7 +1028,7 @@ class Ui_MainWindow(object):
                     pass
                 
                 #Place the label on the num line of the layout
-                self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.LabelRole, self.feat_labels[param["name"]])
+                #self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.LabelRole, self.feat_labels[param["name"]])
                 
                 #If the feature does not have a value, set it to 0
                 if param["attr_value"] == None:
@@ -1113,7 +1109,12 @@ class Ui_MainWindow(object):
                     self.feat_widgets[param["name"]].setText("Error")
                     
                 #Add newly created widget to the layout on the num line
-                self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.FieldRole, self.feat_widgets[param["name"]])
+                new_item = QtWidgets.QTreeWidgetItem(self.top_items[param['attr_cat']] ,['', ''])
+                self.tree_features.setItemWidget(new_item, 0,self.feat_labels[param["name"]])
+                self.tree_features.setItemWidget(new_item, 1,self.feat_widgets[param["name"]])
+                #new_item = QtWidgets.QTreeWidgetItem(self.top_items[param['attr_cat']] ,[self.feat_labels[param["name"]], self.feat_widgets[param["name"]]])
+                self.children_items[param["name"]] = new_item
+                #self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.FieldRole, self.feat_widgets[param["name"]])
                 num += 1
             except:
                 pass
