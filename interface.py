@@ -701,7 +701,7 @@ class Ui_MainWindow(object):
         are printed.
         """
         #set status message
-        self.set_status_msg("Searching for cameras")
+        self.set_status_msg("Searching for cameras", 1500)
         
         #clear the list so the cameras won't appear twice or more
         self.list_detected_cameras.clear()
@@ -735,6 +735,9 @@ class Ui_MainWindow(object):
             
             #Connect camera
             cam.select_camera(self.detected[index]['id_'])
+            
+            
+            self.set_status_msg("Camera connected")
             
             #Change packet size for ethernet camera
 #In the future this will happen only for ethernet cameras
@@ -779,6 +782,7 @@ class Ui_MainWindow(object):
                 #Start live preview in a new thread
                 self.show_preview_thread = threading.Thread(target=self.show_preview)
                 self.show_preview_thread.start()
+                self.set_status_msg("Recording",0)
             else:
                 #Set status message and standby icon
                 self.camera_icon.setPixmap(self.icon_standby)
@@ -790,6 +794,7 @@ class Ui_MainWindow(object):
                 #End recording
                 cam.stop_recording()
                 self.recording = False
+                self.set_status_msg("Recording stopped", 3500)
     
     def seq_duration_wait(self):
         """!@brief Automatic recording interrupt
@@ -821,7 +826,7 @@ class Ui_MainWindow(object):
             if(not self.preview_live):
                 #Set status message and icon
                 self.camera_icon.setPixmap(self.icon_busy)
-                self.set_status_msg("Starting preview")
+                self.set_status_msg("Starting preview",1500)
                 
                 #Start camera frame acquisition (not recording)
                 cam.start_acquisition()
@@ -834,7 +839,7 @@ class Ui_MainWindow(object):
             else:
                 #Reset status icon and print message
                 self.camera_icon.setPixmap(self.icon_standby)
-                self.set_status_msg("Stopping preview")
+                self.set_status_msg("Stopping preview",1500)
                 
                 #Stop receiving frames
                 cam.stop_acquisition()
@@ -848,7 +853,7 @@ class Ui_MainWindow(object):
         #Method runs only if camera is connected
         if self.connected:
             #Set status icon and message
-            self.set_status_msg("Receiving single frame")
+            self.set_status_msg("Receiving single frame",1500)
             self.camera_icon.setPixmap(self.icon_busy)
             
             #Get image
@@ -1204,7 +1209,7 @@ class Ui_MainWindow(object):
 #TODO reading and adding cti files
         
         #Set status update
-        self.set_status_msg("Configuration loaded",500)
+        self.set_status_msg("Configuration loaded",1500)
     
     def load_model(self):
         #Open file dialog for choosing a folder
@@ -1259,7 +1264,7 @@ class Ui_MainWindow(object):
         self.read_config()
         
         #Print status msg
-        self.set_status_msg("Configuration restored")
+        self.set_status_msg("Configuration restored",2500)
     
     def save_seq_settings(self):
         """!@brief Saves recording settings
@@ -1308,6 +1313,9 @@ class Ui_MainWindow(object):
             
             #Disconnect camera
             cam.disconnect_camera()
+            
+            
+            self.set_status_msg("Camera disconnected")
             
             #Imidiately search for new cameras
             self.refresh_cameras()
@@ -1377,18 +1385,19 @@ class Ui_MainWindow(object):
         self.line_edit_val_loss.setText(str(self.train_vals['val_loss']))
         self.line_edit_val_acc.setText(str(self.train_vals['val_acc']))
             
-    def set_status_msg(self, message, timeout=1500):
+    def set_status_msg(self, message, timeout=0):
         """!@brief Shows message in status bar
         @details Method is called when other methods need to send the user 
         some confrimation or status update.
         @param[in] message Contains text to be displayed in the status bar
         @param[in] timeout For how long should the message be displayed. Defaults to 1.5sec.
         """
+        self.status_timer.stop()
         self.status_label.setText(message)
-        
         #When time out is reached, connected method 
         #(self.clear_status) is called.
-        self.status_timer.start(timeout)
+        if(timeout > 0):
+            self.status_timer.start(timeout)
         
     def clear_status(self):
         """!@brief Empties self.status_label in self.statusbar.
