@@ -93,6 +93,15 @@ class Camera:
             self.disconnect_harvester()
             self.vendor = 'Allied Vision Technologies'
             self.active_camera = self.__translate_selected_device(selected_device)
+            with Vimba.get_instance() as vimba:
+                cams = vimba.get_all_cameras()
+                with cams [self.active_camera] as cam:
+                    try:
+                        cam.GVSPAdjustPacketSize.run()
+                        while not cam.GVSPAdjustPacketSize.is_done():
+                            pass
+                    except (AttributeError, VimbaFeatureError):
+                            pass
         else:
             self.active_camera = harvester_index
             self.vendor = 'Other'
@@ -167,6 +176,18 @@ class Camera:
                             disp_name = feature.get_display_name()
                             features_out['attr_name'] = disp_name
                             
+                            #if feature does not have read permission, go to next iteration
+                            if(not feature.get_access_mode()[0]):
+                                continue
+                            
+                            #Get feature's write mode
+                            try:
+                                attr = feature.get_access_mode()[1]
+                            except (AttributeError, VimbaFeatureError):
+                                attr = None
+                            
+                            features_out['attr_enabled'] = attr
+                            
                             #Get feature's type if it exists
                             try:
                                 attr = str(feature.get_type())
@@ -232,6 +253,8 @@ class Camera:
                                 attr = None
                             
                             features_out['attr_tooltip'] = attr
+                            
+                            
                             '''
                             try:
                                 attr = feature.get_unit()

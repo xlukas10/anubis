@@ -738,8 +738,8 @@ class Ui_MainWindow(object):
             
             #Change packet size for ethernet camera
 #In the future this will happen only for ethernet cameras
-            p = {'name': 'GVSPPacketSize'}
-            cam.set_parameter(p,1500)
+           # p = {'name': 'GVSPPacketSize'}
+            #cam.set_parameter(p,1500)
 #THIS IS NOT WORKING NOW!!! FIX IT
             
             #Set up the status bar
@@ -1113,7 +1113,9 @@ class Ui_MainWindow(object):
                     #the text error
                     self.feat_widgets[param["name"]] = QtWidgets.QLabel(self.tab_config)
                     self.feat_widgets[param["name"]].setText("Error")
-                    
+                
+                self.feat_widgets[param["name"]].setEnabled(param["attr_enabled"])
+                
                 #Add newly created widget to the layout on the num line
                 new_item = QtWidgets.QTreeWidgetItem(self.top_items[ctgs[-1]] ,['', ''])
                 self.tree_features.setItemWidget(new_item, 0,self.feat_labels[param["name"]])
