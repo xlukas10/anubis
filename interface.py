@@ -1010,12 +1010,17 @@ class Ui_MainWindow(object):
         while not self.feat_queue.empty():
             try:
                 param = self.feat_queue.get()
-                if(param['attr_cat'] in categories):
-                    pass
-                else:
-                    categories.append(param['attr_cat'])
-                    self.top_items[param['attr_cat']] = QtWidgets.QTreeWidgetItem([param['attr_cat']])
-                    self.tree_features.addTopLevelItem(self.top_items[param['attr_cat']])
+                param['attr_cat'] = param['attr_cat'].lstrip('/')
+                ctgs = param['attr_cat'].split('/')
+                for i, ctg in enumerate(ctgs):
+                    if(not(ctg in categories)):
+                        if(i == 0):
+                            self.top_items[ctg] = QtWidgets.QTreeWidgetItem([ctg])
+                            self.tree_features.addTopLevelItem(self.top_items[ctg])
+                        else:
+                            self.top_items[ctg] = QtWidgets.QTreeWidgetItem([ctg])
+                            self.top_items[ctgs[i-1]].addChild(self.top_items[ctg])
+                        categories.append(ctg)
             #Create a new label with name of the feature
             
                 self.feat_labels[param["name"]] = QtWidgets.QLabel(self.tab_config)
@@ -1109,7 +1114,7 @@ class Ui_MainWindow(object):
                     self.feat_widgets[param["name"]].setText("Error")
                     
                 #Add newly created widget to the layout on the num line
-                new_item = QtWidgets.QTreeWidgetItem(self.top_items[param['attr_cat']] ,['', ''])
+                new_item = QtWidgets.QTreeWidgetItem(self.top_items[ctgs[-1]] ,['', ''])
                 self.tree_features.setItemWidget(new_item, 0,self.feat_labels[param["name"]])
                 self.tree_features.setItemWidget(new_item, 1,self.feat_widgets[param["name"]])
                 #new_item = QtWidgets.QTreeWidgetItem(self.top_items[param['attr_cat']] ,[self.feat_labels[param["name"]], self.feat_widgets[param["name"]]])
