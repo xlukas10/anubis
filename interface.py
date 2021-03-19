@@ -25,7 +25,7 @@ from config_level import Config_level
 class Ui_MainWindow(QtCore.QObject):
     def setupUi(self, MainWindow):
         #VARIABLES
-        
+        self.tmp = False
         """
         !@brief Variable used to store device information of detected cameras
         """
@@ -1091,6 +1091,7 @@ class Ui_MainWindow(QtCore.QObject):
         
     def callback_parameters(self):
         self.param_flag.wait()
+        
         if(self.parameters_signal.text() != "A"):
             self.parameters_signal.setText("A")
         else:
@@ -1103,18 +1104,19 @@ class Ui_MainWindow(QtCore.QObject):
         categories = []
         self.top_items = {}
         self.children_items = {}
-#clear top level items        
+        
+        self.tree_features.clear()
+        
         for name in self.feat_widgets:
-            self.feat_widgets[name].setParent(None)
-            
+            self.feat_widgets[name].deleteLater()
+        
         for name in self.feat_labels:
-            self.feat_labels[name].setParent(None)
+            self.feat_labels[name].deleteLater()
         
         self.feat_widgets.clear()
         self.feat_labels.clear()
-        print("also here")
+        
         while not self.feat_queue.empty():
-            print("new one")
             try:
                 param = self.feat_queue.get()
                 param['attr_cat'] = param['attr_cat'].lstrip('/')
@@ -1224,6 +1226,7 @@ class Ui_MainWindow(QtCore.QObject):
                 
                 #Add newly created widget to the layout on the num line
                 new_item = QtWidgets.QTreeWidgetItem(self.top_items[ctgs[-1]] ,['', ''])
+                #add new item to the last subcategory of its category tree
                 self.tree_features.setItemWidget(new_item, 0,self.feat_labels[param["name"]])
                 self.tree_features.setItemWidget(new_item, 1,self.feat_widgets[param["name"]])
                 #new_item = QtWidgets.QTreeWidgetItem(self.top_items[param['attr_cat']] ,[self.feat_labels[param["name"]], self.feat_widgets[param["name"]]])
@@ -1245,6 +1248,7 @@ class Ui_MainWindow(QtCore.QObject):
         #Start filling features in only with connected camera
         if self.connected and not self.param_flag.is_set():
             #Status message
+            
             self.set_status_msg("Reading features")
             
             #empty feature queue
@@ -1252,12 +1256,13 @@ class Ui_MainWindow(QtCore.QObject):
                 target=cam.get_parameters,
                 kwargs={'feature_queue': self.feat_queue,
                         'flag': self.param_flag,
-                        'visibility': Config_level(1)})#self.combo_config_level.currentIndex()+1)})
-            #implementovat frontu pro komunikaci mezi vlákny
+                        'visibility': Config_level(self.combo_config_level.currentIndex()+1)})
             self.param_callback_thread = threading.Thread(target=self.callback_parameters)
             
-            self.get_params_thread.start()
+            
             self.param_callback_thread.start()
+            self.get_params_thread.start()
+                
             
             
                         
