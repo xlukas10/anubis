@@ -16,6 +16,7 @@ from datetime import datetime
 import enum
 import time#tmp for testing purposes
 from queue import Queue
+import genicam
 
 from global_queue import frame_queue
 from global_queue import active_frame_queue
@@ -26,7 +27,7 @@ class Camera:
     
     def __init__(self, producer_path = 'ZDE VLOZIT DEFAULTNI CESTU'):
         self.h = Harvester()
-        self.set_gentl_producer(producer_path)
+        self.add_gentl_producer(producer_path)
         self.vendor = 'Other'
         self.is_recording = False
         self.acquisition_running = False
@@ -44,7 +45,7 @@ class Camera:
         @todo WHAT IS THE DICTIONARY FORMAT?
         """
         if not self.vendor == 'Other':
-            self.set_gentl_producer(self.paths[0])
+            self.add_gentl_producer(self.paths[0])
         self.h.update()
         self.devices_info = []
         for device in self.h.device_info_list:
@@ -81,7 +82,7 @@ class Camera:
         print("done")
         
         if not self.vendor == 'Other':
-            self.set_gentl_producer(self.paths[0])
+            self.add_gentl_producer(self.paths[0])
             self.h.update()
             print("here")
         #translate selected device to index in harvester's device info list
@@ -89,7 +90,8 @@ class Camera:
                 if camera['id_'] == selected_device:
                     harvester_index = index
                     break
-        if(self.h.device_info_list[harvester_index].vendor == 'Allied Vision Technologies'):
+#FIX NAME OF VENDOR
+        if(self.h.device_info_list[harvester_index].vendor == 'XAllied Vision Technologies'):
             self.disconnect_harvester()
             self.vendor = 'Allied Vision Technologies'
             self.active_camera = self.__translate_selected_device(selected_device)
@@ -97,6 +99,8 @@ class Camera:
                 cams = vimba.get_all_cameras()
                 with cams [self.active_camera] as cam:
                     try:
+                        #Makes sure that the camera won't send packets larger than destination pc
+                        #can raceive
                         cam.GVSPAdjustPacketSize.run()
                         while not cam.GVSPAdjustPacketSize.is_done():
                             pass
@@ -106,6 +110,9 @@ class Camera:
             self.active_camera = harvester_index
             self.vendor = 'Other'
             self.ia = self.h.create_image_acquirer(harvester_index)
+
+            self.ia.remote_device.node_map.GevSCPSPacketSize.value = 1500
+
     
     def get_single_frame(self,):
         """!@brief grab single frame from camera
@@ -120,15 +127,26 @@ class Camera:
                     frame = cam.get_frame()
                     return frame.as_opencv_image()
         else:
-    #to do
-            with Vimba.get_instance() as vimba:
-                cams = vimba.get_all_cameras()
-                with cams [self.active_camera] as cam:
-                    frame = cam.get_frame()
-                    return frame.as_opencv_image()
-            #whole block above is temporary REMOVE IT
-            #self.buffer = self.ia.fetch_buffer().payload.components[0]
-            #return self.buffer.data
+            self.ia.start_acquisition()
+            
+            time.sleep(0.5)
+            buffer = self.ia.fetch_buffer()
+            self.ia.stop_acquisition()
+            print('zde')
+                
+        # Work with the Buffer object. It consists of everything you need.
+            
+            buffer = self.ia.fetch_buffer()
+            print("aaa")
+            frame = buffer.payload.components[0]
+            print('tady')
+            buffer.queue()
+            print("tu")
+            print(frame.data)
+            return frame.data
+            
+        
+                    
     
     
     
@@ -269,7 +287,165 @@ class Camera:
                     
                     #return features_out
         else:
-            return dir(self.ia.remote_device.node_map)
+            features = dir(self.ia.remote_device.node_map)
+            
+            for feature in features:
+                if(feature.startswith('_')):
+                    continue
+                try:
+                    feature_obj = getattr(self.ia.remote_device.node_map, feature).node
+                    feature = getattr(self.ia.remote_device.node_map, feature)
+                    #Some information is accessible through harvester feature, 
+                    #for some information we need to go deeper into Genapi itself
+                    feat_acc = feature_obj.get_access_mode()
+                except:
+                    continue
+                
+                #according to genicam standard
+                #0 - not implemented
+                #1 - not availablle
+                #3 - write only
+                #4 - read only
+                #5 - read and write
+                if(feat_acc == 0 or feat_acc == 1):
+                    continue
+
+                feat_vis = feature_obj.visibility
+                print(feat_vis)
+                if( feat_vis < visibility ):
+                    features_out = {}
+                    features_out['name'] = feature_obj.name
+                    #disp_name = feature.get_display_name()
+                    features_out['attr_name'] = feature_obj.display_name
+                    
+                    
+                    #if feature does not have read permission, go to next iteration
+                    if(feat_acc < 3):
+                        continue
+                    #Get feature's write mode
+                    try:
+                        if(feat_acc == 5 or feat_acc == 3):
+                            attr = True
+                        else:
+                            attr = False
+                    except:
+                        attr = None
+                    
+                    features_out['attr_enabled'] = attr
+                    
+                    #Get feature's type if it exists
+                    #intfIValue = 0       #: IValue interface
+                    #intfIBase = 1        #: IBase interface
+                    #intfIInteger = 2     #: IInteger interface
+                    #intfIBoolean = 3     #: IBoolean interface
+                    #intfICommand = 4     #: ICommand interface
+                    #intfIFloat = 5       #: IFloat interface
+                    #intfIString = 6      #: IString interface
+                    #intfIRegister = 7    #: IRegister interface
+                    #intfICategory = 8    #: ICategory interface
+                    #intfIEnumeration = 9 #: IEnumeration interface
+                    #ntfIEnumEntry = 10   #: IEnumEntry interface
+                    #intfIPort       = 11  #: IPort interface
+
+                    try:
+                        attr = feature_obj.principal_interface_type
+                        if(attr == 2):
+                            attr = "IntFeature"
+                        elif(attr == 3):
+                            attr = "BoolFeature"
+                        elif(attr == 4):
+                            attr = "CommandFeature"
+                        elif(attr == 5):
+                            attr = "FloatFeature"
+                        elif(attr == 6):
+                            attr = "StringFeature"
+                        elif(attr == 9):
+                            attr = "EnumFeature"
+                            print("found enum")
+                        else:
+                            attr = None
+                        print(feature_obj.name)
+#todo category feature
+                    except:
+                        attr = None
+                    
+                    features_out['attr_type'] = attr
+                    
+                    #Get availible enums for enum feature type
+                    if(features_out['attr_type'] == "EnumFeature"):
+                        pass#Not yet implemetnted
+                        #print(dir(feature_obj))
+                        #print("here")
+                        #attr = feature_obj.selected_features
+                        #print(attr)
+                    
+                        attr = None
+                    
+                        features_out['attr_enums'] = attr
+                    
+                    #Get category for the feature
+                    try:
+                        attr = "category"#feature.category
+#not yet implemented
+                    except:
+                        attr = None
+                
+                    features_out['attr_cat'] = attr
+                        
+                    #Get feature's value if it exists
+                    try:
+                        attr = feature.value
+                    except:
+                        attr = None
+                    
+                    features_out['attr_value'] = attr
+                    
+                    #Get feature's range if it exists
+                    try:
+                        attr = [feature.min, feature.max]
+                    except:
+                        attr = None
+                    
+                    features_out['attr_range'] = attr
+                    
+                    #Get feature's increment if it exists
+                    try:
+                        attr = feature.inc
+                    except:
+                        attr = None
+                    
+                    features_out['attr_increment'] = attr
+                    
+                    #Get feature's max length if it exists
+                    try:
+                        attr = feature.max_length
+                    except:
+                        attr = None
+                    
+                    features_out['attr_max_length'] = attr
+                    
+                    try:
+                        attr = feature_obj.tooltip
+                    except:
+                        attr = None
+                    
+                    features_out['attr_tooltip'] = attr
+                    
+                    
+                    '''
+                    try:
+                        attr = feature.get_unit()
+                        print(attr)
+                    except (AttributeError, VimbaFeatureError):
+                        attr = None
+                    
+                    features_out[name]['attr_unit'] = attr
+                    '''
+                
+                    feature_queue.put(features_out)
+            flag.set()
+            return
+            
     
     def read_param_values(self,):
         """@brief Is not used for now, will be probably removed
@@ -419,7 +595,7 @@ class Camera:
         self.is_recording = False
     
     
-    def set_gentl_producer(self,producer_path):
+    def add_gentl_producer(self,producer_path):
         """!@brief Add a new frame producer to the harvester object
         @details adds .cti file specified by producer_path to the harvester object
         @param[in] producer_path path to a .cti file

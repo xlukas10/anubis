@@ -149,25 +149,21 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_zoom_fit.setObjectName("btn_zoom_fit")
         self.gridLayout_4.addWidget(self.btn_zoom_fit, 1, 2, 1, 1)
         
-        self.btn_zoom_out.clicked.connect(lambda: self.set_zoom(-1))
-        self.btn_zoom_fit.clicked.connect(lambda: self.set_zoom(0))
-        self.btn_zoom_in.clicked.connect(lambda: self.set_zoom(1))
-        self.btn_zoom_100.clicked.connect(lambda: self.set_zoom(100))
+        
         
         
         self.btn_single_frame = QtWidgets.QPushButton(self.widget_controls)
         self.btn_single_frame.setObjectName("btn_single_frame")
-        self.btn_single_frame.clicked.connect(self.single_frame)
         self.gridLayout_4.addWidget(self.btn_single_frame, 1, 0, 1, 1)
         
         self.btn_start_preview = QtWidgets.QPushButton(self.widget_controls)
         self.btn_start_preview.setObjectName("btn_start_preview")
-        self.btn_start_preview.clicked.connect(self.preview)
+        
         self.gridLayout_4.addWidget(self.btn_start_preview, 0, 0, 1, 1)
         
         self.btn_start_recording = QtWidgets.QPushButton(self.widget_controls)
         self.btn_start_recording.setObjectName("btn_start_recording")
-        self.btn_start_recording.clicked.connect(self.record)
+        
         self.gridLayout_4.addWidget(self.btn_start_recording, 0, 1, 1, 1)
         
         self.verticalLayout_2.addWidget(self.widget_controls)
@@ -205,16 +201,6 @@ class Ui_MainWindow(QtCore.QObject):
         
             #Connect refresh camera to the UI
         
-        self.btn_refresh_cameras.clicked.connect(self.refresh_cameras)
-        
-        self.btn_connect_camera.clicked.connect(
-            lambda: self.connect_camera(self.list_detected_cameras.currentRow()))
-        
-        self.list_detected_cameras.itemDoubleClicked.connect(
-            lambda: self.connect_camera(self.list_detected_cameras.currentRow()))
-        #možná lambda s indexem itemu
-        
-        self.btn_disconnect_camera.clicked.connect(self.disconnect_camera)
         
         
         
@@ -248,7 +234,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.combo_config_level.addItem("")
         self.combo_config_level.addItem("")
         self.combo_config_level.addItem("")
-        self.combo_config_level.currentIndexChanged.connect(self.load_parameters)
+        
         self.horizontalLayout_5.addWidget(self.combo_config_level)
         self.verticalLayout_3.addWidget(self.frame_config_level)
         
@@ -266,7 +252,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         self.btn_save_config = QtWidgets.QPushButton(self.widget_3)
         self.btn_save_config.setObjectName("btn_save_config")
-        self.btn_save_config.clicked.connect(self.save_cam_config)
+        
         self.horizontalLayout_2.addWidget(self.btn_save_config)
         
         self.btn_load_config = QtWidgets.QPushButton(self.widget_3)
@@ -309,7 +295,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         self.file_manager_save_location = QtWidgets.QPushButton(self.widget_sequence_save)
         self.file_manager_save_location.setObjectName("file_manager_save_location")
-        self.file_manager_save_location.clicked.connect(lambda: self.get_directory(self.line_edit_save_location))
+        
         self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.file_manager_save_location)
         
         self.line_edit_save_location = QtWidgets.QLineEdit(self.widget_sequence_save)
@@ -345,12 +331,11 @@ class Ui_MainWindow(QtCore.QObject):
         
         self.btn_save_sequence_settings = QtWidgets.QPushButton(self.tab_recording_config)
         self.btn_save_sequence_settings.setObjectName("btn_save_sequence_settings")
-        self.btn_save_sequence_settings.clicked.connect(self.save_seq_settings)
         self.verticalLayout.addWidget(self.btn_save_sequence_settings)
         
         self.btn_reset_sequence_settings = QtWidgets.QPushButton(self.tab_recording_config)
         self.btn_reset_sequence_settings.setObjectName("btn_reset_sequence_settings")
-        self.btn_reset_sequence_settings.clicked.connect(self.reset_seq_settings)
+        
         self.verticalLayout.addWidget(self.btn_reset_sequence_settings)
         
         self.tabs.addTab(self.tab_recording_config, "")
@@ -364,7 +349,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         self.btn_save_model = QtWidgets.QPushButton(self.tab_tensorflow)
         self.btn_save_model.setObjectName("btn_save_model")
-        self.btn_save_model.clicked.connect(self.save_model)
+        
         self.gridLayout_3.addWidget(self.btn_save_model, 0, 1, 1, 1)
         
         self.line_edit_model_name = QtWidgets.QLineEdit(self.tab_tensorflow)
@@ -374,7 +359,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         self.btn_load_model = QtWidgets.QPushButton(self.tab_tensorflow)
         self.btn_load_model.setObjectName("btn_load_model")
-        self.btn_load_model.clicked.connect(self.load_model)
+        
         self.gridLayout_3.addWidget(self.btn_load_model, 0, 0, 1, 1)
         
         self.tensorflow_tabs = QtWidgets.QTabWidget(self.tab_tensorflow)
@@ -415,7 +400,8 @@ class Ui_MainWindow(QtCore.QObject):
         
         self.btn_load_dataset = QtWidgets.QPushButton(self.frame_train_preprocess)
         self.btn_load_dataset.setObjectName("btn_load_dataset")
-        self.btn_load_dataset.clicked.connect(lambda: self.get_directory(self.line_edit_dataset_path))
+        
+        
         self.gridLayout_7.addWidget(self.btn_load_dataset, 1, 0, 1, 1)
         
         self.label_val_split = QtWidgets.QLabel(self.frame_train_preprocess)
@@ -424,7 +410,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         self.btn_preprocess = QtWidgets.QPushButton(self.frame_train_preprocess)
         self.btn_preprocess.setObjectName("btn_preprocess")
-        self.btn_preprocess.clicked.connect(self.preprocess_dataset)
+        
         self.gridLayout_7.addWidget(self.btn_preprocess, 6, 0, 1, 1)
         
         self.btn_save_preprocess = QtWidgets.QPushButton(self.frame_train_preprocess)
@@ -521,7 +507,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         self.btn_train_cancel = QtWidgets.QPushButton(self.frame_train_progress)
         self.btn_train_cancel.setObjectName("btn_train_cancel")
-        self.btn_train_cancel.clicked.connect(self.train_model)
+        
         self.gridLayout_6.addWidget(self.btn_train_cancel, 0, 0, 1, 1)
         
         self.gridLayout_8.addWidget(self.frame_train_progress, 0, 0, 1, 4)
@@ -640,6 +626,8 @@ class Ui_MainWindow(QtCore.QObject):
         #----------------------------------------------------------------
         
         #--------------------------------------------------------------
+        
+        self.connect_actions()
         self.retranslateUi(MainWindow)
         self.read_config()
         self.tabs.setCurrentIndex(0)
@@ -648,7 +636,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         self.vision = Computer_vision(self.predictions)
         
-
+    
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -719,6 +707,36 @@ class Ui_MainWindow(QtCore.QObject):
         self.camera_icon.setPixmap(self.icon_offline)
         
     
+    def connect_actions(self):
+        
+        self.btn_zoom_out.clicked.connect(lambda: self.set_zoom(-1))
+        self.btn_zoom_fit.clicked.connect(lambda: self.set_zoom(0))
+        self.btn_zoom_in.clicked.connect(lambda: self.set_zoom(1))
+        self.btn_zoom_100.clicked.connect(lambda: self.set_zoom(100))
+        self.btn_single_frame.clicked.connect(self.single_frame)
+        self.btn_start_preview.clicked.connect(self.preview)
+        self.btn_start_recording.clicked.connect(self.record)
+        self.btn_refresh_cameras.clicked.connect(self.refresh_cameras)
+        
+        self.btn_connect_camera.clicked.connect(
+            lambda: self.connect_camera(self.list_detected_cameras.currentRow()))
+        
+        self.list_detected_cameras.itemDoubleClicked.connect(
+            lambda: self.connect_camera(self.list_detected_cameras.currentRow()))
+        #možná lambda s indexem itemu
+        
+        self.btn_disconnect_camera.clicked.connect(self.disconnect_camera)
+        self.combo_config_level.currentIndexChanged.connect(self.load_parameters)
+        self.btn_save_config.clicked.connect(self.save_cam_config)
+        self.file_manager_save_location.clicked.connect(lambda: self.get_directory(self.line_edit_save_location))
+        
+        self.btn_save_sequence_settings.clicked.connect(self.save_seq_settings)
+        self.btn_reset_sequence_settings.clicked.connect(self.reset_seq_settings)
+        self.btn_save_model.clicked.connect(self.save_model)
+        self.btn_load_model.clicked.connect(self.load_model)
+        self.btn_load_dataset.clicked.connect(lambda: self.get_directory(self.line_edit_dataset_path))
+        self.btn_preprocess.clicked.connect(self.preprocess_dataset)
+        self.btn_train_cancel.clicked.connect(self.train_model)
     #Start of custom methods (not generated by QtDesigner)
     
     def eventFilter(self, obj, event):
@@ -1073,7 +1091,6 @@ class Ui_MainWindow(QtCore.QObject):
         
     def callback_parameters(self):
         self.param_flag.wait()
-        self.param_flag.clear()
         if(self.parameters_signal.text() != "A"):
             self.parameters_signal.setText("A")
         else:
@@ -1095,8 +1112,9 @@ class Ui_MainWindow(QtCore.QObject):
         
         self.feat_widgets.clear()
         self.feat_labels.clear()
-        
+        print("also here")
         while not self.feat_queue.empty():
+            print("new one")
             try:
                 param = self.feat_queue.get()
                 param['attr_cat'] = param['attr_cat'].lstrip('/')
@@ -1215,6 +1233,7 @@ class Ui_MainWindow(QtCore.QObject):
             except:
                 pass
                 #we'll get here when queue is empty
+        self.param_flag.clear()
         
     def load_parameters(self):
         """!@brief Fills layout with feature name and value pairs
@@ -1222,18 +1241,18 @@ class Ui_MainWindow(QtCore.QObject):
         combo box is created. In this version all available parameters are shown.
         TODO config level and command feature type
         """
-        #Start filling features in only on connected camera
+        
+        #Start filling features in only with connected camera
         if self.connected and not self.param_flag.is_set():
             #Status message
             self.set_status_msg("Reading features")
             
             #empty feature queue
-            
             self.get_params_thread = threading.Thread(
                 target=cam.get_parameters,
                 kwargs={'feature_queue': self.feat_queue,
                         'flag': self.param_flag,
-                        'visibility': Config_level(self.combo_config_level.currentIndex()+1)})
+                        'visibility': Config_level(1)})#self.combo_config_level.currentIndex()+1)})
             #implementovat frontu pro komunikaci mezi vlákny
             self.param_callback_thread = threading.Thread(target=self.callback_parameters)
             
@@ -1279,6 +1298,8 @@ class Ui_MainWindow(QtCore.QObject):
         user made to applications default state.
         @TODO load cti files from config
         """
+        
+        cti_files = False
         with open("config.ini", 'r') as config:
             for line in config:
                 #reading configuration for recording
@@ -1289,6 +1310,12 @@ class Ui_MainWindow(QtCore.QObject):
                     self.line_edit_save_location.setText(line.replace("save_location=", "", 1))
                 elif(line.startswith("sequence_duration=")):
                     self.line_edit_sequence_duration.setText(line.replace("sequence_duration=", "", 1))
+                elif(line.startswith("CTI_FILES_PATHS")):
+                    print('a')
+                    cti_files = True
+                elif(cti_files == True):
+                    print(line)
+                    cam.add_gentl_producer(line)
 #TODO reading and adding cti files
         
         #Set status update
