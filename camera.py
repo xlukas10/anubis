@@ -81,12 +81,10 @@ class Camera:
         @details Select camera you will be using and set Camera object accordingly
         @param[in] selected_device ID of a camera you want to connect to
         """
-        print("done")
         
         if not self.vendor == 'Other':
             self.add_gentl_producer(self.paths[0])
             self.h.update()
-            print("here")
         #translate selected device to index in harvester's device info list
         for index, camera in enumerate(self.devices_info):
                 if camera['id_'] == selected_device:
@@ -482,6 +480,23 @@ class Camera:
                 with cams[self.active_camera] as c:
                     #cam.save_settings(path + file_name + '.xml', PersistType.NoLUT)
                     c.save_settings(path, PersistType.NoLUT)
+        else:
+            #At the time of writing this code not Harvester nor genapi for Python 
+            #supported saving .xml config, so the format of saved data created
+            #here is nonstandard and simplified for now.
+            #More here https://github.com/genicam/harvesters/issues/152
+            
+            parameters = queue.Queue()
+            tmp_flag = threading.Event()
+            self.get_parameters(parameters, tmp_flag, Config_level.Invisible)
+            
+            with open(path, 'w') as config:
+                while not parameters.empty():
+                    param = parameters.get_nowait()
+                    for key,val in param.items():
+                        config.write(key + "=" + str(val) + '\n')
+                    config.write('\n')
+
     
     def start_acquisition(self,):
         """!@brief Starts continuous acquisition of image frames
