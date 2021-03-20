@@ -44,6 +44,8 @@ class Camera:
         @return List of Dictionaries cantaining informations about cameras
         @todo WHAT IS THE DICTIONARY FORMAT?
         """
+        #if there is selected camera which uses different API, temporarily start 
+        #Harvester to reload the camera list
         if not self.vendor == 'Other':
             self.add_gentl_producer(self.paths[0])
         self.h.update()
@@ -55,7 +57,7 @@ class Camera:
             self.devices_info.append(d)
         if not self.vendor == 'Other':
             self.disconnect_harvester()
-        return self.devices_info #["ahoj","jak","se","mas","?"]#
+        return self.devices_info
     
     def __translate_selected_device(self, selected_device):
         """!@brief Translates camera ID to index in a list of detected cameras
@@ -166,6 +168,11 @@ class Camera:
                         getattr(cam, parameter['name']).set(new_value)
                     except (AttributeError, VimbaFeatureError):
                         pass
+        else:
+            try:
+                getattr(self.ia.remote_device, parameter['name']).value = new_value
+            except:
+                pass
     
     def get_parameters(self,feature_queue, flag, visibility = Config_level.Unknown):
         """!@brief Read parameters from camera
