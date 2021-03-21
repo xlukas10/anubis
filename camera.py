@@ -450,18 +450,27 @@ class Camera:
             flag.set()
             return
             
-    
-    def read_param_values(self,):
-        """@brief Is not used for now, will be probably removed
+    def execute_command(self, command_feature):
+        
+        if(self.vendor == 'Allied Vision Technologies'):
+            pass
+        else:
+            pass
+        
+    def read_param_value(self,param_name):
+        """@used to get value of one parameter based on its name
         @todo Remove if not changed
         """
 #This method may turn out to be redundant (for Vimba it is not needed, depends on harvester implementation)
-        values = []
-        
+
         if(self.vendor == 'Allied Vision Technologies'):
             return self.get_parameters()
         else:
-            pass
+            try:
+                val = getattr(self.ia.remote_device.node_map, param_name).value
+                return val
+            except:
+                return
     
     def load_config(self,path):
         """@brief load existing camera configuration

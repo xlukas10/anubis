@@ -29,6 +29,11 @@ class Ui_MainWindow(QtCore.QObject):
         """
         !@brief Variable used to store device information of detected cameras
         """
+        self.feat_refresh_timer  = QtCore.QTimer(self)
+        self.feat_refresh_timer.setInterval(2000)
+        self.feat_refresh_timer.timeout.connect(self.update_parameters)
+        self.feat_refresh_timer.start()
+        
         self.image_pixmap = None
         self.w_preview = 0
         self.h_preview = 0
@@ -1197,7 +1202,7 @@ class Ui_MainWindow(QtCore.QObject):
                     
                     #When state of the checkbox change, the feature is sent to 
                     #the camera and changed to the new state
-                    self.feat_widgets[param["name"]].stateChanged.connect(lambda state, param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].isChecked()))
+                    self.feat_widgets[param["name"]].stateChanged.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].isChecked()))
                 elif param["attr_type"] == "EnumFeature":
                     #For enum feature a combo box is created.
                     self.feat_widgets[param["name"]] = QtWidgets.QComboBox(self.tab_config)
@@ -1216,7 +1221,13 @@ class Ui_MainWindow(QtCore.QObject):
                     
                     #When different option is selected change the given enum in
                     #the camera
-                    self.feat_widgets[param["name"]].activated.connect(lambda state, param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].currentText()))
+                    self.feat_widgets[param["name"]].activated.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].currentText()))
+                elif param["attr_type"] == "CommandFeature":
+                    #If the feature type is not recognized, create a label with 
+                    #the text error
+                    self.feat_widgets[param["name"]] = QtWidgets.QButton(self.tab_config)
+                    self.feat_widgets[param["name"]].setText("Execute command")
+                    self.feat_widgets[param["name"]].clicked.connect(lambda param=param: cam.execute_command(param))
                 else:
                     #If the feature type is not recognized, create a label with 
                     #the text error
@@ -1238,6 +1249,24 @@ class Ui_MainWindow(QtCore.QObject):
                 pass
                 #we'll get here when queue is empty
         self.param_flag.clear()
+    
+    def update_parameters(self):
+        if self.connected and not self.param_flag.is_set():
+            for parameter in self.feat_widgets:
+                value = cam.read_param_value(parameter)
+                widget = self.feat_widgets[parameter]
+                if(type(widget) == QtWidgets.QLineEdit):
+                    widget.setText(str(value))
+                elif(type(widget) == QtWidgets.QComboBox):
+                    index = widget.findText(str(value), QtCore.Qt.MatchFixedString)
+                    #Set found index to be the active one
+                    if index >= 0:
+                        widget.setCurrentIndex(index)
+                elif(type(widget) == QtWidgets.QCheckBox):
+                    widget.setChecked(value)
+                else:
+                    print("Update nott implemented")
+        
         
     def load_parameters(self):
         """!@brief Fills layout with feature name and value pairs
