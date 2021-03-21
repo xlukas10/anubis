@@ -728,6 +728,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_disconnect_camera.clicked.connect(self.disconnect_camera)
         self.combo_config_level.currentIndexChanged.connect(self.load_parameters)
         self.btn_save_config.clicked.connect(self.save_cam_config)
+        self.btn_load_config.clicked.connect(self.load_cam_config)
         self.file_manager_save_location.clicked.connect(lambda: self.get_directory(self.line_edit_save_location))
         
         self.btn_save_sequence_settings.clicked.connect(self.save_seq_settings)
@@ -1281,6 +1282,19 @@ class Ui_MainWindow(QtCore.QObject):
         
         #Save camera config to path specified in name (0 index)
         cam.save_config(name[0])
+    
+    def load_cam_config(self):
+    
+        name = QtWidgets.QFileDialog.getOpenFileName(self.centralwidget,
+                                                     "Load Configuration",
+                                                     filter="XML files (*.xml)")
+        
+        print(name)
+        #Set label text to chosen folder path
+        cam.load_config(name[0])
+        
+        self.set_status_msg("Configuration loaded")
+        
         
     def get_directory(self, line_output):
         #set_record_path

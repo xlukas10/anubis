@@ -168,7 +168,7 @@ class Camera:
                         pass
         else:
             try:
-                getattr(self.ia.remote_device, parameter['name']).value = new_value
+                getattr(self.ia.remote_device.node_map, parameter['name']).value = new_value
             except:
                 pass
     
@@ -324,15 +324,14 @@ class Camera:
                     features_out['attr_name'] = feature_obj.display_name
                     
                     
-                    #if feature does not have read permission, go to next iteration
-                    if(feat_acc < 3):
-                        continue
-                    #Get feature's write mode
+                    
+                    #Set feature's write mode
                     try:
                         if(feat_acc == 5 or feat_acc == 3):
-                            attr = True
-                        else:
                             attr = False
+                        else:
+                            attr = True
+                        print("sss")
                     except:
                         attr = None
                     
@@ -467,7 +466,42 @@ class Camera:
     def load_config(self,path):
         """@brief load existing camera configuration
         """
-        pass
+        if self.vendor=='Allied Vision Technologies':
+            pass
+        else:
+            param = {}
+            val = None
+            attr_type = None
+            with open(path, 'r') as config:
+                config_dense = (line for line in config if line) #removes blank lines
+                for line in config_dense:
+                    line = line.rstrip('\n')
+                    if line.startswith('attr_value') and param:
+                        val = line.split('=')
+                        
+                        if(attr_type[1] == 'IntFeature'):
+                            self.set_parameter(param, int(val[1]))
+                        elif(attr_type[1] == 'FloatFeature'):
+                            self.set_parameter(param, float(val[1]))
+                        elif(attr_type[1] == 'EnumFeature'):
+                            self.set_parameter(param, val[1])
+                        elif(attr_type[1] == 'BoolFeature'):
+                            if(val[1] == 'True'):
+                                self.set_parameter(param, True)
+                            else:
+                                self.set_parameter(param, False)
+                        elif(attr_type[1] == 'StringFeature'):
+                            self.set_parameter(param, val[1])
+                        
+                        val = None
+                        param.clear()
+                        attr_type = None
+                    elif line.startswith('attr_type') and param:
+                        attr_type = line.split('=')
+                        
+                    elif line.startswith('name'):
+                        param['name'] = line.split('=')[1]
+                        val = None
     
     def save_config(self,path):#="", filename="config"):
         """!@brief saves configuration of a camera to .xml file
@@ -489,7 +523,7 @@ class Camera:
             parameters = queue.Queue()
             tmp_flag = threading.Event()
             self.get_parameters(parameters, tmp_flag, Config_level.Invisible)
-            
+
             with open(path, 'w') as config:
                 while not parameters.empty():
                     param = parameters.get_nowait()
