@@ -210,10 +210,22 @@ class Ui_MainWindow(QtCore.QObject):
         
         
         self.verticalLayout_4.addWidget(self.list_detected_cameras)
-        self.tip_add_cti = QtWidgets.QLabel(self.tab_connect)
+        
+        self.frame_cti = QtWidgets.QFrame(self.tab_connect)
+        self.frame_cti.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_cti.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_cti.setObjectName("frame_cti")
+        self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.frame_cti)
+        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.tip_add_cti = QtWidgets.QLabel(self.frame_cti)
         self.tip_add_cti.setWordWrap(True)
         self.tip_add_cti.setObjectName("tip_add_cti")
-        self.verticalLayout_4.addWidget(self.tip_add_cti)
+        self.horizontalLayout_6.addWidget(self.tip_add_cti)
+        self.btn_add_cti = QtWidgets.QPushButton(self.frame_cti)
+        self.btn_add_cti.setObjectName("btn_add_cti")
+        self.horizontalLayout_6.addWidget(self.btn_add_cti)
+        self.verticalLayout_4.addWidget(self.frame_cti)
+
         self.tabs.addTab(self.tab_connect, "")
         
         #Tab - Configure camera
@@ -617,10 +629,18 @@ class Ui_MainWindow(QtCore.QObject):
         self.actionRemove_cti_file = QtWidgets.QAction(MainWindow)
         self.actionRemove_cti_file.setObjectName("actionRemove_cti_file")
         
-        self.actionSave_frame = QtWidgets.QAction(MainWindow)
-        self.actionSave_frame.setObjectName("actionSave_frame")
+        self.action_save_frame = QtWidgets.QAction(MainWindow)
+        self.action_save_frame.setShortcutContext(QtCore.Qt.WindowShortcut)
+        self.action_save_frame.setObjectName("action_save_frame")
         
-        self.menuFile.addAction(self.actionSave_frame)
+        self.action_save_settings = QtWidgets.QAction(MainWindow)
+        self.action_save_settings.setStatusTip("")
+        self.action_save_settings.setObjectName("action_save_settings")
+        
+        self.menuFile.addAction(self.action_save_frame)
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.action_save_settings)
+        
         self.menuOptions.addAction(self.actionAdd_Remove_cti_file)
         self.menuOptions.addAction(self.actionRemove_cti_file)
         self.menuHelp.addAction(self.actionOpen_Help)
@@ -655,9 +675,9 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_connect_camera.setText(_translate("MainWindow", "Connect"))
         self.btn_refresh_cameras.setText(_translate("MainWindow", "Refresh"))
         self.btn_disconnect_camera.setText(_translate("MainWindow", "Disconnect"))
-        self.tip_add_cti.setText(_translate("MainWindow", "Tip: If you can\'t detect your camera try adding new .cti file from your camera vendor (Options->Add .cti file)"))
+        self.tip_add_cti.setText(_translate("MainWindow", "Tip: If you can\'t detect your camera try adding new .cti file from your camera vendor"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_connect), _translate("MainWindow", "Connect Camera"))
-        
+        self.btn_add_cti.setText(_translate("MainWindow", "Add .cti file"))
         self.label_config_level.setText(_translate("MainWindow", "Configuration level"))
         self.combo_config_level.setItemText(0, _translate("MainWindow", "Beginner"))
         self.combo_config_level.setItemText(1, _translate("MainWindow", "Expert"))
@@ -704,7 +724,11 @@ class Ui_MainWindow(QtCore.QObject):
         self.actionAdd_Remove_cti_file.setText(_translate("MainWindow", "Add .cti file"))
         self.actionOpen_Help.setText(_translate("MainWindow", "Open Help"))
         self.actionRemove_cti_file.setText(_translate("MainWindow", "Remove .cti file"))
-        self.actionSave_frame.setText(_translate("MainWindow", "Save frame"))
+        self.action_save_frame.setText(_translate("MainWindow", "Save frame"))
+        self.action_save_settings.setText(_translate("MainWindow", "Save settings"))
+        self.action_save_settings.setToolTip(_translate("MainWindow", "Save modifications made to application settings"))
+        self.action_save_settings.setShortcut(_translate("MainWindow", "Ctrl+S"))
+        
         #added manually
         self.camera_status.setText("Camera: Not connected")
         self.receive_status.setText("Received frames: 0")
@@ -722,6 +746,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_start_preview.clicked.connect(self.preview)
         self.btn_start_recording.clicked.connect(self.record)
         self.btn_refresh_cameras.clicked.connect(self.refresh_cameras)
+        self.btn_add_cti.clicked.connect(self.add_cti)
         
         self.btn_connect_camera.clicked.connect(
             lambda: self.connect_camera(self.list_detected_cameras.currentRow()))
@@ -743,6 +768,8 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_load_dataset.clicked.connect(lambda: self.get_directory(self.line_edit_dataset_path))
         self.btn_preprocess.clicked.connect(self.preprocess_dataset)
         self.btn_train_cancel.clicked.connect(self.train_model)
+        
+        self.action_save_settings.triggered.connect(self.save_cti_config)
     #Start of custom methods (not generated by QtDesigner)
     
     def eventFilter(self, obj, event):
@@ -767,6 +794,14 @@ class Ui_MainWindow(QtCore.QObject):
             elif event.type() == QtCore.QEvent.MouseButtonRelease:
                 self.last_time_move = 0
         return QtWidgets.QWidget.eventFilter(self, obj, event)
+    
+    def add_cti(self):
+        path = QtWidgets.QFileDialog.getOpenFileName(self.centralwidget,
+                                                     "Load GenTL producer",
+                                                     filter="CTI files (*.cti)")
+        
+        cam.add_gentl_producer(path[0])
+        self.set_status_msg("File added")
     
     def refresh_cameras(self):
         """!@brief Calls function to detect connected cameras and prints them
@@ -1359,10 +1394,8 @@ class Ui_MainWindow(QtCore.QObject):
                 elif(line.startswith("sequence_duration=")):
                     self.line_edit_sequence_duration.setText(line.replace("sequence_duration=", "", 1))
                 elif(line.startswith("CTI_FILES_PATHS")):
-                    print('a')
                     cti_files = True
                 elif(cti_files == True):
-                    print(line)
                     cam.add_gentl_producer(line)
 #TODO reading and adding cti files
         
@@ -1401,8 +1434,14 @@ class Ui_MainWindow(QtCore.QObject):
         with open("config.ini", 'r') as config:
             file_contents = config.readlines()
         
+        end_of_rec_conf = None
         #Find end of Recording config part of the file
-        end_of_rec_conf = file_contents.index("CTI_FILES_PATHS\n")
+        #if no delimiter is found a new one is added
+        try:
+            end_of_rec_conf = file_contents.index("CTI_FILES_PATHS\n")
+        except(ValueError):
+            file_contents.append("CTI_FILES_PATHS\n")
+            end_of_rec_conf = -1
             
         with open("config.ini", 'w') as config:
             #Write default states to the file
@@ -1507,6 +1546,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.preprocess_thread = threading.Thread(target=self.vision.process_dataset, kwargs={'width': width, 'height': height, 'path': path, 'split': split, 'categories': categories})
         self.preprocess_thread.start()
    
+    
     def train_model(self):
         if(not self.training_flag.is_set()):
             self.training_flag.set()
@@ -1542,7 +1582,36 @@ class Ui_MainWindow(QtCore.QObject):
         self.line_edit_acc.setText(str(self.train_vals['acc']))
         self.line_edit_val_loss.setText(str(self.train_vals['val_loss']))
         self.line_edit_val_acc.setText(str(self.train_vals['val_acc']))
+    
+    def save_cti_config(self):
+        paths = cam.get_gentl_producers()
+        config = []
+        
+        
+        with open("config.ini", 'r') as file:
+            for line in file:
+                config.append(line)
+        
+        with open("config.ini", 'w') as file:
+            for line in config:
+                #reading configuration for recording
+                if(line.startswith("CTI_FILES_PATHS")):
+                    file.write(line)
+                    break
+                else:
+                    file.write(line)
+                    
+            if isinstance(paths, str):
+                file.write(paths + '\n')
+            else:
+                if(paths):
+                    for path in paths:
+                        file.write(path + '\n')
+        
+        self.set_status_msg("Configuration saved")
             
+            
+        
     def set_status_msg(self, message, timeout=0):
         """!@brief Shows message in status bar
         @details Method is called when other methods need to send the user 

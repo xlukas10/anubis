@@ -120,7 +120,7 @@
        <string/>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_connect">
        <attribute name="title">
@@ -158,13 +158,32 @@
          <widget class="QListWidget" name="list_detected_cameras"/>
         </item>
         <item>
-         <widget class="QLabel" name="tip_add_cti">
-          <property name="text">
-           <string>Tip: If you can't detect your camera try adding new .cti file from your camera vendor (Options-&gt;Add .cti file)</string>
+         <widget class="QFrame" name="frame_cti">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
           </property>
-          <property name="wordWrap">
-           <bool>true</bool>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
           </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QLabel" name="tip_add_cti">
+             <property name="text">
+              <string>Tip: If you can't detect your camera try adding a new .cti file from your camera vendor</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btn_add_cti">
+             <property name="text">
+              <string>Add .cti file</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
@@ -671,11 +690,13 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionSave_frame"/>
+    <addaction name="action_save_frame"/>
+    <addaction name="separator"/>
+    <addaction name="action_save_settings"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
-     <string>Options</string>
+     <string>Tools</string>
     </property>
     <addaction name="actionAdd_Remove_cti_file"/>
     <addaction name="actionRemove_cti_file"/>
@@ -706,9 +727,26 @@
     <string>Remove .cti file</string>
    </property>
   </action>
-  <action name="actionSave_frame">
+  <action name="action_save_frame">
    <property name="text">
     <string>Save frame</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+  </action>
+  <action name="action_save_settings">
+   <property name="text">
+    <string>Save settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Save modifications made to application settings</string>
+   </property>
+   <property name="statusTip">
+    <string/>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S, Ctrl+S</string>
    </property>
   </action>
  </widget>

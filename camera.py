@@ -22,17 +22,18 @@ from global_queue import frame_queue
 from global_queue import active_frame_queue
 
 from config_level import Config_level
+from vendors import Vendors
 
 class Camera:
     
-    def __init__(self, producer_path = 'ZDE VLOZIT DEFAULTNI CESTU'):
+    def __init__(self, producer_paths):
         self.h = Harvester()
-        self.add_gentl_producer(producer_path)
-        self.vendor = 'Other'
+        self.paths = []
+        self.add_gentl_producer(producer_paths)
+        self.vendor = Vendors.Other
         self.is_recording = False
         self.acquisition_running = False
         self.devices_info = []
-        self.paths = [producer_path]
         self.active_camera = 0
         self.ia = None #image acquifier
         
@@ -46,8 +47,8 @@ class Camera:
         """
         #if there is selected camera which uses different API, temporarily start 
         #Harvester to reload the camera list
-        if not self.vendor == 'Other':
-            self.add_gentl_producer(self.paths[0])
+        if not self.vendor == Vendors.Other:
+            self.add_gentl_producer(self.paths)
         self.h.update()
         self.devices_info = []
         for device in self.h.device_info_list:
@@ -55,7 +56,7 @@ class Camera:
                  'model': device.model,
                  'vendor': device.vendor}
             self.devices_info.append(d)
-        if not self.vendor == 'Other':
+        if not self.vendor == Vendors.Other:
             self.disconnect_harvester()
         return self.devices_info
     
@@ -65,7 +66,7 @@ class Camera:
             This method must be called in every method where new connection to a camera is made.
         @param[in] selected_device ID of a camera you want to connect to
         """
-        if self.vendor == 'Allied Vision Technologies':
+        if self.vendor == Vendors.Allied_Vision_Technologies:
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras()
                 for index, camera in enumerate(cams):
@@ -82,8 +83,8 @@ class Camera:
         @param[in] selected_device ID of a camera you want to connect to
         """
         
-        if not self.vendor == 'Other':
-            self.add_gentl_producer(self.paths[0])
+        if not self.vendor == Vendors.Other:
+            self.add_gentl_producer(self.paths)
             self.h.update()
         #translate selected device to index in harvester's device info list
         for index, camera in enumerate(self.devices_info):
@@ -91,9 +92,9 @@ class Camera:
                     harvester_index = index
                     break
 #FIX NAME OF VENDOR
-        if(self.h.device_info_list[harvester_index].vendor == 'XAllied Vision Technologies'):
+        if(self.h.device_info_list[harvester_index].vendor == 'Allied Vision Technologies'):
             self.disconnect_harvester()
-            self.vendor = 'Allied Vision Technologies'
+            self.vendor = Vendors.Allied_Vision_Technologies
             self.active_camera = self.__translate_selected_device(selected_device)
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras()
@@ -108,7 +109,7 @@ class Camera:
                             pass
         else:
             self.active_camera = harvester_index
-            self.vendor = 'Other'
+            self.vendor = Vendors.Other
             self.ia = self.h.create_image_acquirer(harvester_index)
 
             self.ia.remote_device.node_map.GevSCPSPacketSize.value = 1500
@@ -120,7 +121,7 @@ class Camera:
             loads single frame from active_camera
         @return unmodified frame from camera
         """
-        if(self.vendor == 'Allied Vision Technologies'):
+        if(self.vendor == Vendors.Allied_Vision_Technologies):
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras()
                 with cams [self.active_camera] as cam:
@@ -157,7 +158,7 @@ class Camera:
                          other keys will be used in later versions
         @param[in] new_value variable compatible with value key in parameter
         """
-        if(self.vendor == 'Allied Vision Technologies'):
+        if(self.vendor == Vendors.Allied_Vision_Technologies):
 #EDIT to work well with new parameter dictionary (name, value, maximum etc.)
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras()
@@ -182,7 +183,7 @@ class Camera:
             if given information exist for the parameter
         """
 #categories are defined by GenICam SFNC
-        if(self.vendor == 'Allied Vision Technologies'):
+        if(self.vendor == Vendor.Allied_Vision_Technologies):
             #Establishing communication
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras ()
@@ -452,7 +453,7 @@ class Camera:
             
     def execute_command(self, command_feature):
         
-        if(self.vendor == 'Allied Vision Technologies'):
+        if(self.vendor == Vendors.Allied_Vision_Technologies):
             pass
         else:
             pass
@@ -463,8 +464,14 @@ class Camera:
         """
 #This method may turn out to be redundant (for Vimba it is not needed, depends on harvester implementation)
 
-        if(self.vendor == 'Allied Vision Technologies'):
-            return self.get_parameters()
+        if(self.vendor == Vendors.Allied_Vision_Technologies):
+            try:
+                with Vimba.get_instance() as vimba:
+                    cams = vimba.get_all_cameras ()
+                    with cams[self.active_camera] as cam:
+                            return getattr(cam, param_name).get()
+            except:
+                pass
         else:
             try:
                 val = getattr(self.ia.remote_device.node_map, param_name).value
@@ -475,8 +482,11 @@ class Camera:
     def load_config(self,path):
         """@brief load existing camera configuration
         """
-        if self.vendor=='Allied Vision Technologies':
-            pass
+        if self.vendor == Vendors.Allied_Vision_Technologies:
+            with Vimba.get_instance() as vimba:
+                cams = vimba.get_all_cameras ()
+                with cams[self.active_camera] as cam:
+                    cam.load_settings(path, PersistType.NoLUT)
         else:
             param = {}
             val = None
@@ -517,7 +527,7 @@ class Camera:
         @param[in] path A path where the file will be saved
         @todo what will happen if the file already exists
         """
-        if self.vendor=='Allied Vision Technologies':
+        if self.vendor == Vendors.Allied_Vision_Technologies:
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras ()
                 with cams[self.active_camera] as c:
@@ -547,12 +557,14 @@ class Camera:
             acquisition in that thread (producer thread)
         """
         #create threading object for vimba, harvester or future api and start the thread
-        if not self.acquisition_running:
-            self._stream_stop_switch = threading.Event()
-            self._frame_producer_thread = threading.Thread(target=self._frame_producer)
-            self._frame_producer_thread.start()
-            self.acquisition_running = True
-        pass
+        if self.vendor == Vendors.Allied_Vision_Technologies:
+            if not self.acquisition_running:
+                self._stream_stop_switch = threading.Event()
+                self._frame_producer_thread = threading.Thread(target=self._frame_producer)
+                self._frame_producer_thread.start()
+                self.acquisition_running = True
+        else:
+            pass
     
     def stop_acquisition(self,):
         """!@brief Stops continuous acquisition
@@ -571,16 +583,17 @@ class Camera:
         @todo implement for harvesters and define interface for APIs to come
         """
 #implement if vendor mechanism
-        with Vimba.get_instance() as vimba:
-            cams = vimba.get_all_cameras()
-            with cams[self.active_camera] as c:
-                try:
-                    c.start_streaming(handler=self.__frame_handler_vimba)
-                    self._stream_stop_switch.wait()
-                finally:
-                    c.stop_streaming()
+        if self.vendor == Vendors.Allied_Vision_Technologies:
+            with Vimba.get_instance() as vimba:
+                cams = vimba.get_all_cameras()
+                with cams[self.active_camera] as c:
+                    try:
+                        c.start_streaming(handler=self.__frame_handler_vimba)
+                        self._stream_stop_switch.wait()
+                    finally:
+                        c.stop_streaming()
+        else:
             pass
-        return
     
     def __frame_handler_vimba(self,cam ,frame):
         """!@brief Defines how to process incoming frames
@@ -668,6 +681,7 @@ class Camera:
             application configuration for later use
         """
         self.h.add_file(producer_path)
+        self.paths.append(producer_path)
     
     def remove_gentl_producer(self,producer_path):
         """!@brief Remove existing frame producer from the harvester object
@@ -678,6 +692,11 @@ class Camera:
         """
         self.h.remove_file(producer_path)
 
+    def get_gentl_producers(self):
+        print(self.paths)
+        return self.paths
+        
+        
     def disconnect_harvester(self,):
         """!@brief Destroys harvester object so other APIs can access cameras
         """
@@ -688,7 +707,7 @@ class Camera:
         
         self.stop_recording()
         self.disconnect_harvester()
-        self.__init__(self.paths[0]) #Zmenit pro obecne cesty
+        self.__init__(self.paths) #Zmenit pro obecne cesty
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         
 
