@@ -28,7 +28,12 @@ class Computer_vision():
         self.training_data = []
         
     def load_model(self,path):
-        self.model = keras.models.load_model(path)
+        try:
+            self.model = keras.models.load_model(path)
+            return True
+        except:
+            self.model = None
+            return False
     
     def save_model(self,path):
         self.model.save(path)

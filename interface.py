@@ -399,168 +399,141 @@ class Ui_MainWindow(QtCore.QObject):
         self.gridLayout_9 = QtWidgets.QGridLayout(self.tab_train)
         self.gridLayout_9.setObjectName("gridLayout_9")
         
-        self.frame_train_preprocess = QtWidgets.QFrame(self.tab_train)
-        self.frame_train_preprocess.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_train_preprocess.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_train_preprocess.setObjectName("frame_train_preprocess")
-        
-        self.gridLayout_7 = QtWidgets.QGridLayout(self.frame_train_preprocess)
-        self.gridLayout_7.setObjectName("gridLayout_7")
-        
-        self.label_img_resize = QtWidgets.QLabel(self.frame_train_preprocess)
-        self.label_img_resize.setObjectName("label_img_resize")
-        self.gridLayout_7.addWidget(self.label_img_resize, 3, 0, 1, 1)
-    
-        self.label_model_arch = QtWidgets.QLabel(self.frame_train_preprocess)
-        self.label_model_arch.setObjectName("label_model_arch")
-        self.gridLayout_7.addWidget(self.label_model_arch, 0, 0, 1, 1)
-        
-        self.btn_load_dataset = QtWidgets.QPushButton(self.frame_train_preprocess)
-        self.btn_load_dataset.setObjectName("btn_load_dataset")
-        
-        
-        self.gridLayout_7.addWidget(self.btn_load_dataset, 1, 0, 1, 1)
-        
-        self.label_val_split = QtWidgets.QLabel(self.frame_train_preprocess)
-        self.label_val_split.setObjectName("label_val_split")
-        self.gridLayout_7.addWidget(self.label_val_split, 5, 0, 1, 1)
-        
-        self.btn_preprocess = QtWidgets.QPushButton(self.frame_train_preprocess)
-        self.btn_preprocess.setObjectName("btn_preprocess")
-        
-        self.gridLayout_7.addWidget(self.btn_preprocess, 6, 0, 1, 1)
-        
-        self.btn_save_preprocess = QtWidgets.QPushButton(self.frame_train_preprocess)
-        self.btn_save_preprocess.setObjectName("btn_save_preprocess")
-        self.gridLayout_7.addWidget(self.btn_save_preprocess, 6, 1, 1, 1)
-        
-        self.frame_train_val_split = QtWidgets.QFrame(self.frame_train_preprocess)
-        self.frame_train_val_split.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_train_val_split.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_train_val_split.setObjectName("frame_train_val_split")
-        
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.frame_train_val_split)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        
-        self.line_edit_val_split_1 = QtWidgets.QLineEdit(self.frame_train_val_split)
-        self.line_edit_val_split_1.setInputMethodHints(QtCore.Qt.ImhDigitsOnly)
-        self.line_edit_val_split_1.setObjectName("line_edit_val_split_1")
-        self.horizontalLayout.addWidget(self.line_edit_val_split_1)
-        
-        self.label_colon = QtWidgets.QLabel(self.frame_train_val_split)
-        self.label_colon.setObjectName("label_colon")
-        self.horizontalLayout.addWidget(self.label_colon)
-        
-        self.line_edit_val_split_2 = QtWidgets.QLineEdit(self.frame_train_val_split)
-        self.line_edit_val_split_2.setInputMethodHints(QtCore.Qt.ImhDigitsOnly)
-        self.line_edit_val_split_2.setObjectName("line_edit_val_split_2")
-        self.horizontalLayout.addWidget(self.line_edit_val_split_2)
-        
-        self.gridLayout_7.addWidget(self.frame_train_val_split, 5, 1, 1, 1)
-        
-        self.frame_train_resize = QtWidgets.QFrame(self.frame_train_preprocess)
-        self.frame_train_resize.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_train_resize.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_train_resize.setObjectName("frame_train_resize")
-        
-        self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.frame_train_resize)
-        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        
-        self.label_res_width = QtWidgets.QLabel(self.frame_train_resize)
-        self.label_res_width.setObjectName("label_res_width")
-        self.horizontalLayout_4.addWidget(self.label_res_width)
-        
-        self.line_edit_res_width = QtWidgets.QLineEdit(self.frame_train_resize)
-        self.line_edit_res_width.setInputMethodHints(QtCore.Qt.ImhDigitsOnly)
-        self.line_edit_res_width.setObjectName("line_edit_res_width")
-        self.horizontalLayout_4.addWidget(self.line_edit_res_width)
-        
-        self.label_res_height = QtWidgets.QLabel(self.frame_train_resize)
-        self.label_res_height.setObjectName("label_res_height")
-        self.horizontalLayout_4.addWidget(self.label_res_height)
-        
-        self.line_edit_res_height = QtWidgets.QLineEdit(self.frame_train_resize)
-        self.line_edit_res_height.setInputMethodHints(QtCore.Qt.ImhDigitsOnly)
-        self.line_edit_res_height.setObjectName("line_edit_res_height")
-        self.horizontalLayout_4.addWidget(self.line_edit_res_height)
-        
-        self.gridLayout_7.addWidget(self.frame_train_resize, 4, 0, 1, 2)
-        
-        self.combo_model_arch = QtWidgets.QComboBox(self.frame_train_preprocess)
-        self.combo_model_arch.setObjectName("combo_model_arch")
-        self.combo_model_arch.addItem("")
-        self.gridLayout_7.addWidget(self.combo_model_arch, 0, 1, 1, 1)
-        
-        self.line_edit_dataset_path = QtWidgets.QLineEdit(self.frame_train_preprocess)
-        self.line_edit_dataset_path.setObjectName("line_edit_dataset_path")
-        self.gridLayout_7.addWidget(self.line_edit_dataset_path, 1, 1, 1, 1)
-        
-        self.gridLayout_9.addWidget(self.frame_train_preprocess, 0, 0, 1, 1)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_9.addItem(spacerItem1, 2, 0, 1, 1)
         
         self.frame_train_stats = QtWidgets.QFrame(self.tab_train)
         self.frame_train_stats.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_train_stats.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_train_stats.setObjectName("frame_train_stats")
+        
         self.gridLayout_8 = QtWidgets.QGridLayout(self.frame_train_stats)
         self.gridLayout_8.setObjectName("gridLayout_8")
         
-        self.line_edit_val_acc = QtWidgets.QLineEdit(self.frame_train_stats)
-        self.line_edit_val_acc.setEnabled(False)
-        self.line_edit_val_acc.setObjectName("line_edit_val_acc")
-        self.gridLayout_8.addWidget(self.line_edit_val_acc, 5, 3, 1, 1)
-        
-        self.frame_train_progress = QtWidgets.QFrame(self.frame_train_stats)
-        self.frame_train_progress.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_train_progress.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_train_progress.setObjectName("frame_train_progress")
-        
-        self.gridLayout_6 = QtWidgets.QGridLayout(self.frame_train_progress)
-        self.gridLayout_6.setObjectName("gridLayout_6")
-        
-        self.progress_bar_train = QtWidgets.QProgressBar(self.frame_train_progress)
-        self.progress_bar_train.setProperty("value", 24)
-        self.progress_bar_train.setObjectName("progress_bar_train")
-        self.gridLayout_6.addWidget(self.progress_bar_train, 2, 0, 1, 1)
-        
-        self.btn_train_cancel = QtWidgets.QPushButton(self.frame_train_progress)
-        self.btn_train_cancel.setObjectName("btn_train_cancel")
-        
-        self.gridLayout_6.addWidget(self.btn_train_cancel, 0, 0, 1, 1)
-        
-        self.gridLayout_8.addWidget(self.frame_train_progress, 0, 0, 1, 4)
-        
-        self.line_edit_loss = QtWidgets.QLineEdit(self.frame_train_stats)
-        self.line_edit_loss.setEnabled(False)
-        self.line_edit_loss.setObjectName("line_edit_loss")
-        self.gridLayout_8.addWidget(self.line_edit_loss, 1, 1, 1, 1)
-        
         self.label_val_acc = QtWidgets.QLabel(self.frame_train_stats)
         self.label_val_acc.setObjectName("label_val_acc")
-        self.gridLayout_8.addWidget(self.label_val_acc, 5, 2, 1, 1)
-        
-        self.label_loss = QtWidgets.QLabel(self.frame_train_stats)
-        self.label_loss.setObjectName("label_loss")
-        self.gridLayout_8.addWidget(self.label_loss, 1, 0, 1, 1)
-        
-        self.label_val_loss = QtWidgets.QLabel(self.frame_train_stats)
-        self.label_val_loss.setObjectName("label_val_loss")
-        self.gridLayout_8.addWidget(self.label_val_loss, 1, 2, 1, 1)
+        self.gridLayout_8.addWidget(self.label_val_acc, 6, 3, 1, 1)
         
         self.line_edit_acc = QtWidgets.QLineEdit(self.frame_train_stats)
         self.line_edit_acc.setEnabled(False)
         self.line_edit_acc.setObjectName("line_edit_acc")
-        self.gridLayout_8.addWidget(self.line_edit_acc, 5, 1, 1, 1)
+        self.gridLayout_8.addWidget(self.line_edit_acc, 6, 2, 1, 1)
         
         self.label_acc = QtWidgets.QLabel(self.frame_train_stats)
         self.label_acc.setObjectName("label_acc")
-        self.gridLayout_8.addWidget(self.label_acc, 5, 0, 1, 1)
+        self.gridLayout_8.addWidget(self.label_acc, 6, 0, 1, 1)
+        
+        self.label_val_loss = QtWidgets.QLabel(self.frame_train_stats)
+        self.label_val_loss.setObjectName("label_val_loss")
+        self.gridLayout_8.addWidget(self.label_val_loss, 2, 3, 1, 1)
+        
+        self.line_edit_val_acc = QtWidgets.QLineEdit(self.frame_train_stats)
+        self.line_edit_val_acc.setEnabled(False)
+        self.line_edit_val_acc.setObjectName("line_edit_val_acc")
+        self.gridLayout_8.addWidget(self.line_edit_val_acc, 6, 4, 1, 1)
         
         self.line_edit_val_loss = QtWidgets.QLineEdit(self.frame_train_stats)
         self.line_edit_val_loss.setEnabled(False)
         self.line_edit_val_loss.setObjectName("line_edit_val_loss")
-        self.gridLayout_8.addWidget(self.line_edit_val_loss, 1, 3, 1, 1)
+        self.gridLayout_8.addWidget(self.line_edit_val_loss, 2, 4, 1, 1)
         
-        self.gridLayout_9.addWidget(self.frame_train_stats, 2, 0, 1, 1)
+        self.label_epoch = QtWidgets.QLabel(self.frame_train_stats)
+        self.label_epoch.setObjectName("label_epoch")
+        self.gridLayout_8.addWidget(self.label_epoch, 1, 0, 1, 1)
+        
+        self.label_active_epoch = QtWidgets.QLabel(self.frame_train_stats)
+        self.label_active_epoch.setObjectName("label_active_epoch")
+        self.gridLayout_8.addWidget(self.label_active_epoch, 1, 2, 1, 1)
+        
+        self.line_edit_loss = QtWidgets.QLineEdit(self.frame_train_stats)
+        self.line_edit_loss.setEnabled(False)
+        self.line_edit_loss.setObjectName("line_edit_loss")
+        self.gridLayout_8.addWidget(self.line_edit_loss, 2, 2, 1, 1)
+        
+        self.label_loss = QtWidgets.QLabel(self.frame_train_stats)
+        self.label_loss.setObjectName("label_loss")
+        self.gridLayout_8.addWidget(self.label_loss, 2, 0, 1, 1)
+        
+        self.btn_train_cancel = QtWidgets.QPushButton(self.frame_train_stats)
+        self.btn_train_cancel.setObjectName("btn_train_cancel")
+        self.gridLayout_8.addWidget(self.btn_train_cancel, 0, 0, 1, 1)
+        
+        self.progress_bar_train = QtWidgets.QProgressBar(self.frame_train_stats)
+        self.progress_bar_train.setProperty("value", 0)
+        self.progress_bar_train.setObjectName("progress_bar_train")
+        self.gridLayout_8.addWidget(self.progress_bar_train, 0, 2, 1, 3)
+        
+        self.gridLayout_9.addWidget(self.frame_train_stats, 3, 0, 1, 1)
+        
+        self.frame_train_preprocess = QtWidgets.QFrame(self.tab_train)
+        self.frame_train_preprocess.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_train_preprocess.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_train_preprocess.setObjectName("frame_train_preprocess")
+        
+        self.gridLayout_6 = QtWidgets.QGridLayout(self.frame_train_preprocess)
+        self.gridLayout_6.setObjectName("gridLayout_6")
+        self.label_img_resize = QtWidgets.QLabel(self.frame_train_preprocess)
+        self.label_img_resize.setObjectName("label_img_resize")
+        self.gridLayout_6.addWidget(self.label_img_resize, 1, 0, 1, 1)
+        
+        self.btn_load_dataset = QtWidgets.QPushButton(self.frame_train_preprocess)
+        self.btn_load_dataset.setObjectName("btn_load_dataset")
+        self.gridLayout_6.addWidget(self.btn_load_dataset, 0, 0, 1, 1)
+        
+        self.label_val_split = QtWidgets.QLabel(self.frame_train_preprocess)
+        self.label_val_split.setObjectName("label_val_split")
+        self.gridLayout_6.addWidget(self.label_val_split, 4, 0, 1, 1)
+        
+        self.line_edit_val_split = QtWidgets.QLineEdit(self.frame_train_preprocess)
+        self.line_edit_val_split.setMaximumSize(QtCore.QSize(186, 16777215))
+        self.line_edit_val_split.setInputMethodHints(QtCore.Qt.ImhDigitsOnly)
+        self.line_edit_val_split.setObjectName("line_edit_val_split")
+        self.gridLayout_6.addWidget(self.line_edit_val_split, 4, 1, 1, 1)
+        
+        self.line_edit_epochs = QtWidgets.QLineEdit(self.frame_train_preprocess)
+        self.line_edit_epochs.setObjectName("line_edit_epochs")
+        self.gridLayout_6.addWidget(self.line_edit_epochs, 5, 1, 1, 1)
+        
+        self.label_train_epochs = QtWidgets.QLabel(self.frame_train_preprocess)
+        self.label_train_epochs.setObjectName("label_train_epochs")
+        self.gridLayout_6.addWidget(self.label_train_epochs, 5, 0, 1, 1)
+        
+        self.btn_preprocess = QtWidgets.QPushButton(self.frame_train_preprocess)
+        self.btn_preprocess.setObjectName("btn_preprocess")
+        self.gridLayout_6.addWidget(self.btn_preprocess, 6, 0, 1, 1)
+        
+        self.progress_bar_preprocess = QtWidgets.QProgressBar(self.frame_train_preprocess)
+        self.progress_bar_preprocess.setProperty("value", 0)
+        self.progress_bar_preprocess.setObjectName("progress_bar_preprocess")
+        self.gridLayout_6.addWidget(self.progress_bar_preprocess, 6, 1, 1, 2)
+        
+        self.label_res_width = QtWidgets.QLabel(self.frame_train_preprocess)
+        self.label_res_width.setObjectName("label_res_width")
+        self.gridLayout_6.addWidget(self.label_res_width, 2, 0, 1, 1, QtCore.Qt.AlignRight)
+        
+        self.label_res_height = QtWidgets.QLabel(self.frame_train_preprocess)
+        self.label_res_height.setObjectName("label_res_height")
+        self.gridLayout_6.addWidget(self.label_res_height, 3, 0, 1, 1, QtCore.Qt.AlignRight)
+        
+        self.line_edit_res_width = QtWidgets.QLineEdit(self.frame_train_preprocess)
+        self.line_edit_res_width.setEnabled(False)
+        self.line_edit_res_width.setInputMethodHints(QtCore.Qt.ImhDigitsOnly)
+        self.line_edit_res_width.setObjectName("line_edit_res_width")
+        self.gridLayout_6.addWidget(self.line_edit_res_width, 2, 1, 1, 1)
+        
+        self.line_edit_res_height = QtWidgets.QLineEdit(self.frame_train_preprocess)
+        self.line_edit_res_height.setEnabled(False)
+        self.line_edit_res_height.setInputMethodHints(QtCore.Qt.ImhDigitsOnly)
+        self.line_edit_res_height.setObjectName("line_edit_res_height")
+        self.gridLayout_6.addWidget(self.line_edit_res_height, 3, 1, 1, 1)
+        
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_6.addItem(spacerItem2, 2, 2, 1, 1)
+        self.line_edit_dataset_path = QtWidgets.QLineEdit(self.frame_train_preprocess)
+        self.line_edit_dataset_path.setObjectName("line_edit_dataset_path")
+        self.gridLayout_6.addWidget(self.line_edit_dataset_path, 0, 1, 1, 2)
+        
+        self.gridLayout_9.addWidget(self.frame_train_preprocess, 1, 0, 1, 1)
         self.tensorflow_tabs.addTab(self.tab_train, "")
         
         self.gridLayout_3.addWidget(self.tensorflow_tabs, 2, 0, 1, 2)
@@ -697,29 +670,29 @@ class Ui_MainWindow(QtCore.QObject):
         self.tabs.setTabText(self.tabs.indexOf(self.tab_recording_config), _translate("MainWindow", "Recording Configuration"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_tensorflow), _translate("MainWindow", "Tensorflow"))
         self.btn_save_model.setText(_translate("MainWindow", "Save model"))
-        self.line_edit_model_name.setText(_translate("MainWindow", "Loaded model - not changable"))
+        self.line_edit_model_name.setText(_translate("MainWindow", "Select a model to load"))
         self.btn_load_model.setText(_translate("MainWindow", "Load model"))
         self.tensorflow_tabs.setTabText(self.tensorflow_tabs.indexOf(self.tab_classify), _translate("MainWindow", "Classify"))
-        self.tensorflow_tabs.setTabText(self.tensorflow_tabs.indexOf(self.tab_train), _translate("MainWindow", "Train"))
-        self.label_img_resize.setText(_translate("MainWindow", "Image resize"))
-        self.label_model_arch.setText(_translate("MainWindow", "Model architecture"))
+        self.tensorflow_tabs.setTabText(self.tensorflow_tabs.indexOf(self.tab_classify), _translate("MainWindow", "Classify"))
+        self.label_val_acc.setText(_translate("MainWindow", "Validation Accuracy"))
+        self.label_acc.setText(_translate("MainWindow", "Accuracy"))
+        self.label_val_loss.setText(_translate("MainWindow", "Validation Loss"))
+        self.label_epoch.setText(_translate("MainWindow", "Epoch: "))
+        self.label_active_epoch.setText(_translate("MainWindow", "0/0"))
+        self.label_loss.setText(_translate("MainWindow", "Loss"))
+        self.btn_train_cancel.setText(_translate("MainWindow", "Train"))
+        self.label_img_resize.setText(_translate("MainWindow", "Resize dimensions"))
         self.btn_load_dataset.setText(_translate("MainWindow", "Select Dataset"))
-        self.label_val_split.setText(_translate("MainWindow", "Validation split [%]"))
+        self.label_val_split.setText(_translate("MainWindow", "Data for a validation [%]"))
+        self.line_edit_val_split.setText(_translate("MainWindow", "70"))
+        self.label_train_epochs.setText(_translate("MainWindow", "Train epochs"))
         self.btn_preprocess.setText(_translate("MainWindow", "Preprocess Data"))
-        self.btn_save_preprocess.setText(_translate("MainWindow", "Save preprocessed data"))
-        self.line_edit_val_split_1.setText(_translate("MainWindow", "70"))
-        self.label_colon.setText(_translate("MainWindow", ":"))
-        self.line_edit_val_split_2.setText(_translate("MainWindow", "30"))
         self.label_res_width.setText(_translate("MainWindow", "Width"))
         self.label_res_height.setText(_translate("MainWindow", "Height"))
-        self.combo_model_arch.setItemText(0, _translate("MainWindow", "Use loaded model"))
-        self.btn_train_cancel.setText(_translate("MainWindow", "Train"))
-        self.label_val_acc.setText(_translate("MainWindow", "Validation Accuracy"))
-        self.label_loss.setText(_translate("MainWindow", "Loss"))
-        self.label_val_loss.setText(_translate("MainWindow", "Validation Loss"))
-        self.label_acc.setText(_translate("MainWindow", "Accuracy"))
+        self.tensorflow_tabs.setTabText(self.tensorflow_tabs.indexOf(self.tab_train), _translate("MainWindow", "Train"))
+        self.tabs.setTabText(self.tabs.indexOf(self.tab_tensorflow), _translate("MainWindow", "Tensorflow"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
-        self.menuOptions.setTitle(_translate("MainWindow", "Options"))
+        self.menuOptions.setTitle(_translate("MainWindow", "Tools"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.actionAdd_Remove_cti_file.setText(_translate("MainWindow", "Add .cti file"))
         self.actionOpen_Help.setText(_translate("MainWindow", "Open Help"))
@@ -727,7 +700,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.action_save_frame.setText(_translate("MainWindow", "Save frame"))
         self.action_save_settings.setText(_translate("MainWindow", "Save settings"))
         self.action_save_settings.setToolTip(_translate("MainWindow", "Save modifications made to application settings"))
-        self.action_save_settings.setShortcut(_translate("MainWindow", "Ctrl+S"))
+        self.action_save_settings.setShortcut(_translate("MainWindow", "Ctrl+S, Ctrl+S"))
         
         #added manually
         self.camera_status.setText("Camera: Not connected")
@@ -1338,26 +1311,27 @@ class Ui_MainWindow(QtCore.QObject):
         as an .xml file and its contents are dependent on module used in Camera 
         class to save the config.
         """
-        #Open file dialog for choosing a save location and name
-        name = QtWidgets.QFileDialog.getSaveFileName(self.centralwidget,
-                                                     "Save Configuration",
-                                                     filter="XML files (*.xml)",
-                                                     directory="config.xml")
         
-        #Save camera config to path specified in name (0 index)
-        cam.save_config(name[0])
+        if(self.connected):
+            #Open file dialog for choosing a save location and name
+            name = QtWidgets.QFileDialog.getSaveFileName(self.centralwidget,
+                                                         "Save Configuration",
+                                                         filter="XML files (*.xml)",
+                                                         directory="config.xml")
+            
+            #Save camera config to path specified in name (0 index)
+            cam.save_config(name[0])
     
     def load_cam_config(self):
-    
-        name = QtWidgets.QFileDialog.getOpenFileName(self.centralwidget,
-                                                     "Load Configuration",
-                                                     filter="XML files (*.xml)")
-        
-        print(name)
-        #Set label text to chosen folder path
-        cam.load_config(name[0])
-        
-        self.set_status_msg("Configuration loaded")
+        if self.connected:
+            name = QtWidgets.QFileDialog.getOpenFileName(self.centralwidget,
+                                                         "Load Configuration",
+                                                         filter="XML files (*.xml)")
+           
+            #Set label text to chosen folder path
+            cam.load_config(name[0])
+            
+            self.set_status_msg("Configuration loaded")
         
         
     def get_directory(self, line_output):
@@ -1407,9 +1381,11 @@ class Ui_MainWindow(QtCore.QObject):
         name = self.get_directory(self.line_edit_model_name)
         
         #Set label text to chosen folder path
-        self.vision.load_model(name)
-        
-        self.set_status_msg("Model loaded")
+        if(self.vision.load_model(name)):
+            self.set_status_msg("Model loaded")
+        else:
+            self.set_status_msg("Failed to load model")
+            self.line_edit_model_name.setText("Select a model to load")
         
     def save_model(self):
         #Open file dialog for choosing a folder
