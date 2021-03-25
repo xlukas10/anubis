@@ -18,6 +18,8 @@ class Computer_vision():
     def __init__(self,plot):
         self.model = None
         self.SIZE = 50
+        self.width = 1
+        self.height =  1
         self.categories = []
         self.plot = plot
         self.split = 0
@@ -28,9 +30,17 @@ class Computer_vision():
         self.training_data = []
         
     def load_model(self,path):
+        if(self.model):
+            keras.backend.clear_session()
+            self.model = None
+        
+        
         try:
             self.model = keras.models.load_model(path)
-            return True
+            input_dim = list(self.model.get_layer(index=0).input_shape)
+            self.width = input_dim[1]
+            self.height = input_dim[2]
+            return [self.width, self.height]
         except:
             self.model = None
             return False
@@ -66,36 +76,40 @@ class Computer_vision():
             
             prediction_flag.clear()
     
-    def process_dataset(self, path, width=50, height=50, split=0, categories=[]):
-        if(path != None):
-            if width == -1:
-                width = 50
-            if height == -1:
-                height = 50
-                
+    def process_dataset(self, path, process_perc , split=0, categories=[], process_flag = None, callback_flag = None):
+        if(path != None and self.model != None):
             self.split = split
+            
             
             del self.x
             del self.y
             
             self.x = []
             self.y = []
-            
-            self.__create_training_data(path,categories, width, height)
+            print("aaa")
+            self._create_training_data(path,categories, callback_flag,  process_perc)
+            print("bbb")
             
             for features,label in self.training_data:
                 self.x.append(features)
                 self.y.append(label)
             
-            self.x = np.array(self.x).reshape(-1, width, height, 1)
+            self.x = np.array(self.x).reshape(-1, self.width, self.height, 1)
             self.y = np.array(self.y)
-            print('assembled')
-        
-        
+            
+            process_flag.set()
         
     
-    def __create_training_data(self, path, categories, width, height):
+    def _create_training_data(self, path, categories, callback_flag, process_perc):
         self.training_data.clear()
+        items = 0
+        
+        for category in categories:
+            path_cat = os.path.join(path, category)
+            items += len(os.listdir(path_cat))
+            
+        percent = int(items/100)
+        items_done = 0
 
         for category in categories:
             path_cat = os.path.join(path, category)
@@ -103,10 +117,16 @@ class Computer_vision():
             for img in os.listdir(path_cat):
                 try:
                     img_array = cv2.imread(os.path.join(path_cat,img),cv2.IMREAD_GRAYSCALE)
-                    new_array = cv2.resize(img_array, (width, height))
+                    new_array = cv2.resize(img_array, (self.width, self.height))
                     self.training_data.append([new_array,class_num])
+                    items_done += 1
+                    if(items_done % percent == 0):
+                        process_perc[0] = items_done/percent
+                        callback_flag.set()
                 except Exception as e:
                     pass
+            process_perc[0] = 100
+            callback_flag.set()
         random.shuffle(self.training_data)
 
         

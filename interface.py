@@ -40,6 +40,7 @@ class Ui_MainWindow(QtCore.QObject):
                     
         self.move_x_prev = 0
         self.move_y_prev = 0
+        self.process_perc = [0]
         
         
         self.preview_zoom = 1
@@ -58,9 +59,14 @@ class Ui_MainWindow(QtCore.QObject):
         self.training_flag = threading.Event()
         self.param_flag = threading.Event()
         self.param_flag = threading.Event()
+        self.process_flag = threading.Event()
+        self.process_prog_flag = threading.Event()
         
-        self.callback_signal = QtWidgets.QLineEdit()
-        self.callback_signal.textChanged.connect(self.update_training)
+        self.callback_train_signal = QtWidgets.QLineEdit()
+        self.callback_train_signal.textChanged.connect(self.update_training)
+        
+        self.callback_process_signal = QtWidgets.QLineEdit()
+        self.callback_process_signal.textChanged.connect(self.update_processing)
         
         self.resize_signal = QtWidgets.QLineEdit()
         self.resize_signal.textChanged.connect(self.update_img)
@@ -1380,8 +1386,11 @@ class Ui_MainWindow(QtCore.QObject):
         #Open file dialog for choosing a folder
         name = self.get_directory(self.line_edit_model_name)
         
+        dim = self.vision.load_model(name)
         #Set label text to chosen folder path
-        if(self.vision.load_model(name)):
+        if(dim):
+            self.line_edit_res_width.setText(str(dim[0]))
+            self.line_edit_res_height.setText(str(dim[1]))
             self.set_status_msg("Model loaded")
         else:
             self.set_status_msg("Failed to load model")
@@ -1494,24 +1503,8 @@ class Ui_MainWindow(QtCore.QObject):
             self.refresh_cameras()
         
     def preprocess_dataset(self):
-        width_str = self.line_edit_res_width.text()
-        height_str = self.line_edit_res_height.text()
-        
-        width = 0
-        height = 0
-        
-        if(width_str == '' or width_str == '0'):
-            width_str = - 1
-        else:
-            width = int(self.line_edit_res_width.text())
-            
-        if(height_str == '' or height_str == '0'):
-            width_str = - 1
-        else:
-            height = int(self.line_edit_res_height.text())
-            
         path = self.line_edit_dataset_path.text()
-        split = float(self.line_edit_val_split_2.text())/100
+        split = float(self.line_edit_val_split.text())/100
         files = os.scandir(path)
         categories = []
         
@@ -1519,10 +1512,34 @@ class Ui_MainWindow(QtCore.QObject):
             if file.is_dir():
                 categories.append(file.name)
         
-        self.preprocess_thread = threading.Thread(target=self.vision.process_dataset, kwargs={'width': width, 'height': height, 'path': path, 'split': split, 'categories': categories})
+        
+        self.preprocess_thread = threading.Thread(
+            target=self.vision.process_dataset, 
+            kwargs={'path': path,
+                    'process_perc': self.process_perc,
+                    'split': split, 'categories': categories,
+                    'process_flag': self.process_flag,
+                    'callback_flag': self.process_prog_flag})
+        self.callback_preprocess_thread = threading.Thread(target=self.preprocess_callback)
+        
+        
+        self.callback_preprocess_thread.start()
         self.preprocess_thread.start()
    
+    def preprocess_callback(self):
+        while(not self.process_flag.is_set()):
+            self.process_prog_flag.wait()
+            self.process_prog_flag.clear()
+            if(self.callback_process_signal.text() != "A"):
+                self.callback_process_signal.setText("A")
+            else:
+                self.callback_process_signal.setText("B")
+        
+        self.set_status_msg("Dataset preprocess completed")
     
+    def update_processing(self):
+        self.progress_bar_preprocess.setValue(int(self.process_perc[0]))
+        
     def train_model(self):
         if(not self.training_flag.is_set()):
             self.training_flag.set()
@@ -1532,9 +1549,9 @@ class Ui_MainWindow(QtCore.QObject):
                 'progress_flag': self.progress_flag,
                 'training_flag': self.training_flag})
             
-            self.callback_thread = threading.Thread(target=self.training_callback)
+            self.callback_train_thread = threading.Thread(target=self.training_callback)
             
-            self.callback_thread.start()
+            self.callback_train_thread.start()
             self.train_thread.start()
         else:
             #stop training prematurely
@@ -1544,10 +1561,10 @@ class Ui_MainWindow(QtCore.QObject):
         while(self.training_flag.is_set()):
             self.progress_flag.wait()
             self.progress_flag.clear()
-            if(self.callback_signal.text() != "A"):
-                self.callback_signal.setText("A")
+            if(self.callback_train_signal.text() != "A"):
+                self.callback_train_signal.setText("A")
             else:
-                self.callback_signal.setText("B")
+                self.callback_train_signal.setText("B")
             
             
             
