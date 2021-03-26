@@ -86,27 +86,36 @@ class Computer_vision():
             
             self.x = []
             self.y = []
-            print("aaa")
-            self._create_training_data(path,categories, callback_flag,  process_perc)
-            print("bbb")
             
-            for features,label in self.training_data:
-                self.x.append(features)
-                self.y.append(label)
+            print('aaa')
+            if(self._create_training_data(path,categories, callback_flag,  process_perc)):
             
-            self.x = np.array(self.x).reshape(-1, self.width, self.height, 1)
-            self.y = np.array(self.y)
-            
-            process_flag.set()
+                for features,label in self.training_data:
+                    self.x.append(features)
+                    self.y.append(label)
+                
+                self.x = np.array(self.x).reshape(-1, self.width, self.height, 1)
+                self.y = np.array(self.y)
+                
+                process_flag.set()
+                return True
+            else:
+                process_flag.set()
+                return False
         
     
     def _create_training_data(self, path, categories, callback_flag, process_perc):
         self.training_data.clear()
         items = 0
+        process_perc[0] = 0
+        callback_flag.set()
         
-        for category in categories:
-            path_cat = os.path.join(path, category)
-            items += len(os.listdir(path_cat))
+        try:
+            for category in categories:
+                path_cat = os.path.join(path, category)
+                items += len(os.listdir(path_cat))
+        except:
+            return False
             
         percent = int(items/100)
         items_done = 0
@@ -128,16 +137,16 @@ class Computer_vision():
             process_perc[0] = 100
             callback_flag.set()
         random.shuffle(self.training_data)
+        
+        return True
 
         
     def train(self,  train_vals, progress_flag, training_flag):
-        print("strat training")
         
         callback = Gui_callback(train_vals,progress_flag)
        
         self.model.fit(self.x,self.y,batch_size=32,validation_split=self.split,epochs=5, callbacks=[callback])
         training_flag.clear()
-        print('trained')
         
         
 class Gui_callback(keras.callbacks.Callback):
@@ -182,8 +191,6 @@ class Gui_callback(keras.callbacks.Callback):
 #Pass in label for epochs
     def on_epoch_begin(self, epoch, logs=None):
         self.active_epoch = epoch
-        if self.verbose and self.epochs > 1:
-            print('Epoch %d/%d' % (epoch + 1, self.epochs))
 
     def on_train_batch_end(self, batch, logs=None):
         self._update_progbar(batch, logs)
@@ -231,7 +238,6 @@ class Gui_callback(keras.callbacks.Callback):
         if(self.target == None):
             self.target = 0
         
-        
         percentage = int( (self.seen)/((self.target*self.epochs)/100))
         try:
             self.train_vals['loss'] = format(float(logs['loss']),'.3f')
@@ -250,4 +256,6 @@ class Gui_callback(keras.callbacks.Callback):
         except:
             pass
         self.train_vals['progress'] = percentage
+        self.train_vals['max_epoch'] = self.epochs
+        self.train_vals['epoch'] = self.active_epoch + 1
         self.progress_flag.set()

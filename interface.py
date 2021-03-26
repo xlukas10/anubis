@@ -43,6 +43,8 @@ class Ui_MainWindow(QtCore.QObject):
         self.process_perc = [0]
         
         
+        
+        
         self.preview_zoom = 1
         self.preview_fit = True
         
@@ -79,7 +81,9 @@ class Ui_MainWindow(QtCore.QObject):
                            'loss': 0,
                            'acc': 0,
                            'val_loss': 0,
-                           'val_acc': 0}
+                           'val_acc': 0,
+                           'max_epoch': 0,
+                           'epoch': 0}
         
         self.prediction_flag = threading.Event()
         
@@ -1503,38 +1507,46 @@ class Ui_MainWindow(QtCore.QObject):
             self.refresh_cameras()
         
     def preprocess_dataset(self):
-        path = self.line_edit_dataset_path.text()
-        split = float(self.line_edit_val_split.text())/100
-        files = os.scandir(path)
-        categories = []
-        
-        for file in files:
-            if file.is_dir():
-                categories.append(file.name)
-        
-        
-        self.preprocess_thread = threading.Thread(
-            target=self.vision.process_dataset, 
-            kwargs={'path': path,
-                    'process_perc': self.process_perc,
-                    'split': split, 'categories': categories,
-                    'process_flag': self.process_flag,
-                    'callback_flag': self.process_prog_flag})
-        self.callback_preprocess_thread = threading.Thread(target=self.preprocess_callback)
-        
-        
-        self.callback_preprocess_thread.start()
-        self.preprocess_thread.start()
+        if(self.line_edit_dataset_path.text()):
+            try:
+                path = self.line_edit_dataset_path.text()
+                split = float(self.line_edit_val_split.text())/100
+                files = os.scandir(path)
+                categories = []
+                
+                for file in files:
+                    if file.is_dir():
+                        categories.append(file.name)
+                
+                self.process_flag.clear()
+                
+                self.preprocess_thread = threading.Thread(
+                    target=self.vision.process_dataset, 
+                    kwargs={'path': path,
+                            'process_perc': self.process_perc,
+                            'split': split, 'categories': categories,
+                            'process_flag': self.process_flag,
+                            'callback_flag': self.process_prog_flag})
+                self.callback_preprocess_thread = threading.Thread(target=self.preprocess_callback)
+                
+                
+                self.callback_preprocess_thread.start()
+                self.preprocess_thread.start()
+            except:
+                self.process_prog_flag.clear()
+                self.process_flag.clear()
    
     def preprocess_callback(self):
         while(not self.process_flag.is_set()):
-            self.process_prog_flag.wait()
+            self.process_prog_flag.wait(2)
+            if(not self.process_prog_flag.is_set()):
+                continue
             self.process_prog_flag.clear()
             if(self.callback_process_signal.text() != "A"):
                 self.callback_process_signal.setText("A")
             else:
                 self.callback_process_signal.setText("B")
-        
+                
         self.set_status_msg("Dataset preprocess completed")
     
     def update_processing(self):
@@ -1559,7 +1571,9 @@ class Ui_MainWindow(QtCore.QObject):
     
     def training_callback(self):
         while(self.training_flag.is_set()):
-            self.progress_flag.wait()
+            self.progress_flag.wait(2)
+            if(not self.progress_flag.is_set()):
+                continue
             self.progress_flag.clear()
             if(self.callback_train_signal.text() != "A"):
                 self.callback_train_signal.setText("A")
@@ -1575,6 +1589,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.line_edit_acc.setText(str(self.train_vals['acc']))
         self.line_edit_val_loss.setText(str(self.train_vals['val_loss']))
         self.line_edit_val_acc.setText(str(self.train_vals['val_acc']))
+        self.label_active_epoch.setText(str(self.train_vals['epoch']) + '/' + str(self.train_vals['max_epoch']))
     
     def save_cti_config(self):
         paths = cam.get_gentl_producers()
@@ -1610,7 +1625,7 @@ class Ui_MainWindow(QtCore.QObject):
         @details Method is called when other methods need to send the user 
         some confrimation or status update.
         @param[in] message Contains text to be displayed in the status bar
-        @param[in] timeout For how long should the message be displayed. Defaults to 1.5sec.
+        @param[in] timeout For how long should the message be displayed [ms]. Defaults to infinity.
         """
         self.status_timer.stop()
         self.status_label.setText(message)
