@@ -452,9 +452,12 @@ class Camera:
             return
             
     def execute_command(self, command_feature):
-        
+        #not tested
         if(self.vendor == Vendors.Allied_Vision_Technologies):
-            pass
+            with Vimba.get_instance() as vimba:
+                cams = vimba.get_all_cameras ()
+                with cams[self.active_camera] as cam:
+                    getattr(cam, command_feature['name']).run()
         else:
             pass
         
