@@ -544,61 +544,21 @@
                <enum>QFrame::Raised</enum>
               </property>
               <layout class="QGridLayout" name="gridLayout_6">
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_img_resize">
-                 <property name="text">
-                  <string>Resize dimensions</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QPushButton" name="btn_load_dataset">
-                 <property name="text">
-                  <string>Select Dataset</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="label_val_split">
-                 <property name="text">
-                  <string>Data for a validation [%]</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1">
-                <widget class="QLineEdit" name="line_edit_val_split">
-                 <property name="maximumSize">
-                  <size>
-                   <width>186</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="inputMethodHints">
-                  <set>Qt::ImhDigitsOnly</set>
-                 </property>
-                 <property name="text">
-                  <string>70</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="1">
-                <widget class="QLineEdit" name="line_edit_epochs"/>
-               </item>
-               <item row="5" column="0">
+               <item row="6" column="0">
                 <widget class="QLabel" name="label_train_epochs">
                  <property name="text">
                   <string>Train epochs</string>
                  </property>
                 </widget>
                </item>
-               <item row="6" column="0">
+               <item row="7" column="0">
                 <widget class="QPushButton" name="btn_preprocess">
                  <property name="text">
                   <string>Preprocess Data</string>
                  </property>
                 </widget>
                </item>
-               <item row="6" column="1" colspan="2">
+               <item row="7" column="1" colspan="2">
                 <widget class="QProgressBar" name="progress_bar_preprocess">
                  <property name="value">
                   <number>0</number>
@@ -654,6 +614,47 @@
                </item>
                <item row="0" column="1" colspan="2">
                 <widget class="QLineEdit" name="line_edit_dataset_path"/>
+               </item>
+               <item row="0" column="0">
+                <widget class="QPushButton" name="btn_load_dataset">
+                 <property name="text">
+                  <string>Select Dataset</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_img_resize">
+                 <property name="text">
+                  <string>Resize dimensions</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QLabel" name="label_val_split">
+                 <property name="text">
+                  <string>Data for a validation [%]</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="1">
+                <widget class="QSpinBox" name="spin_box_epochs">
+                 <property name="maximum">
+                  <number>1024</number>
+                 </property>
+                 <property name="value">
+                  <number>5</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QDoubleSpinBox" name="spin_box_val_split">
+                 <property name="maximum">
+                  <double>100.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>70.000000000000000</double>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>

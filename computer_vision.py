@@ -145,11 +145,11 @@ class Computer_vision():
         return True
 
         
-    def train(self,  train_vals, progress_flag, training_flag):
+    def train(self, epochs, train_vals, progress_flag, training_flag):
         
         callback = Gui_callback(train_vals,progress_flag)
        
-        self.model.fit(self.x,self.y,batch_size=32,validation_split=self.split,epochs=5, callbacks=[callback])
+        self.model.fit(self.x,self.y,batch_size=32,validation_split=self.split,epochs=epochs, callbacks=[callback])
         training_flag.clear()
         
         
