@@ -1579,6 +1579,7 @@ class Ui_MainWindow(QtCore.QObject):
                 self.callback_train_signal.setText("A")
             else:
                 self.callback_train_signal.setText("B")
+        self.set_status_msg("Training ended")
             
             
             
