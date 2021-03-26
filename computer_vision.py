@@ -46,7 +46,11 @@ class Computer_vision():
             return False
     
     def save_model(self,path):
-        self.model.save(path)
+        if(self.model):
+            self.model.save(path)
+            return True
+        else:
+            return False
     
     def classify(self,frame,prediction_flag):
         #get current frame

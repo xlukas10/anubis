@@ -1344,7 +1344,7 @@ class Ui_MainWindow(QtCore.QObject):
             self.set_status_msg("Configuration loaded")
         
         
-    def get_directory(self, line_output):
+    def get_directory(self, line_output = None):
         #set_record_path
         """!@brief Opens file dialog for user to set path to save frames.
         @details Method is called by Save Location button. Path is written to 
@@ -1356,7 +1356,8 @@ class Ui_MainWindow(QtCore.QObject):
                                                      )
         
         #Set label text to chosen folder path
-        line_output.setText(name)
+        if(line_output):
+            line_output.setText(name)
         return name
         
     def read_config(self):
@@ -1403,14 +1404,17 @@ class Ui_MainWindow(QtCore.QObject):
     def save_model(self):
         #Open file dialog for choosing a folder
         name = QtWidgets.QFileDialog.getSaveFileName(self.centralwidget,
-                                                     "Save Model",
-                                                     filter="Keras model folder (*.model)",
-                                                     )
-        
+                                                    "Save Model",
+                                                    filter="Keras model folder (*.model)",
+                                                    )
         #Set label text to chosen folder path
-        self.vision.save_model(name)
-        
-        self.set_status_msg("Model saved")
+        if(name[0]):
+            print("here")
+            saved = self.vision.save_model(name[0])
+            if(saved):
+                self.set_status_msg("Model saved")
+            else:
+                self.set_status_msg("Failed to save model")
     
     def reset_seq_settings(self):
         """!@brief Restores default recording settings
@@ -1555,7 +1559,7 @@ class Ui_MainWindow(QtCore.QObject):
     def train_model(self):
         if(not self.training_flag.is_set()):
             self.training_flag.set()
-            print("hola hola")
+            
             self.train_thread = threading.Thread(target=self.vision.train, kwargs={
                 'train_vals': self.train_vals,
                 'progress_flag': self.progress_flag,
