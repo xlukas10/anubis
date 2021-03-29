@@ -179,6 +179,11 @@ class Camera:
         """!@brief Read parameters from camera
         @details Based on self.vendor and self.active_camera chooses right API and
             loads all available camera parameters
+        @param[in] feature_queue each parameter's dictionary is put into 
+            this queue
+        @param[in] flag used to signal that the method finished (threading object)
+        @param[in] visibility Defines level of parameters that should be put in
+            the queue
         @return A dictionary with parameter names as keys. Each key points to 
             dictionary containing given parameter information: name, 
             value, type, range, increment and max_length 
@@ -454,6 +459,10 @@ class Camera:
             return
             
     def execute_command(self, command_feature):
+        """@brief Execute command feature type
+        @param[in] command_feature dictionary containing at least 'name' of 
+        the selected feature
+        """
         #not tested
         if(self.vendor == Vendors.Allied_Vision_Technologies):
             with Vimba.get_instance() as vimba:
@@ -465,7 +474,8 @@ class Camera:
         
     def read_param_value(self,param_name):
         """@used to get value of one parameter based on its name
-        @todo Remove if not changed
+        @param[in] param_name name of the parametr whose value we want to read
+        @return a value of the selected parameter
         """
 
         if(self.vendor == Vendors.Allied_Vision_Technologies):
@@ -485,6 +495,8 @@ class Camera:
     
     def load_config(self,path):
         """@brief load existing camera configuration
+        @param[in] path Defines path and a name of the file containing the
+        configuration of the camera
         """
         if self.vendor == Vendors.Allied_Vision_Technologies:
             with Vimba.get_instance() as vimba:
@@ -699,17 +711,21 @@ class Camera:
         self.h.remove_file(producer_path)
 
     def get_gentl_producers(self):
-        print(self.paths)
+        """@brief used to get a list of all path used by Harvesters in a
+        present moment
+        @return List of defined cti file paths
+        """
         return self.paths
+    
         
         
     def disconnect_harvester(self,):
-        """!@brief Destroys harvester object so other APIs can access cameras
+        """@brief Destroys harvester object so other APIs can access cameras
         """
         self.h.reset()
         
     def disconnect_camera(self):
-        print("disconnecting")
+        """@brief Disconnect camera and restores the object to its initial state"""
         
         self.stop_recording()
         self.disconnect_harvester()
