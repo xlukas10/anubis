@@ -970,7 +970,8 @@ class Ui_MainWindow(QtCore.QObject):
             self.camera_icon.setPixmap(self.icon_busy)
             
             #Get image
-            image = cam.get_single_frame()
+            image, pixel_format = cam.get_single_frame()
+            print(pixel_format)
             
             #Try to run prediction
             self.predict(image)
@@ -982,7 +983,7 @@ class Ui_MainWindow(QtCore.QObject):
             #Convert image to proper format fo PyQt
             h, w, ch = image.shape
             bytes_per_line = ch * w
-            image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
+            image = QtGui.QImage(image.data, w, h, bytes_per_line, self._get_QImage_format(pixel_format))
 #TODO Get color format dynamically
             
             #get size of preview window
@@ -1016,6 +1017,9 @@ class Ui_MainWindow(QtCore.QObject):
         #Auxiliary variables for fps calculation
         frames = 0
         cycles = 0
+        
+        color_format = QtGui.QImage.Format_Invalid
+        str_color = None
         #runs as long as the camera is recording or preview is active
         while self.recording or self.preview_live:
             cycles = cycles + 1
@@ -1025,22 +1029,22 @@ class Ui_MainWindow(QtCore.QObject):
                 image = active_frame_queue.get_nowait()
                 self.received = self.received + 1
                 
-                frames = frames + 1
+                frames += 1
                 
                 #Dump all remaining frames (If frames are received faster than 
                 #refresh_rate).
                 while not active_frame_queue.qsize() == 0:
-                    frames = frames + 1
+                    frames += 1
                     self.received = self.received + 1
                     active_frame_queue.get_nowait()
                 
                 #Try to run a prediction
-                self.predict(image)
+                self.predict(image[0])
                 
                 #Set up a new value of received frames in the statusbar
                 self.receive_status.setText("Received frames: " + str(self.received))
                 
-                #More cycles -> more exact fps calculation (value is more stable in gui)
+#Change to time dependency instead of cycle#More cycles -> more exact fps calculation (value is more stable in gui)
                 if cycles > 20:
                     #[frames*Hz/c] -> [frames/s]
                     self.fps = round(frames*(refresh_rate/cycles),1)
@@ -1049,10 +1053,18 @@ class Ui_MainWindow(QtCore.QObject):
                     cycles = 0
                     frames = 0
                 
-                #Convert image to proper format fo PyQt
-                h, w, ch = image.shape
+                #Convert image to proper format for PyQt
+                h, w, ch = image[0].shape
                 bytes_per_line = ch * w
-                image = QtGui.QImage(image.data, w, h, bytes_per_line, QtGui.QImage.Format_Grayscale8)
+                if(color_format == QtGui.QImage.Format_Invalid):
+                    self.set_status_msg("Used image format is not supported")
+                
+                if(str_color != image[1]):
+                    str_color = image[1]
+                    color_format = self._get_QImage_format(str_color)
+                
+                
+                image = QtGui.QImage(image[0].data, w, h, bytes_per_line, color_format)
 #TODO Get color format dynamically
                 
                 #get size of preview window if zoom fit is selected
@@ -1631,6 +1643,119 @@ class Ui_MainWindow(QtCore.QObject):
         self.set_status_msg("Configuration saved")
             
             
+    def _get_QImage_format(self, format_string):
+        image_format = None
+        
+        if(format_string == 'Format_Mono'):
+            image_format = QtGui.QImage.Format_Mono
+        elif(format_string == 'Format_MonoLSB'):
+            image_format = QtGui.QImage.Format_MonoLSB
+        elif(format_string == 'Format_Indexed8'):
+            image_format = QtGui.QImage.Format_Indexed8
+        elif(format_string == 'Format_RGB32'):
+            image_format = QtGui.QImage.Format_RGB32
+        elif(format_string == 'Format_ARGB32'):
+            image_format = QtGui.QImage.Format_ARGB32
+        elif(format_string == 'Format_ARGB32_Premultiplied'):
+            image_format = QtGui.QImage.Format_ARGB32_Premultiplied
+        elif(format_string == 'Format_RGB16'):
+            image_format = QtGui.QImage.Format_RGB16
+        elif(format_string == 'Format_ARGB8565_Premultiplied'):
+            image_format = QtGui.QImage.Format_ARGB8565_Premultiplied
+        elif(format_string == 'Format_RGB666'):
+            image_format = QtGui.QImage.Format_RGB666
+        elif(format_string == 'Format_ARGB6666_Premultiplied'):
+            image_format = QtGui.QImage.Format_ARGB6666_Premultiplied
+        elif(format_string == 'Format_RGB555'):
+            image_format = QtGui.QImage.Format_RGB555
+        elif(format_string == 'Format_ARGB8555_Premultiplied'):
+            image_format = QtGui.QImage.Format_ARGB8555_Premultiplied
+        elif(format_string == 'Format_RGB888' or format_string == 'RGB8'):
+            image_format = QtGui.QImage.Format_RGB888
+        elif(format_string == 'Format_RGB444'):
+            image_format = QtGui.QImage.Format_RGB444
+        elif(format_string == 'Format_ARGB4444_Premultiplied'):
+            image_format = QtGui.QImage.Format_ARGB4444_Premultiplied
+        elif(format_string == 'Format_RGBX8888'):
+            image_format = QtGui.QImage.Format_RGBX8888
+        elif(format_string == 'Format_RGBA8888' or format_string == 'RGBa8'):
+            image_format = QtGui.QImage.Format_RGBA8888
+        elif(format_string == 'Format_RGBA8888_Premultiplied'):
+            image_format = QtGui.QImage.Format_RGBA8888_Premultiplied
+        elif(format_string == 'Format_BGR30'):
+            image_format = QtGui.QImage.Format_BGR30
+        elif(format_string == 'Format_A2BGR30_Premultiplied'):
+            image_format = QtGui.QImage.Format_A2BGR30_Premultiplied
+        elif(format_string == 'Format_RGB30'):
+            image_format = QtGui.QImage.Format_RGB30
+        elif(format_string == 'Format_A2RGB30_Premultiplied'):
+            image_format = QtGui.QImage.Format_A2RGB30_Premultiplied
+        elif(format_string == 'Format_Alpha8'):
+            image_format = QtGui.QImage.Format_Alpha8
+        elif(format_string == 'Format_Grayscale8' or format_string == 'Mono8'):
+            image_format = QtGui.QImage.Format_Grayscale8
+        elif(format_string == 'Format_Grayscale16' or format_string == 'Mono16'):
+            image_format = QtGui.QImage.Format_Grayscale16
+        elif(format_string == 'Format_RGBX64'):
+            image_format = QtGui.QImage.Format_RGBX64
+        elif(format_string == 'Format_RGBA64'):
+            image_format = QtGui.QImage.Format_RGBA64
+        elif(format_string == 'Format_RGBA64_Premultiplied'):
+            image_format = QtGui.QImage.Format_RGBA64_Premultiplied
+        elif(format_string == 'Format_BGR888' or format_string == 'BGR8'):
+            image_format = QtGui.QImage.Format_BGR888
+        else:
+            print('Invalid')
+            image_format = QtGui.QImage.Format_Invalid
+        
+        return image_format
+        
+        '''
+        SFNC OPTIONS not yet implemented
+        Mono1p
+        Mono2p, Mono4p, Mono8s, Mono10, Mono10p, Mono12, Mono12p, Mono14, 
+        , R8, G8, B8, , RGB8_Planar, , RGB10, RGB10_Planar, 
+        RGB10p32, RGB12, RGB12_Planar, RGB16, RGB16_Planar, RGB565p, BGR10, 
+        BGR12, BGR16, BGR565p, , BGRa8, YUV422_8, YCbCr411_8, YCbCr422_8, 
+        YCbCr601_422_8, YCbCr709_422_8, YCbCr8, BayerBG8, BayerGB8, BayerGR8, 
+        BayerRG8, BayerBG10, BayerGB10, BayerGR10, BayerRG10, BayerBG12, 
+        BayerGB12, BayerGR12, BayerRG12, BayerBG16, BayerGB16, BayerGR16, 
+        BayerRG16, Coord3D_A8, Coord3D_B8, Coord3D_C8, Coord3D_ABC8, 
+        Coord3D_ABC8_Planar, Coord3D_A16, Coord3D_B16, Coord3D_C16, 
+        Coord3D_ABC16, Coord3D_ABC16_Planar, Coord3D_A32f, Coord3D_B32f, 
+        Coord3D_C32f, Coord3D_ABC32f, Coord3D_ABC32f_Planar, Confidence1, 
+        Confidence1p, Confidence8, Confidence16, Confidence32f, Raw8, Raw16, 
+        Device-specific
+        - GigE Vision Specific:
+        Mono12Packed, BayerGR10Packed, BayerRG10Packed, BayerGB10Packed, 
+        BayerBG10Packed, BayerGR12Packed, BayerRG12Packed, BayerGB12Packed, 
+        BayerBG12Packed, RGB10V1Packed, RGB12V1Packed, 
+        - Deprecated:
+        Mono8Signed (Deprecated, use Mono8s)
+        '''
+        '''
+        SFNC OPTIONS - all
+        Mono1p
+        Mono2p, Mono4p, Mono8, Mono8s, Mono10, Mono10p, Mono12, Mono12p, Mono14, 
+        Mono16, R8, G8, B8, RGB8, RGB8_Planar, RGBa8, RGB10, RGB10_Planar, 
+        RGB10p32, RGB12, RGB12_Planar, RGB16, RGB16_Planar, RGB565p, BGR10, 
+        BGR12, BGR16, BGR565p, BGR8, BGRa8, YUV422_8, YCbCr411_8, YCbCr422_8, 
+        YCbCr601_422_8, YCbCr709_422_8, YCbCr8, BayerBG8, BayerGB8, BayerGR8, 
+        BayerRG8, BayerBG10, BayerGB10, BayerGR10, BayerRG10, BayerBG12, 
+        BayerGB12, BayerGR12, BayerRG12, BayerBG16, BayerGB16, BayerGR16, 
+        BayerRG16, Coord3D_A8, Coord3D_B8, Coord3D_C8, Coord3D_ABC8, 
+        Coord3D_ABC8_Planar, Coord3D_A16, Coord3D_B16, Coord3D_C16, 
+        Coord3D_ABC16, Coord3D_ABC16_Planar, Coord3D_A32f, Coord3D_B32f, 
+        Coord3D_C32f, Coord3D_ABC32f, Coord3D_ABC32f_Planar, Confidence1, 
+        Confidence1p, Confidence8, Confidence16, Confidence32f, Raw8, Raw16, 
+        Device-specific
+        - GigE Vision Specific:
+        Mono12Packed, BayerGR10Packed, BayerRG10Packed, BayerGB10Packed, 
+        BayerBG10Packed, BayerGR12Packed, BayerRG12Packed, BayerGB12Packed, 
+        BayerBG12Packed, RGB10V1Packed, RGB12V1Packed, 
+        - Deprecated:
+        Mono8Signed (Deprecated, use Mono8s)
+        '''
         
     def set_status_msg(self, message, timeout=0):
         """!@brief Shows message in status bar

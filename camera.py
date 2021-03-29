@@ -126,7 +126,8 @@ class Camera:
                 cams = vimba.get_all_cameras()
                 with cams [self.active_camera] as cam:
                     frame = cam.get_frame()
-                    return frame.as_opencv_image()
+                    pixel_format = str(frame.get_pixel_format())
+                    return [frame.as_opencv_image(), pixel_format]
         else:
             self.ia.start_acquisition()
             
@@ -144,7 +145,8 @@ class Camera:
             buffer.queue()
             print("tu")
             print(frame.data)
-            return frame.data
+            pixel_format = None
+            return [frame.data, pixel_format]
             
         
                     
@@ -183,7 +185,7 @@ class Camera:
             if given information exist for the parameter
         """
 #categories are defined by GenICam SFNC
-        if(self.vendor == Vendor.Allied_Vision_Technologies):
+        if(self.vendor == Vendors.Allied_Vision_Technologies):
             #Establishing communication
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras ()
@@ -609,8 +611,10 @@ class Camera:
             if not frame_queue.full() and frame.get_status() == FrameStatus.Complete:
                 frame_copy = copy.deepcopy(frame)
                 if self.is_recording:
-                    frame_queue.put_nowait(frame_copy.as_opencv_image())
-                active_frame_queue.put_nowait(frame_copy.as_opencv_image())
+                    frame_queue.put_nowait([frame_copy.as_opencv_image(),
+                                            str(frame_copy.get_pixel_format())])
+                active_frame_queue.put_nowait([frame_copy.as_opencv_image(),
+                                               str(frame_copy.get_pixel_format())])
                 #queue used for preview
                 #Saving only image data, metadata are lost - is it a problem?
             else:
