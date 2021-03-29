@@ -646,7 +646,7 @@ class Camera:
         print("consuming")
         while self.acquisition_running:
             if not frame_queue.empty(): 
-                frame = frame_queue.get_nowait()
+                frame = frame_queue.get_nowait()[0]
                 name = name_scheme
                 name = name.replace("%t", datetime.now().strftime("%H-%M-%S"))
                 name = name.replace("%d", datetime.now().strftime("%d-%m-%Y"))
