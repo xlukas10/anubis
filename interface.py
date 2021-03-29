@@ -30,8 +30,9 @@ class Ui_MainWindow(QtCore.QObject):
         !@brief Variable used to store device information of detected cameras
         """
         self.feat_refresh_timer  = QtCore.QTimer(self)
-        self.feat_refresh_timer.setInterval(2000)
+        self.feat_refresh_timer.setInterval(4000)
         self.feat_refresh_timer.timeout.connect(self.update_parameters)
+        self.feat_refresh_timer.timeout.connect(self.refresh_parameters)
         self.feat_refresh_timer.start()
         
         self.image_pixmap = None
@@ -42,9 +43,11 @@ class Ui_MainWindow(QtCore.QObject):
         self.move_y_prev = 0
         self.process_perc = [0]
         
+        self.parameter_values = {}
         
-        
-        
+        self.update_completed_flag = threading.Event()
+        self.update_completed_flag.set()
+        self.update_flag = threading.Event()
         self.preview_zoom = 1
         self.preview_fit = True
         
@@ -121,8 +124,9 @@ class Ui_MainWindow(QtCore.QObject):
         #Window with camera preview
         #-------------------------------------------------------------------
         self.preview_area = QtWidgets.QScrollArea(self.preview_and_control)
-        self.preview_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.preview_area.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #disables scrollbars in preview window
+        #self.preview_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #self.preview_area.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.preview_area.installEventFilter(self)
         
         self.camera_preview = QtWidgets.QLabel(self.preview_area)
@@ -1020,6 +1024,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         color_format = QtGui.QImage.Format_Invalid
         str_color = None
+        time_fps = time.monotonic_ns()
         #runs as long as the camera is recording or preview is active
         while self.recording or self.preview_live:
             cycles = cycles + 1
@@ -1045,9 +1050,13 @@ class Ui_MainWindow(QtCore.QObject):
                 self.receive_status.setText("Received frames: " + str(self.received))
                 
 #Change to time dependency instead of cycle#More cycles -> more exact fps calculation (value is more stable in gui)
-                if cycles > 20:
+                
+                if cycles > 30:
+                    time_now = time.monotonic_ns()
+                    time_passed = time_now - time_fps
+                    time_fps = time_now
                     #[frames*Hz/c] -> [frames/s]
-                    self.fps = round(frames*(refresh_rate/cycles),1)
+                    self.fps = round(frames/(time_passed/1_000_000_000),1)
                     self.fps_status.setText("FPS: " + str(self.fps))
                     
                     cycles = 0
@@ -1288,24 +1297,49 @@ class Ui_MainWindow(QtCore.QObject):
                 #we'll get here when queue is empty
         self.param_flag.clear()
     
+    def refresh_parameters(self):
+        #called every 3 seconds or so
+        if (self.feat_widgets and self.connected and
+            not self.param_flag.is_set() and self.update_completed_flag.is_set()):
+            
+            self.update_completed_flag.clear()
+            
+            self.update_thread = threading.Thread(target=self.read_parameters)
+            self.update_thread.start()
+            
+            
+    def read_parameters(self):
+        if(not self.feat_widgets):
+            return
+        
+        print(self.feat_widgets)
+        for parameter in self.feat_widgets:
+            self.parameter_values[parameter] = cam.read_param_value(parameter)
+        self.update_flag.set()
+                
     def update_parameters(self):
-        if self.connected and not self.param_flag.is_set():
+        if self.connected and not self.param_flag.is_set() and self.update_flag.is_set():
+            self.update_flag.clear()
+            
             for parameter in self.feat_widgets:
-                value = cam.read_param_value(parameter)
+                value = self.parameter_values[parameter]
                 widget = self.feat_widgets[parameter]
-                if(type(widget) == QtWidgets.QLineEdit):
-                    widget.setText(str(value))
-                elif(type(widget) == QtWidgets.QComboBox):
-                    index = widget.findText(str(value), QtCore.Qt.MatchFixedString)
-                    #Set found index to be the active one
-                    if index >= 0:
-                        widget.setCurrentIndex(index)
-                elif(type(widget) == QtWidgets.QCheckBox):
-                    widget.setChecked(value)
-                else:
-                    print("Update nott implemented")
-        
-        
+                try:
+                    if(type(widget) == QtWidgets.QLineEdit):
+                        widget.setText(str(value))
+                    elif(type(widget) == QtWidgets.QComboBox):
+                        index = widget.findText(str(value), QtCore.Qt.MatchFixedString)
+                        #Set found index to be the active one
+                        if index >= 0:
+                            widget.setCurrentIndex(index)
+                    elif(type(widget) == QtWidgets.QCheckBox):
+                        widget.setChecked(value)
+                    else:
+                        print("Update not implemented")
+                except:
+                    pass
+            self.update_completed_flag.set()
+                    
     def load_parameters(self):
         """!@brief Fills layout with feature name and value pairs
         @details Based on the feature type a new label, text area, checkbox or

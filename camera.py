@@ -467,7 +467,6 @@ class Camera:
         """@used to get value of one parameter based on its name
         @todo Remove if not changed
         """
-#This method may turn out to be redundant (for Vimba it is not needed, depends on harvester implementation)
 
         if(self.vendor == Vendors.Allied_Vision_Technologies):
             try:
