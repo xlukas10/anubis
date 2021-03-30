@@ -38,6 +38,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.image_pixmap = None
         self.w_preview = 0
         self.h_preview = 0
+        self.model_loaded = False
                     
         self.move_x_prev = 0
         self.move_y_prev = 0
@@ -1481,12 +1482,16 @@ class Ui_MainWindow(QtCore.QObject):
             self.line_edit_res_width.setText(str(dim[0]))
             self.line_edit_res_height.setText(str(dim[1]))
             self.set_status_msg("Model loaded")
+            self.model_loaded = True
         else:
             self.set_status_msg("Failed to load model")
             self.line_edit_model_name.setText("Select a model to load")
         
     def save_model(self):
         #Open file dialog for choosing a folder
+        if(not self.model_loaded):
+            return
+        
         name = QtWidgets.QFileDialog.getSaveFileName(self.centralwidget,
                                                     "Save Model",
                                                     filter="Keras model folder (*.model)",
