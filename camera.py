@@ -648,6 +648,9 @@ class Camera:
         if(folder_path[-1] != '/'):
             folder_path = folder_path + '/'
             
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+            
         n = name_scheme.find("%n")
         if(n==-1):
             name_scheme = name_scheme + "(%n)"
