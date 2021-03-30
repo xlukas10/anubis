@@ -149,10 +149,6 @@ class Ui_MainWindow(QtCore.QObject):
         self.gridLayout_4 = QtWidgets.QGridLayout(self.widget_controls)
         self.gridLayout_4.setObjectName("gridLayout_4")
         
-        
-        
-        
-        
         self.btn_zoom_in = QtWidgets.QPushButton(self.widget_controls)
         self.btn_zoom_in.setObjectName("btn_zoom_in")
         self.gridLayout_4.addWidget(self.btn_zoom_in, 0, 2, 1, 1)
@@ -168,9 +164,6 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_zoom_fit = QtWidgets.QPushButton(self.widget_controls)
         self.btn_zoom_fit.setObjectName("btn_zoom_fit")
         self.gridLayout_4.addWidget(self.btn_zoom_fit, 1, 2, 1, 1)
-        
-        
-        
         
         self.btn_single_frame = QtWidgets.QPushButton(self.widget_controls)
         self.btn_single_frame.setObjectName("btn_single_frame")
@@ -219,10 +212,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.list_detected_cameras.setObjectName("list_detected_cameras")
         
         
-            #Connect refresh camera to the UI
-        
-        
-        
+        #Connect refresh camera to the UI
         
         self.verticalLayout_4.addWidget(self.list_detected_cameras)
         
@@ -1229,29 +1219,33 @@ class Ui_MainWindow(QtCore.QObject):
                 if param["attr_type"] == "IntFeature":
                     #For int feature a Line edit field is created, but only 
                     #integers can be written in.
-                    self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
-                    validator = QtGui.QIntValidator()
-                    self.feat_widgets[param["name"]].setValidator(validator)
+                    self.feat_widgets[param["name"]] = QtWidgets.QSpinBox(self.tab_config)
+                    if(param["attr_range"]):
+                        self.feat_widgets[param["name"]].setRange(
+                                                param["attr_range"][0],
+                                                param["attr_range"][1])
                     
                     #Set text to the current value of the feature
-                    self.feat_widgets[param["name"]].setText(str(param["attr_value"]))
+                    self.feat_widgets[param["name"]].setValue(param["attr_value"])
                     
                     #Call feature change for this feature when enter is pressed in this field.
                     #Text is the value that will be set to the feature.
-                    self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,int(self.feat_widgets[param["name"]].text())))
+                    self.feat_widgets[param["name"]].valueChanged.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].value()))
                 elif param["attr_type"] == "FloatFeature":
                     #For float feature a Line edit field is created, but only 
                     #real numbers can be written in.
-                    self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
-                    validator = QtGui.QDoubleValidator()
-                    self.feat_widgets[param["name"]].setValidator(validator)
+                    self.feat_widgets[param["name"]] = QtWidgets.QDoubleSpinBox(self.tab_config)
+                    if(param["attr_range"]):
+                        self.feat_widgets[param["name"]].setRange(
+                                                param["attr_range"][0],
+                                                param["attr_range"][1])
                     
                     #Set text to the current value of the feature
-                    self.feat_widgets[param["name"]].setText(str(param["attr_value"]))
+                    self.feat_widgets[param["name"]].setValue(param["attr_value"])
                     
                     #Call feature change for this feature when enter is pressed in this field.
                     #Text is the value that will be set to the feature.
-                    self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,float(self.feat_widgets[param["name"]].text())))
+                    self.feat_widgets[param["name"]].valueChanged.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].value()))
                 elif param["attr_type"] == "StringFeature":
                     #For string feature a Line edit field is created.
                     self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)

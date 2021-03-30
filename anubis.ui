@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1249</width>
-    <height>687</height>
+    <width>1208</width>
+    <height>644</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -83,15 +83,15 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>586</width>
-            <height>498</height>
+            <width>565</width>
+            <height>455</height>
            </rect>
           </property>
           <widget class="QLabel" name="camera_preview">
            <property name="geometry">
             <rect>
-             <x>0</x>
-             <y>0</y>
+             <x>-30</x>
+             <y>-10</y>
              <width>760</width>
              <height>521</height>
             </rect>
@@ -684,7 +684,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1249</width>
+     <width>1208</width>
      <height>26</height>
     </rect>
    </property>

@@ -701,8 +701,9 @@ class Camera:
             application configuration for later use
         @return list of all active producers
         """
-        self.h.add_file(producer_path)
-        self.paths.append(producer_path)
+        if(not producer_path in self.paths):
+            self.h.add_file(producer_path)
+            self.paths.append(producer_path)
         
         return self.paths
     
