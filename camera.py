@@ -92,7 +92,7 @@ class Camera:
                     harvester_index = index
                     break
 #FIX NAME OF VENDOR
-        if(self.h.device_info_list[harvester_index].vendor == 'Allied Vision Technologies'):
+        if(self.h.device_info_list[harvester_index].vendor == 'xAllied Vision Technologies'):
             self.disconnect_harvester()
             self.vendor = Vendors.Allied_Vision_Technologies
             self.active_camera = self.__translate_selected_device(selected_device)
@@ -112,7 +112,11 @@ class Camera:
             self.vendor = Vendors.Other
             self.ia = self.h.create_image_acquirer(harvester_index)
 
-            self.ia.remote_device.node_map.GevSCPSPacketSize.value = 1500
+            #self.ia.remote_device.node_map.GevSCPSPacketSize.value = 1500
+            #self.ia.remote_device.node_map.Width.value = 105
+            #self.ia.remote_device.node_map.PixelFormat.value = 'Mono8'
+            
+            #self.ia.remote_device.node_map.Height.value = 1
 
     
     def get_single_frame(self,):
@@ -130,23 +134,17 @@ class Camera:
                     return [frame.as_opencv_image(), pixel_format]
         else:
             self.ia.start_acquisition()
-            
-            time.sleep(0.5)
-            buffer = self.ia.fetch_buffer()
-            self.ia.stop_acquisition()
-            print('zde')
                 
         # Work with the Buffer object. It consists of everything you need.
-            
-            buffer = self.ia.fetch_buffer()
-            print("aaa")
-            frame = buffer.payload.components[0]
-            print('tady')
-            buffer.queue()
-            print("tu")
-            print(frame.data)
-            pixel_format = None
-            return [frame.data, pixel_format]
+            print("dhd")
+            with self.ia.fetch_buffer() as buffer:
+                print("aaa")
+                frame = buffer.payload.components[0]
+                print(buffer.payload.components)
+                print("tu")
+                print(frame.data)
+                pixel_format = None
+                return [frame.data, pixel_format]
             
         
                     

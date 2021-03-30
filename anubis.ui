@@ -127,7 +127,7 @@
        <string/>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_connect">
        <attribute name="title">
@@ -172,8 +172,22 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
-           <item>
+          <layout class="QGridLayout" name="gridLayout_7">
+           <item row="0" column="3">
+            <widget class="QPushButton" name="btn_remove_cti">
+             <property name="text">
+              <string>Remove selected .cti</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QPushButton" name="btn_add_cti">
+             <property name="text">
+              <string>Add a new .cti file</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" rowspan="2">
             <widget class="QLabel" name="tip_add_cti">
              <property name="text">
               <string>Tip: If you can't detect your camera try adding a new .cti file from your camera vendor</string>
@@ -183,12 +197,8 @@
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QPushButton" name="btn_add_cti">
-             <property name="text">
-              <string>Add .cti file</string>
-             </property>
-            </widget>
+           <item row="1" column="2" colspan="2">
+            <widget class="QComboBox" name="combo_remove_cti"/>
            </item>
           </layout>
          </widget>
