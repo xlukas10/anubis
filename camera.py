@@ -26,10 +26,11 @@ from vendors import Vendors
 
 class Camera:
     
-    def __init__(self, producer_paths):
+    def __init__(self, producer_paths = None):
         self.h = Harvester()
         self.paths = []
-        self.add_gentl_producer(producer_paths)
+        if(producer_paths):
+            self.add_gentl_producer(producer_paths)
         self.vendor = Vendors.Other
         self.is_recording = False
         self.acquisition_running = False
@@ -698,9 +699,12 @@ class Camera:
         @param[in] producer_path path to a .cti file
         @todo producer_path probably should be also attached to
             application configuration for later use
+        @return list of all active producers
         """
         self.h.add_file(producer_path)
         self.paths.append(producer_path)
+        
+        return self.paths
     
     def remove_gentl_producer(self,producer_path):
         """!@brief Remove existing frame producer from the harvester object
@@ -709,7 +713,12 @@ class Camera:
         @todo producer_path probably should be also removed from
             application configuration
         """
-        self.h.remove_file(producer_path)
+        if(producer_path in self.paths):
+            self.paths.remove(producer_path)
+            self.h.remove_file(producer_path)
+            return (self.paths, True)
+        else:
+            return(None, False)
 
     def get_gentl_producers(self):
         """@brief used to get a list of all path used by Harvesters in a

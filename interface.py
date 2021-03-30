@@ -742,6 +742,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_start_recording.clicked.connect(self.record)
         self.btn_refresh_cameras.clicked.connect(self.refresh_cameras)
         self.btn_add_cti.clicked.connect(self.add_cti)
+        self.btn_remove_cti.clicked.connect(self.remove_cti)
         
         self.btn_connect_camera.clicked.connect(
             lambda: self.connect_camera(self.list_detected_cameras.currentRow()))
@@ -800,8 +801,21 @@ class Ui_MainWindow(QtCore.QObject):
                                                      "Load GenTL producer",
                                                      filter="CTI files (*.cti)")
         
-        cam.add_gentl_producer(path[0])
+        cti_files = cam.add_gentl_producer(path[0])
+        try:
+            self.combo_remove_cti.clear()
+            self.combo_remove_cti.addItems(cti_files)
+        except:
+            pass
+        
         self.set_status_msg("File added")
+        
+    def remove_cti(self):
+        cti_files, removed = cam.remove_gentl_producer(self.combo_remove_cti.currentText())
+        if(removed):
+            self.set_status_msg("File removed")
+            self.combo_remove_cti.clear()
+            self.combo_remove_cti.addItems(cti_files)
     
     def refresh_cameras(self):
         """!@brief Calls function to detect connected cameras and prints them
@@ -1429,6 +1443,8 @@ class Ui_MainWindow(QtCore.QObject):
         """
         
         cti_files = False
+        loaded_cti = None
+        
         with open("config.ini", 'r') as config:
             for line in config:
                 #reading configuration for recording
@@ -1442,7 +1458,14 @@ class Ui_MainWindow(QtCore.QObject):
                 elif(line.startswith("CTI_FILES_PATHS")):
                     cti_files = True
                 elif(cti_files == True):
-                    cam.add_gentl_producer(line)
+                    print(line)
+                    loaded_cti = cam.add_gentl_producer(line)
+                    
+        #if no cti path is present in the config adding files will be skipped
+        try:
+            self.combo_remove_cti.addItems(loaded_cti)
+        except:
+            pass
 #TODO reading and adding cti files
         
         #Set status update

@@ -10,5 +10,5 @@ from camera import Camera
 
 
 #Change location to be read from settings file!!!
-cam = Camera('C:/Programy/Allied Vision/Vimba_4.0/VimbaGigETL/Bin/Win64/VimbaGigETL.cti')
+cam = Camera()
 #'C:/Programy/Allied Vision/Vimba_4.0/VimbaGigETL/Bin/Win64/VimbaGigETL.cti'
