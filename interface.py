@@ -637,8 +637,8 @@ class Ui_MainWindow(QtCore.QObject):
         
         #--------------------------------------------------------------
         
-        self.connect_actions()
         self.setup_validators()
+        self.connect_actions()
         self.retranslateUi(MainWindow)
         self.read_config()
         self.tabs.setCurrentIndex(0)
@@ -763,6 +763,8 @@ class Ui_MainWindow(QtCore.QObject):
     
     def setup_validators(self):
         self.line_edit_sequence_duration.setValidator(QtGui.QDoubleValidator(0,16777216,5))
+        expression = QtCore.QRegExp("^[^\\\\/:*?\"<>|]*$")
+        self.line_edit_sequence_name.setValidator(QtGui.QRegExpValidator(expression))
         
     def eventFilter(self, obj, event):
         if (obj == self.preview_area):
@@ -1340,6 +1342,9 @@ class Ui_MainWindow(QtCore.QObject):
             for parameter in self.feat_widgets:
                 value = self.parameter_values[parameter]
                 widget = self.feat_widgets[parameter]
+                if(value == None):
+                    continue
+                
                 try:
                     if(type(widget) == QtWidgets.QLineEdit):
                         widget.setText(str(value))
