@@ -136,20 +136,12 @@ class Camera:
         else:
             self.ia.start_acquisition()
                 
-        # Work with the Buffer object. It consists of everything you need.
-            print("dhd")
             with self.ia.fetch_buffer() as buffer:
-                print("aaa")
                 frame = buffer.payload.components[0]
-                print(buffer.payload.components)
-                print("tu")
-                print(frame.data)
-                pixel_format = None
+                pixel_format = self.ia.remote_device.node_map.PixelFormat.value
                 return [frame.data, pixel_format]
             
-        
-                    
-    
+            self.ia.stop_acquisition()
     
     
     def set_parameter(self,parameter, new_value):
@@ -467,9 +459,15 @@ class Camera:
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras ()
                 with cams[self.active_camera] as cam:
-                    getattr(cam, command_feature['name']).run()
+                    try:
+                        getattr(cam, command_feature['name']).run()
+                    except:
+                        pass
         else:
-            pass
+            try:
+                getattr(self.ia.remote_device.node_map, command_feature['name']).execute()
+            except:
+                pass
         
     def read_param_value(self,param_name):
         """@used to get value of one parameter based on its name
@@ -484,13 +482,13 @@ class Camera:
                     with cams[self.active_camera] as cam:
                             return getattr(cam, param_name).get()
             except:
-                pass
+                return None
         else:
             try:
                 val = getattr(self.ia.remote_device.node_map, param_name).value
                 return val
             except:
-                return
+                return None
     
     def load_config(self,path):
         """@brief load existing camera configuration
@@ -571,15 +569,13 @@ class Camera:
         @details Creates a threading object for the right API and starts frame 
             acquisition in that thread (producer thread)
         """
-        #create threading object for vimba, harvester or future api and start the thread
-        if self.vendor == Vendors.Allied_Vision_Technologies:
-            if not self.acquisition_running:
-                self._stream_stop_switch = threading.Event()
-                self._frame_producer_thread = threading.Thread(target=self._frame_producer)
-                self._frame_producer_thread.start()
-                self.acquisition_running = True
-        else:
-            pass
+        
+        if not self.acquisition_running:
+            self._stream_stop_switch = threading.Event()
+            self._frame_producer_thread = threading.Thread(target=self._frame_producer)
+            self._frame_producer_thread.start()
+            self.acquisition_running = True
+
     
     def stop_acquisition(self,):
         """!@brief Stops continuous acquisition
@@ -603,14 +599,23 @@ class Camera:
                 cams = vimba.get_all_cameras()
                 with cams[self.active_camera] as c:
                     try:
-                        c.start_streaming(handler=self.__frame_handler_vimba)
+                        c.start_streaming(handler=self._frame_handler_vimba)
                         self._stream_stop_switch.wait()
                     finally:
                         c.stop_streaming()
         else:
-            pass
+            self.ia.start_acquisition()
+            
+            while(not self._stream_stop_switch.is_set()):
+                with self.ia.fetch_buffer() as buffer:
+                    frame = buffer.payload.components[0]
+                    pixel_format = self.ia.remote_device.node_map.PixelFormat.value
+                    frame_queue.put_nowait([frame.data.copy(), pixel_format])
+                    #data should contain numpy array which should be compatible
+                    #with opencv image ig not do some conversion here
+            self.ia.stop_acquisition()
     
-    def __frame_handler_vimba(self,cam ,frame):
+    def _frame_handler_vimba(self,cam ,frame):
         """!@brief Defines how to process incoming frames
         @details Currently is defined for Vimba and defines how to acquire
             whole frame and put into the frame_queue
@@ -677,7 +682,6 @@ class Camera:
         @param[in] file_path path where the files will be saved
         @param[in] configuration parameters of output files and possibly camera parameters
         """
-        print("starting")
         self.start_acquisition()
         self._frame_consumer_thread = threading.Thread(target=self._frame_consumer, args=(folder_path,name_scheme,configuration))
         self._frame_consumer_thread.start()
@@ -727,8 +731,6 @@ class Camera:
         @return List of defined cti file paths
         """
         return self.paths
-    
-        
         
     def disconnect_harvester(self,):
         """@brief Destroys harvester object so other APIs can access cameras
@@ -740,7 +742,7 @@ class Camera:
         
         self.stop_recording()
         self.disconnect_harvester()
-        self.__init__(self.paths) #Zmenit pro obecne cesty
+        self.__init__(self.paths)
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         
 

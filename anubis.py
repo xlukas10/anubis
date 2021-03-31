@@ -11,8 +11,6 @@ import threading
 from interface import Ui_MainWindow
 
 
-
-
 #Start the app. UI is defined in interface.py
 if __name__ == "__main__":
     import sys
