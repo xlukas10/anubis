@@ -8,6 +8,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg#, NavigationToo
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
+import operator
 
 class Prediction_graph(FigureCanvasQTAgg):
     
@@ -16,8 +17,8 @@ class Prediction_graph(FigureCanvasQTAgg):
         
         self.axes = self.figure.add_subplot(111)
         self.N = 0
-        self.categories = []
-        self.probability = []
+        self.categories = ["ctg1", "ctg2", "ctg3", "ctg4", "ctg5"]
+        self.probability = [0, 0, 0, 0, 0]
         self.w = 1
         self.axes.set_ylim(-1,1)
         #self.indent = np.arange(self.N)
@@ -33,8 +34,30 @@ class Prediction_graph(FigureCanvasQTAgg):
                 self.categories.append(str(category))
     
     def write_probability(self, probability = []):
-        self.probability = probability[0]#test with multiple output classes
+        print('kk')
+        top_5 = []
+        top_indices = []
+        
+        if(len(probability) < 5):
+            top_5 = probability
+            top_indices = range(0, len(probability))
+        else:
+            for i in range(0, 5): 
+                top = 0
+                top_index = 0
+                  
+                for j in range(len(probability)):     
+                    if probability[j] > top:
+                        top = probability[j];
+                        top_index = j
+                          
+                probability.remove(top);
+                top_5.append(top)
+                top_indices.append(top_index)
+        
+        print(top_indices)
+        self.probability = top_5#test with multiple output classes
         self.figure.canvas.axes.clear()
         
-        self.axes.bar(self.categories,self.probability,self.w)
+        self.axes.bar(operator.itemgetter(*top_indices)(self.categories),top_5,self.w)
         self.figure.canvas.draw()

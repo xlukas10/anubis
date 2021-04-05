@@ -40,6 +40,7 @@ class Computer_vision():
             input_dim = list(self.model.get_layer(index=0).input_shape)
             self.width = input_dim[1]
             self.height = input_dim[2]
+            
             return [self.width, self.height]
         except:
             self.model = None
@@ -52,13 +53,28 @@ class Computer_vision():
         else:
             return False
     
+    def train(self, epochs, train_vals, split, progress_flag, training_flag):
+        if(split):
+            self.split = split
+        else:
+            self.split = 0
+        callback = Gui_callback(train_vals,progress_flag)
+       
+        self.model.fit(self.x,self.y,batch_size=32,validation_split=self.split,epochs=epochs, callbacks=[callback])
+        training_flag.clear()
+        
+        
     def classify(self,frame,prediction_flag):
         #get current frame
         if self.model != None:
             input_dim = list(self.model.get_layer(index=0).input_shape)
             
-            if(list(self.model.get_layer(index=-1).output_shape) != self.categories):
-                self.categories = list(self.model.get_layer(index=-1).output_shape)
+            if(self.model.get_layer(index=-1).output_shape[1] != len(self.categories)):
+                print('adding cat')
+                #Add reading categories
+                for ctg in range(0,self.model.get_layer(index=-1).output_shape[1]):
+                    self.categories.append(f'ctg {ctg}')
+                print(self.categories)
                 self.plot.add_categories(self.categories)
                 
             
@@ -73,16 +89,15 @@ class Computer_vision():
             
             #run .predict
             out_data = self.model.predict([frame_data])
-            
-            self.plot.write_probability(out_data)
+            print(out_data[0].tolist())
+            self.plot.write_probability(out_data[0].tolist())
             #save output to variable and write it to the plot
             
             
             prediction_flag.clear()
     
-    def process_dataset(self, path, process_perc , split=0, categories=[], process_flag = None, callback_flag = None):
+    def process_dataset(self, path, process_perc , categories=[], process_flag = None, callback_flag = None):
         if(path != None and self.model != None):
-            self.split = split
             
             
             del self.x
@@ -91,7 +106,6 @@ class Computer_vision():
             self.x = []
             self.y = []
             
-            print('aaa')
             if(self._create_training_data(path,categories, callback_flag,  process_perc)):
             
                 for features,label in self.training_data:
@@ -100,7 +114,7 @@ class Computer_vision():
                 
                 self.x = np.array(self.x).reshape(-1, self.width, self.height, 1)
                 self.y = np.array(self.y)
-                
+                print(self.y)
                 process_flag.set()
                 return True
             else:
@@ -138,20 +152,14 @@ class Computer_vision():
                         callback_flag.set()
                 except Exception as e:
                     pass
-            process_perc[0] = 100
-            callback_flag.set()
+        process_perc[0] = 100
+        callback_flag.set()
         random.shuffle(self.training_data)
         
         return True
 
         
-    def train(self, epochs, train_vals, progress_flag, training_flag):
-        
-        callback = Gui_callback(train_vals,progress_flag)
-       
-        self.model.fit(self.x,self.y,batch_size=32,validation_split=self.split,epochs=epochs, callbacks=[callback])
-        training_flag.clear()
-        
+
         
 class Gui_callback(keras.callbacks.Callback):
     def __init__(self, train_vals, progress_flag, count_mode='samples', stateful_metrics=None):
