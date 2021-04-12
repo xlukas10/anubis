@@ -566,18 +566,12 @@ class Ui_MainWindow(QtCore.QObject):
         MainWindow.setCentralWidget(self.centralwidget)
         
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1005, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1208, 26))
         self.menubar.setObjectName("menubar")
-        
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
-        
-        self.menuOptions = QtWidgets.QMenu(self.menubar)
-        self.menuOptions.setObjectName("menuOptions")
-        
         self.menuHelp = QtWidgets.QMenu(self.menubar)
         self.menuHelp.setObjectName("menuHelp")
-        
         MainWindow.setMenuBar(self.menubar)
         
         #Define statusbar
@@ -621,23 +615,39 @@ class Ui_MainWindow(QtCore.QObject):
         self.actionRemove_cti_file.setObjectName("actionRemove_cti_file")
         
         self.action_save_frame = QtWidgets.QAction(MainWindow)
-        self.action_save_frame.setShortcutContext(QtCore.Qt.WindowShortcut)
         self.action_save_frame.setObjectName("action_save_frame")
         
         self.action_save_settings = QtWidgets.QAction(MainWindow)
-        self.action_save_settings.setStatusTip("")
         self.action_save_settings.setObjectName("action_save_settings")
         
-        self.menuFile.addAction(self.action_save_frame)
-        self.menuFile.addSeparator()
-        self.menuFile.addAction(self.action_save_settings)
+        self.actionAbout_Anubis = QtWidgets.QAction(MainWindow)
+        self.actionAbout_Anubis.setObjectName("actionAbout_Anubis")
         
-        self.menuOptions.addAction(self.actionAdd_Remove_cti_file)
-        self.menuOptions.addAction(self.actionRemove_cti_file)
+        self.actionGit_Repository = QtWidgets.QAction(MainWindow)
+        self.actionGit_Repository.setObjectName("actionGit_Repository")
+        
+        self.actionSave_camera_config = QtWidgets.QAction(MainWindow)
+        self.actionSave_camera_config.setObjectName("actionSave_camera_config")
+        
+        self.actionLoad_camera_config = QtWidgets.QAction(MainWindow)
+        self.actionLoad_camera_config.setObjectName("actionLoad_camera_config")
+        
+        self.menuFile.addAction(self.actionSave_camera_config)
+        self.menuFile.addAction(self.actionLoad_camera_config)
+        self.menuFile.addAction(self.actionAdd_Remove_cti_file)
+        self.menuFile.addAction(self.actionRemove_cti_file)
+        
+        self.menuFile.addSeparator()
+        
+        self.menuFile.addAction(self.action_save_settings)
         self.menuHelp.addAction(self.actionOpen_Help)
         
+        self.menuHelp.addSeparator()
+        
+        self.menuHelp.addAction(self.actionAbout_Anubis)
+        self.menuHelp.addAction(self.actionGit_Repository)
+        
         self.menubar.addAction(self.menuFile.menuAction())
-        self.menubar.addAction(self.menuOptions.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
         #----------------------------------------------------------------
         
@@ -655,7 +665,7 @@ class Ui_MainWindow(QtCore.QObject):
     
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Anubis"))
         self.btn_zoom_100.setText(_translate("MainWindow", "Zoom to 100%"))
         self.btn_zoom_fit.setText(_translate("MainWindow", "Fit to window"))
         self.btn_start_recording.setText(_translate("MainWindow", "Start/Stop recording"))
@@ -710,15 +720,17 @@ class Ui_MainWindow(QtCore.QObject):
         self.tensorflow_tabs.setTabText(self.tensorflow_tabs.indexOf(self.tab_train), _translate("MainWindow", "Train"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_tensorflow), _translate("MainWindow", "Tensorflow"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
-        self.menuOptions.setTitle(_translate("MainWindow", "Tools"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.actionAdd_Remove_cti_file.setText(_translate("MainWindow", "Add .cti file"))
         self.actionOpen_Help.setText(_translate("MainWindow", "Open Help"))
         self.actionRemove_cti_file.setText(_translate("MainWindow", "Remove .cti file"))
         self.action_save_frame.setText(_translate("MainWindow", "Save frame"))
-        self.action_save_settings.setText(_translate("MainWindow", "Save settings"))
+        self.action_save_settings.setText(_translate("MainWindow", "Save app state"))
         self.action_save_settings.setToolTip(_translate("MainWindow", "Save modifications made to application settings"))
-        self.action_save_settings.setShortcut(_translate("MainWindow", "Ctrl+S, Ctrl+S"))
+        self.actionAbout_Anubis.setText(_translate("MainWindow", "About Anubis"))
+        self.actionGit_Repository.setText(_translate("MainWindow", "Git Repository"))
+        self.actionSave_camera_config.setText(_translate("MainWindow", "Save camera config"))
+        self.actionLoad_camera_config.setText(_translate("MainWindow", "Load camera config"))
         
         #added manually
         self.camera_status.setText("Camera: Not connected")
