@@ -23,8 +23,10 @@ from computer_vision import Computer_vision
 from config_level import Config_level
 
 class Ui_MainWindow(QtCore.QObject):
-    def setupUi(self, MainWindow):
+    def __init__(self):
         #VARIABLES
+        
+        super(Ui_MainWindow,self).__init__()
         self.tmp = False
         """
         !@brief Variable used to store device information of detected cameras
@@ -104,6 +106,10 @@ class Ui_MainWindow(QtCore.QObject):
         
         self.status_timer = QtCore.QTimer()
         self.status_timer.timeout.connect(self.clear_status)
+        
+        
+    def setupUi(self, MainWindow):
+        
         
         
         MainWindow.setObjectName("MainWindow")
