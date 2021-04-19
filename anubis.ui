@@ -127,7 +127,7 @@
        <string/>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_connect">
        <attribute name="title">
@@ -207,7 +207,7 @@
       </widget>
       <widget class="QWidget" name="tab_config">
        <attribute name="title">
-        <string>Camera Configuration</string>
+        <string>Configure Camera</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
@@ -286,7 +286,7 @@
       </widget>
       <widget class="QWidget" name="tab_recording_config">
        <attribute name="title">
-        <string>Recording Configuration</string>
+        <string>Configure Recording</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>

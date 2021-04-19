@@ -16,8 +16,11 @@ import time
 
 class Computer_vision():
     def __init__(self,plot):
+        """!@brief Initialize object and its variables
+        @param[in] plot The class needs to have a reference to the GUI object the
+        classification results will be shown in.
+        """
         self.model = None
-        self.SIZE = 50
         self.width = 1
         self.height =  1
         self.categories = []
@@ -30,6 +33,12 @@ class Computer_vision():
         self.training_data = []
         
     def load_model(self,path):
+        """!@brief Load Keras model.
+        @details Model is loaded from the path and variables defining input
+        dimensions of the model are set.
+        @param[in] path Path to the folder with saved model.
+        @return True if loading is successful else False.
+        """
         if(self.model):
             keras.backend.clear_session()
             self.model = None
@@ -47,6 +56,10 @@ class Computer_vision():
             return False
     
     def save_model(self,path):
+        """!@brief Save model to defined path
+        @param[in] path Path to the folder where model will be saved.
+        @return True if loading is successful else False.
+        """
         if(self.model):
             self.model.save(path)
             return True
@@ -97,9 +110,22 @@ class Computer_vision():
             prediction_flag.clear()
     
     def process_dataset(self, path, process_perc , categories=[], process_flag = None, callback_flag = None):
+        """!@brief Prepare dataset to be used as input and desired output.
+        @details The method will proceed only if a model is loaded and path is valid.
+        dimensions of the model are set.
+        @param[in] path Path to the dataset
+        @param[in] process_perc Reference to the progress variable in the 
+            calling function. Value should be read during callbacks
+        @param[in] categories Names of the individual folders containing data
+            for different categories.
+        @param[in] process_flag When processing finishes the flag is raised.
+        @param[in] callback_flag Threading event telling the calling function
+            to update progress based on the valu in process_perc
+        @return True if loading is successful else False.
+        """
+        
         if(path != None and self.model != None):
-            
-            
+               
             del self.x
             del self.y
             
@@ -121,8 +147,20 @@ class Computer_vision():
                 process_flag.set()
                 return False
         
-    
     def _create_training_data(self, path, categories, callback_flag, process_perc):
+        """!@brief Auxilary method to resize all input data to the size of input
+        of the loaded model.
+        dimensions of the model are set.
+        @param[in] path Path to the dataset
+        @param[in] categories Names of the individual folders containing data
+            for different categories.
+        @param[in] callback_flag Threading event telling the calling function
+            to update progress based on the valu in process_perc
+        @param[in] process_perc Reference to the progress variable in the 
+            calling function. Value should be read during callbacks
+        @return True if loading is successful else False.
+        """
+        
         self.training_data.clear()
         items = 0
         process_perc[0] = 0
@@ -157,8 +195,6 @@ class Computer_vision():
         random.shuffle(self.training_data)
         
         return True
-
-        
 
         
 class Gui_callback(keras.callbacks.Callback):

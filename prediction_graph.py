@@ -34,7 +34,6 @@ class Prediction_graph(FigureCanvasQTAgg):
                 self.categories.append(str(category))
     
     def write_probability(self, probability = []):
-        print('kk')
         top_5 = []
         top_indices = []
         
@@ -55,7 +54,6 @@ class Prediction_graph(FigureCanvasQTAgg):
                 top_5.append(top)
                 top_indices.append(top_index)
         
-        print(top_indices)
         self.probability = top_5#test with multiple output classes
         self.figure.canvas.axes.clear()
         

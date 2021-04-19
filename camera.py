@@ -577,7 +577,6 @@ class Camera:
     def save_config(self,path):
         """!@brief saves configuration of a camera to .xml file
         @param[in] path A path where the file will be saved
-        @todo what will happen if the file already exists
         """
         if self.vendor == Vendors.Allied_Vision_Technologies:
             with Vimba.get_instance() as vimba:
@@ -653,7 +652,6 @@ class Camera:
         """!@brief Gets frames from camera while continuous acquisition is active
         @details Loads frames from camera as they come and stores them
             in a frame queue for consumer thread to process. The thread runs until stream_stop_switch is set
-        @todo implement for harvesters and define interface for APIs to come
         """
         
         if self.vendor == Vendors.Allied_Vision_Technologies:
@@ -714,9 +712,8 @@ class Camera:
     
     def _frame_handler_vimba(self,cam ,frame):
         """!@brief Defines how to process incoming frames
-        @details Currently is defined for Vimba and defines how to acquire
+        @details Is defined for Vimba and defines how to acquire
             whole frame and put into the frame_queue
-        @todo implement for harvesters and define interface for APIs to come
         """
         try:
             #if frame.get_status() == FrameStatus.Complete:
