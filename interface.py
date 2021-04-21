@@ -33,6 +33,7 @@ from global_camera import cam
 from global_queue import active_frame_queue
 from computer_vision import Computer_vision
 from config_level import Config_level
+import webbrowser
 
 class Ui_MainWindow(QtCore.QObject):
     def __init__(self):
@@ -801,6 +802,13 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_train_cancel.clicked.connect(self.train_model)
         
         self.action_save_settings.triggered.connect(self.save_cti_config)
+        self.actionOpen_Help.triggered.connect(lambda: 
+                            webbrowser.open(
+                                os.path.dirname(os.path.realpath(__file__)) + 
+                                "/Help//index.html",
+                                new=2))
+        self.actionGit_Repository.triggered.connect(lambda: 
+                            webbrowser.open("https://github.com/xlukas10/anubis",new=2))
     
     def setup_validators(self):
         """!@brief create input constrains for various widgets
