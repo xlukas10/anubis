@@ -255,12 +255,12 @@ class Gui_callback(keras.callbacks.Callback):
         self.epochs = params['epochs']
         self.target = params['steps']
 
-#done
+
     def on_train_begin(self, logs=None):
         # When this logger is called inside `fit`, validation is silent.
         self._called_in_fit = True
 
-#done
+
 
 
 #Pass in label for epochs

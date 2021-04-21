@@ -41,60 +41,93 @@ class Ui_MainWindow(QtCore.QObject):
         """
         
         super(Ui_MainWindow,self).__init__()
-        self.tmp = False
         
+        ##Automatic feature refresh timer
         self.feat_refresh_timer  = QtCore.QTimer(self)
         self.feat_refresh_timer.setInterval(4000)
         self.feat_refresh_timer.timeout.connect(self.update_parameters)
         self.feat_refresh_timer.timeout.connect(self.start_refresh_parameters)
         self.feat_refresh_timer.start()
         
+        ##Holds current frame displayed in the GUI
         self.image_pixmap = None
+        ##Width of the preview area
         self.w_preview = 0
+        ##Height of the preview area
         self.h_preview = 0
+        
+        ##Is tensorflow model loaded
         self.model_loaded = False
                     
+        ##Last value of the dragging in the preview area - x axis
         self.move_x_prev = 0
+        ##Last value of the dragging in the preview area - y axis
         self.move_y_prev = 0
+        ##Progress percentage of dataset loading/preprocessing
         self.process_perc = [0]
         
+        ##Used to store values of parameters when automatically refreshing them
         self.parameter_values = {}
         
+        ##Flag used when running various parameter refreshing methods
         self.update_completed_flag = threading.Event()
         self.update_completed_flag.set()
+        
+        ##Flag used when running various parameter refreshing methods
         self.update_flag = threading.Event()
+        
+        ##Value of current preview zoom in %/100
         self.preview_zoom = 1
+        ##Resizing image to preview area size instead of using zoom
         self.preview_fit = True
         
+        ##Holds parameter category paths for tree widget
         self.top_items = {}
+        ##Holds children widgets for tree widget
         self.children_items = {}
         
-        #Contains all dynamically created widgets
+        ##Contains all dynamically created widgets for parameters
         self.feat_widgets = {}
+        ##Contains all dynamically created labels of parameters
         self.feat_labels = {}
+        ##Stores dictionaries of every parameter until they are processed to the GUI
         self.feat_queue = Queue()
         
+        ##List of detected cameras
         self.detected = []
+        ##Is camera connected
         self.connected = False
+        
+        ##Is true while the tensorflow training is running
         self.training_flag = threading.Event()
+        ##Flag is not set while the application is getting parameters from the cam object
         self.param_flag = threading.Event()
-        self.param_flag = threading.Event()
+        
+        ##Signals that computer vision class is still processing dataset
         self.process_flag = threading.Event()
+        ##Signal used to tell the main thread to update dataset progress
         self.process_prog_flag = threading.Event()
         
+        ##Widget used to transfer GUI changes from thread into the main thread while training
         self.callback_train_signal = QtWidgets.QLineEdit()
         self.callback_train_signal.textChanged.connect(self.update_training)
         
+        ##Widget used to transfer GUI changes from thread into the main thread while processing dataset
         self.callback_process_signal = QtWidgets.QLineEdit()
         self.callback_process_signal.textChanged.connect(self.update_processing)
         
+        ##Widget used to transfer GUI changes from thread into the main thread while updating preview
         self.resize_signal = QtWidgets.QLineEdit()
         self.resize_signal.textChanged.connect(self.update_img)
         
+        ##Widget used to transfer GUI changes from thread into the main thread while showing parameters
         self.parameters_signal = QtWidgets.QLineEdit()
         self.parameters_signal.textChanged.connect(self.show_parameters)
         
+        ##Signal used to tell the main thread to update training progress
         self.progress_flag = threading.Event()
+        
+        ##dictionary holding variables used in a callback while training
         self.train_vals = {'progress': 0,
                            'loss': 0,
                            'acc': 0,
@@ -103,19 +136,30 @@ class Ui_MainWindow(QtCore.QObject):
                            'max_epoch': 0,
                            'epoch': 0}
         
+        ##Signals that prediction was completed and a new one can be made
         self.prediction_flag = threading.Event()
         
+        ##Signals that a recording was stopped, either by timer or manually
         self.interupt_flag = threading.Event()
+        
+        ##State of recording
         self.recording = False
+        ##State of live preview
         self.preview_live = False
         
+        ##Holds image of offline state of a camera
         self.icon_offline = QtGui.QPixmap("./icons/icon_offline.png")
+        ##Holds image of standby state of a camera
         self.icon_standby = QtGui.QPixmap("./icons/icon_standby.png")
+        ##Holds image of busy state of a camera
         self.icon_busy = QtGui.QPixmap("./icons/icon_busy.png")
         
+        ##Current frames per second received from the camera
         self.fps = 0.0
+        ##Total sum of received frames for active camera session
         self.received = 0
         
+        ##Timer used to show a status messages for specific time window
         self.status_timer = QtCore.QTimer()
         self.status_timer.timeout.connect(self.clear_status)
         
@@ -1622,8 +1666,9 @@ class Ui_MainWindow(QtCore.QObject):
             self.train_thread.start()
         else:
             #stop training prematurely
-            self.training_flag.clear()
-    
+            #self.training_flag.clear()
+            pass
+            
     def training_callback(self):
         """!@brief Auxiliary method used to transfer thread state changes into
         the main thread.
@@ -1890,7 +1935,6 @@ class Ui_MainWindow(QtCore.QObject):
         """!@brief Fills layout with feature name and value pairs
         @details Based on the feature type a new label, text area, checkbox or
         combo box is created. In this version all available parameters are shown.
-        TODO config level and command feature type
         """
         
         #Start filling features in only with connected camera

@@ -4,7 +4,7 @@ Created on Sat Feb 27 08:38:16 2021
 
 @author: Jakub Lukaszczyk
 """
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg#, NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
@@ -29,7 +29,6 @@ class Prediction_graph(FigureCanvasQTAgg):
         self.probability = [0, 0, 0, 0, 0]
         self.w = 1
         self.axes.set_ylim(-1,1)
-        #self.indent = np.arange(self.N)
         
         self.axes.bar(self.categories,self.probability,self.w)
         super(Prediction_graph,self).__init__(self.figure)
