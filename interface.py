@@ -802,6 +802,10 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_train_cancel.clicked.connect(self.train_model)
         
         self.action_save_settings.triggered.connect(self.save_cti_config)
+        self.actionRemove_cti_file.triggered.connect(self.remove_cti)
+        self.actionAdd_Remove_cti_file.triggered.connect(self.add_cti)
+        self.actionSave_camera_config.triggered.connect(self.save_cam_config)
+        self.actionLoad_camera_config.triggered.connect(self.load_cam_config)
         self.actionOpen_Help.triggered.connect(lambda: 
                             webbrowser.open(
                                 os.path.dirname(os.path.realpath(__file__)) + 
@@ -809,6 +813,7 @@ class Ui_MainWindow(QtCore.QObject):
                                 new=2))
         self.actionGit_Repository.triggered.connect(lambda: 
                             webbrowser.open("https://github.com/xlukas10/anubis",new=2))
+        self.actionAbout_Anubis.triggered.connect(self.about)
     
     def setup_validators(self):
         """!@brief create input constrains for various widgets
@@ -926,7 +931,6 @@ class Ui_MainWindow(QtCore.QObject):
             self.combo_remove_cti.addItems(loaded_cti)
         except:
             pass
-#TODO reading and adding cti files
         
         #Set status update
         self.set_status_msg("Configuration loaded",1500)
@@ -962,6 +966,9 @@ class Ui_MainWindow(QtCore.QObject):
                         file.write(path + '\n')
         
         self.set_status_msg("Configuration saved")
+        
+    def about(self):
+        pass
     
 #-------------Connect camera tab--------------------
     def add_cti(self):
