@@ -26,6 +26,7 @@ class Computer_vision():
         self.categories = []
         self.plot = plot
         self.split = 0
+        self.busy = False
         
         self.x = []
         self.y = []
@@ -67,27 +68,52 @@ class Computer_vision():
             return False
     
     def train(self, epochs, train_vals, split, progress_flag, training_flag):
-        if(split):
-            self.split = split
-        else:
-            self.split = 0
-        callback = Gui_callback(train_vals,progress_flag)
-       
-        self.model.fit(self.x,self.y,batch_size=32,validation_split=self.split,epochs=epochs, callbacks=[callback])
-        training_flag.clear()
-        
-        
+        """!@brief Start training loaded model
+        @details If the object is not busy, the tensorflow/Keras training will
+            start. During training the callback object will push current values of 
+            training variavles int the references passed in train_vals.
+        @param[in] epochs How many times should the dataset be introduced to
+            the network.
+        @param[in] train_vals Reference to variables used in callback to inform
+            calling functions about training progress
+        @param[in] split Fraction of dataset to be used as validation data (float).
+        @param[in] progress_flag Signal to tell that it is time to update
+            progress values
+        @param[in] training_flag Used to announce finished training
+        """
+        if(self.model != None and not self.busy):
+            self.busy = True
+            if(split):
+                self.split = split
+            else:
+                self.split = 0
+            callback = Gui_callback(train_vals,progress_flag)
+           
+            self.model.fit(self.x,
+                           self.y,
+                           batch_size=32,
+                           validation_split=self.split,epochs=epochs,
+                           callbacks=[callback])
+            self.busy = False
+            training_flag.clear()
+             
     def classify(self,frame,prediction_flag):
+        """!@brief Classify image using trained model
+        @details This method does not change the behavior of the network but
+            only uses it to make prediction about what is in the picture. The
+            result is shown in the plot passed by reference in the __init__ method.
+        @param[in] frame OpenCV image that the prediction will be done for.
+        @param[in] predition_flag Announces that the prediction was completed
+        """
+        
         #get current frame
         if self.model != None:
             input_dim = list(self.model.get_layer(index=0).input_shape)
             
             if(self.model.get_layer(index=-1).output_shape[1] != len(self.categories)):
-                print('adding cat')
                 #Add reading categories
                 for ctg in range(0,self.model.get_layer(index=-1).output_shape[1]):
                     self.categories.append(f'ctg {ctg}')
-                print(self.categories)
                 self.plot.add_categories(self.categories)
                 
             
@@ -102,7 +128,6 @@ class Computer_vision():
             
             #run .predict
             out_data = self.model.predict([frame_data])
-            print(out_data[0].tolist())
             self.plot.write_probability(out_data[0].tolist())
             #save output to variable and write it to the plot
             
@@ -124,8 +149,8 @@ class Computer_vision():
         @return True if loading is successful else False.
         """
         
-        if(path != None and self.model != None):
-               
+        if(path != None and self.model != None and not self.busy):
+            self.busy = True
             del self.x
             del self.y
             
@@ -140,15 +165,17 @@ class Computer_vision():
                 
                 self.x = np.array(self.x).reshape(-1, self.width, self.height, 1)
                 self.y = np.array(self.y)
-                print(self.y)
+    
+                self.busy = False
                 process_flag.set()
                 return True
             else:
+                self.busy = False
                 process_flag.set()
                 return False
         
     def _create_training_data(self, path, categories, callback_flag, process_perc):
-        """!@brief Auxilary method to resize all input data to the size of input
+        """!@brief Auxiliary method to resize all input data to the size of input
         of the loaded model.
         dimensions of the model are set.
         @param[in] path Path to the dataset

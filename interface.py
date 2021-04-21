@@ -1328,7 +1328,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.fps_status.setText("FPS: " + str(self.fps))
     
     def preview_callback(self):
-        """!@brief Auxilary method used to transfer thread state change into
+        """!@brief Auxiliary method used to transfer thread state change into
         the main thread.
         """
         if(self.resize_signal.text() != "A"):
@@ -1560,7 +1560,7 @@ class Ui_MainWindow(QtCore.QObject):
                 self.process_flag.clear()
     
     def preprocess_callback(self):
-        """!@brief Auxilary method used to transfer thread state changes into
+        """!@brief Auxiliary method used to transfer thread state changes into
         the main thread.
         """
         while(not self.process_flag.is_set()):
@@ -1610,7 +1610,7 @@ class Ui_MainWindow(QtCore.QObject):
             self.training_flag.clear()
     
     def training_callback(self):
-        """!@brief Auxilary method used to transfer thread state changes into
+        """!@brief Auxiliary method used to transfer thread state changes into
         the main thread.
         """
         while(self.training_flag.is_set()):
@@ -1931,7 +1931,7 @@ class Ui_MainWindow(QtCore.QObject):
             self.set_status_msg("Configuration loaded")
     
     def callback_parameters(self):
-        """!@brief Auxilary method used to transfer thread state change into
+        """!@brief Auxiliary method used to transfer thread state change into
         the main thread.
         """
         self.param_flag.wait()
