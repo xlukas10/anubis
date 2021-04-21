@@ -13,6 +13,14 @@ import operator
 class Prediction_graph(FigureCanvasQTAgg):
     
     def __init__(self, parent=None, width=5, height=4, dpi=100):
+        """!@brief Initializes prediction graph
+        @details The graph is created as a bar plot with 5 categories all
+        initialized to 0.
+        @param[in] parent Parent widget
+        @param[in] width Width of the created figure
+        @param[in] height Height of the created figure
+        @param[in] dpi Dots per inch of the created figure
+        """
         self.figure = Figure(figsize=(width, height), dpi=dpi)
         
         self.axes = self.figure.add_subplot(111)
@@ -27,6 +35,12 @@ class Prediction_graph(FigureCanvasQTAgg):
         super(Prediction_graph,self).__init__(self.figure)
     
     def add_categories(self, categories = []):
+        """!@brief Changes default categories of the plot to categories from
+            method argument
+        @details All categories currently in a plot are removed and new ones
+            are added in their place. Count is not limited
+        @param[in] categories A list with names of the new categories
+        """
         self.categories.clear()
         
         for category in categories:
@@ -34,6 +48,12 @@ class Prediction_graph(FigureCanvasQTAgg):
                 self.categories.append(str(category))
     
     def write_probability(self, probability = []):
+        """!@brief Finds top 5 items in given input and plots them
+        @details The input probability should have the same dimensions as the 
+            categories. after finding the top 5, the categories with the same 
+            indices are plotted.
+        @param[in] probability Results to be plotted
+        """
         top_5 = []
         top_indices = []
         
