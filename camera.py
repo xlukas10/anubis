@@ -26,16 +26,25 @@ from vendors import Vendors
 
 class Camera:
     def __init__(self, producer_paths = None):
+        ##Harvester object used to communicate with Harvester module
         self.h = Harvester()
+        ##paths to GenTL producers
         self.paths = []
         if(producer_paths):
             self.add_gentl_producer(producer_paths)
+            
+        ##Camera vendor used to select the correct API
         self.vendor = Vendors.Other
+        ##Recording state
         self.is_recording = False
+        ##Image acqisition state
         self.acquisition_running = False
+        ##Detected devices
         self.devices_info = []
+        ##Index of active camera for active API
         self.active_camera = 0
-        self.ia = None #image acquifier
+        ##Image acquifier object used by Harvester
+        self.ia = None
     
     def get_camera_list(self,):
         """!@brief Connected camera discovery
@@ -72,7 +81,6 @@ class Camera:
                 if camera['id_'] == selected_device:
                     harvester_index = index
                     break
-#FIX NAME OF VENDOR
         if(self.h.device_info_list[harvester_index].vendor == 'Allied Vision Technologies'):
             self.disconnect_harvester()
             self.vendor = Vendors.Allied_Vision_Technologies
@@ -129,7 +137,7 @@ class Camera:
             value, type, range, increment and max_length 
             if given information exist for the parameter
         """
-#categories are defined by GenICam SFNC
+        #categories are defined by GenICam SFNC
         if(self.vendor == Vendors.Allied_Vision_Technologies):
             #Establishing communication
             with Vimba.get_instance() as vimba:
@@ -237,8 +245,6 @@ class Camera:
                             '''
                             feature_queue.put(features_out)
                     flag.set()
-                    
-                    #return features_out
         else:
             features = dir(self.ia.remote_device.node_map)
             
@@ -399,9 +405,9 @@ class Camera:
             return
     
     def read_param_value(self,param_name):
-        """@used to get value of one parameter based on its name
-        @param[in] param_name name of the parametr whose value we want to read
-        @return a value of the selected parameter
+        """!@brief Used to get value of one parameter based on its name
+        @param[in] param_name Name of the parametr whose value we want to read
+        @return A value of the selected parameter
         """
 
         if(self.vendor == Vendors.Allied_Vision_Technologies):
@@ -419,26 +425,28 @@ class Camera:
             except:
                 return None
     
-    def set_parameter(self,parameter, new_value):
-        """!@brief method for setting camera's parameters
+    def set_parameter(self,parameter_name, new_value):
+        """!@brief Method for setting camera's parameters
         @details Sets parameter to value defined by new_value
-        @param[in] parameter A dictionary with mandatory keys name and value,
-                         other keys will be used in later versions
-        @param[in] new_value variable compatible with value key in parameter
+        @param[in] parameter_name A name of the parameter to be changed
+        @param[in] new_value Variable compatible with value key in parameter
         @return True if success else returns False
         """
+        print(parameter_name)
+        print(new_value)
         if(self.vendor == Vendors.Allied_Vision_Technologies):
 #EDIT to work well with new parameter dictionary (name, value, maximum etc.)
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras()
                 with cams[self.active_camera] as cam:
                     try:
-                        getattr(cam, parameter['name']).set(new_value)
+                        getattr(cam, parameter_name).set(new_value)
                     except (AttributeError, VimbaFeatureError):
+                        print("ne")
                         return False
         else:
             try:
-                getattr(self.ia.remote_device.node_map, parameter['name']).value = new_value
+                getattr(self.ia.remote_device.node_map, parameter_name).value = new_value
             except:
                 return False
         
@@ -446,8 +454,8 @@ class Camera:
     
     def execute_command(self, command_feature):
         """@brief Execute command feature type
-        @param[in] command_feature dictionary containing at least 'name' of 
-        the selected feature
+        @param[in] command_feature Dictionary containing at least 'name' of 
+            the selected feature
         """
         #not tested
         if(self.vendor == Vendors.Allied_Vision_Technologies):
@@ -465,10 +473,10 @@ class Camera:
                 pass
     
     def get_single_frame(self,):
-        """!@brief grab single frame from camera
+        """!@brief Grab single frame from camera
         @details Based on vendor variable chooses right API for acquisition and 
             loads single frame from active_camera
-        @return unmodified frame from camera
+        @return Unmodified frame from camera
         """
         if(self.vendor == Vendors.Allied_Vision_Technologies):
             with Vimba.get_instance() as vimba:
@@ -501,7 +509,8 @@ class Camera:
     
     def stop_acquisition(self,):
         """!@brief Stops continuous acquisition
-        @details Sets stream_stop_switch, acquisition running to false and removes inner link to queue object
+        @details Sets stream_stop_switch, acquisition running to false and 
+            removes inner link to queue object
         """
         #stop threads created by start_acquisition
         if self.acquisition_running == True:
@@ -512,8 +521,9 @@ class Camera:
     def start_recording(self,folder_path,name_scheme,configuration,):
         """!@brief Starts continuous acquisition of image frames and saves them to files/video
         @details Calls start_acquisition method and configures camera parameters for optimal acquisition
-        @param[in] file_path path where the files will be saved
-        @param[in] configuration parameters of output files and possibly camera parameters
+        @param[in] file_path Path where the files will be saved
+        @param[in] name_scheme Naming template for saved files
+        @param[in] configuration Parameters of output files and possibly camera parameters
         """
         self.start_acquisition()
         self._frame_consumer_thread = threading.Thread(target=self._frame_consumer, args=(folder_path,name_scheme,configuration))
@@ -522,17 +532,14 @@ class Camera:
     
     def stop_recording(self,):
         """!@brief Stops continuous acquisition of image frames and closes all files
-        @details Calls start_acquisition method and configures camera parameters for optimal acquisition
-        @param[in] file_path path where the files will be saved
-        @param[in] configuration parameters of output files and possibly camera parameters
         """
         self.stop_acquisition()
         self.is_recording = False
     
     def load_config(self,path):
-        """@brief load existing camera configuration
-        @param[in] path Defines path and a name of the file containing the
-        configuration of the camera
+        """!@brief Load existing camera configuration
+        @param[in] path Defines a path and a name of the file containing the
+            configuration of the camera
         """
         if self.vendor == Vendors.Allied_Vision_Technologies:
             with Vimba.get_instance() as vimba:
@@ -575,7 +582,7 @@ class Camera:
                         val = None
     
     def save_config(self,path):
-        """!@brief saves configuration of a camera to .xml file
+        """!@brief Saves configuration of a camera to .xml file
         @param[in] path A path where the file will be saved
         """
         if self.vendor == Vendors.Allied_Vision_Technologies:
@@ -603,10 +610,8 @@ class Camera:
     
     def add_gentl_producer(self,producer_path):
         """!@brief Add a new frame producer to the harvester object
-        @details adds .cti file specified by producer_path to the harvester object
-        @param[in] producer_path path to a .cti file
-        @todo producer_path probably should be also attached to
-            application configuration for later use
+        @details Adds .cti file specified by producer_path to the harvester object
+        @param[in] producer_path Path to a .cti file
         @return list of all active producers
         """
         if(not producer_path in self.paths):
@@ -617,10 +622,8 @@ class Camera:
     
     def remove_gentl_producer(self,producer_path):
         """!@brief Remove existing frame producer from the harvester object
-        @details removes .cti file specified by producer_path from the harvester object
-        @param[in] producer_path path to a .cti file
-        @todo producer_path probably should be also removed from
-            application configuration
+        @details Removes .cti file specified by producer_path from the harvester object
+        @param[in] producer_path Path to a .cti file
         """
         if(producer_path in self.paths):
             self.paths.remove(producer_path)
@@ -630,19 +633,19 @@ class Camera:
             return(None, False)
     
     def get_gentl_producers(self):
-        """@brief used to get a list of all path used by Harvesters in a
+        """!@brief Used to get a list of all path used by Harvesters in a
         present moment
         @return List of defined cti file paths
         """
         return self.paths
     
     def disconnect_harvester(self,):
-        """@brief Destroys harvester object so other APIs can access cameras
+        """!@brief Destroys harvester object so other APIs can access cameras
         """
         self.h.reset()
     
     def disconnect_camera(self):
-        """@brief Disconnect camera and restores the object to its initial state"""
+        """!@brief Disconnect camera and restores the object to its initial state"""
         
         self.stop_recording()
         self.disconnect_harvester()
@@ -651,7 +654,8 @@ class Camera:
     def _frame_producer(self):
         """!@brief Gets frames from camera while continuous acquisition is active
         @details Loads frames from camera as they come and stores them
-            in a frame queue for consumer thread to process. The thread runs until stream_stop_switch is set
+            in a frame queue for consumer thread to process. The thread 
+            runs until stream_stop_switch is set
         """
         
         if self.vendor == Vendors.Allied_Vision_Technologies:
@@ -676,13 +680,11 @@ class Camera:
             self.ia.stop_acquisition()
     
     def _frame_consumer(self, folder_path, name_scheme, additional_config):
-        """!@brief Gradually saves frames generated by _frame_consumer_thread
+        """!@brief Gradually saves frames generated by _frame_producer_thread
         @details Uses openCV to saves images from frame_queue 
             to file_path according to additional_config
-        @param[in] file_path path where the files will be saved
-        @param[in] additional_config unused for now, in future may contain image format, specific naming convention etc.
-        @todo If configuration is implemented elsewhere remove this method
-        @todo Implement for harvester as well
+        @param[in] file_path Path where the files will be saved
+        @param[in] additional_config Reserved.
         """
         if(folder_path[-1] != '/'):
             folder_path = folder_path + '/'
@@ -716,7 +718,6 @@ class Camera:
             whole frame and put into the frame_queue
         """
         try:
-            #if frame.get_status() == FrameStatus.Complete:
             if not frame_queue.full() and frame.get_status() == FrameStatus.Complete:
                 frame_copy = copy.deepcopy(frame)
                 if self.is_recording:
@@ -724,13 +725,9 @@ class Camera:
                                             str(frame_copy.get_pixel_format())])
                 active_frame_queue.put_nowait([frame_copy.as_opencv_image(),
                                                str(frame_copy.get_pixel_format())])
-                #queue used for preview
-                #Saving only image data, metadata are lost - is it a problem?
             else:
                 print("queue full")
-            #else:
-            #    print("frame not complete")
             cam.queue_frame(frame)
         except:
-            print("Something went wrong.")
+            pass
     

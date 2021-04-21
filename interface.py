@@ -44,7 +44,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         ##Automatic feature refresh timer
         self.feat_refresh_timer  = QtCore.QTimer(self)
-        self.feat_refresh_timer.setInterval(4000)
+        self.feat_refresh_timer.setInterval(400000)
         self.feat_refresh_timer.timeout.connect(self.update_parameters)
         self.feat_refresh_timer.timeout.connect(self.start_refresh_parameters)
         self.feat_refresh_timer.start()
@@ -161,7 +161,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         ##Timer used to show a status messages for specific time window
         self.status_timer = QtCore.QTimer()
-        self.status_timer.timeout.connect(self.clear_status)
+        
         
         
     def setupUi(self, MainWindow):
@@ -1790,7 +1790,7 @@ class Ui_MainWindow(QtCore.QObject):
                     
                     #Call feature change for this feature when enter is pressed in this field.
                     #Text is the value that will be set to the feature.
-                    self.feat_widgets[param["name"]].valueChanged.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].value()))
+                    self.feat_widgets[param["name"]].valueChanged.connect(lambda new_val,param=param: cam.set_parameter(param["name"],new_val))
                 elif param["attr_type"] == "FloatFeature":
                     #For float feature a Line edit field is created, but only 
                     #real numbers can be written in.
@@ -1805,7 +1805,7 @@ class Ui_MainWindow(QtCore.QObject):
                     
                     #Call feature change for this feature when enter is pressed in this field.
                     #Text is the value that will be set to the feature.
-                    self.feat_widgets[param["name"]].valueChanged.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].value()))
+                    self.feat_widgets[param["name"]].valueChanged.connect(lambda new_val,param=param: cam.set_parameter(param["name"],new_val))
                 elif param["attr_type"] == "StringFeature":
                     #For string feature a Line edit field is created.
                     self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
@@ -1815,7 +1815,7 @@ class Ui_MainWindow(QtCore.QObject):
                     
                     #Call feature change for this feature when enter is pressed in this field.
                     #Text is the value that will be set to the feature.
-                    self.feat_widgets[param["name"]].returnPressed.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].text()))            
+                    self.feat_widgets[param["name"]].returnPressed.connect(lambda new_val,param=param: cam.set_parameter(param["name"],new_val))            
                 elif param["attr_type"] == "BoolFeature":
                     #For bool feature a checkbox is created.
                     self.feat_widgets[param["name"]] = QtWidgets.QCheckBox(self.tab_config)
@@ -1825,7 +1825,7 @@ class Ui_MainWindow(QtCore.QObject):
                     
                     #When state of the checkbox change, the feature is sent to 
                     #the camera and changed to the new state
-                    self.feat_widgets[param["name"]].stateChanged.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].isChecked()))
+                    self.feat_widgets[param["name"]].stateChanged.connect(lambda new_val,param=param: cam.set_parameter(param["name"],new_val))
                 elif param["attr_type"] == "EnumFeature":
                     #For enum feature a combo box is created.
                     self.feat_widgets[param["name"]] = QtWidgets.QComboBox(self.tab_config)
@@ -1844,18 +1844,18 @@ class Ui_MainWindow(QtCore.QObject):
                     
                     #When different option is selected change the given enum in
                     #the camera
-                    self.feat_widgets[param["name"]].activated.connect(lambda param=param: cam.set_parameter(param,self.feat_widgets[param["name"]].currentText()))
+                    self.feat_widgets[param["name"]].activated.connect(lambda new_val,param=param: cam.set_parameter(param["name"],new_val+1))
                 elif param["attr_type"] == "CommandFeature":
                     #If the feature type is not recognized, create a label with 
                     #the text error
-                    self.feat_widgets[param["name"]] = QtWidgets.QButton(self.tab_config)
+                    self.feat_widgets[param["name"]] = QtWidgets.QPushButton(self.tab_config)
                     self.feat_widgets[param["name"]].setText("Execute command")
                     self.feat_widgets[param["name"]].clicked.connect(lambda param=param: cam.execute_command(param))
                 else:
                     #If the feature type is not recognized, create a label with 
                     #the text error
                     self.feat_widgets[param["name"]] = QtWidgets.QLabel(self.tab_config)
-                    self.feat_widgets[param["name"]].setText("Error")
+                    self.feat_widgets[param["name"]].setText("Unknown feature type")
                 
                 self.feat_widgets[param["name"]].setEnabled(param["attr_enabled"])
                 
