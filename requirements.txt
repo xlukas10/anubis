@@ -1,7 +1,8 @@
 harvesters >= 1.2.8
 genicam >= 1.0.0
-#kivy >= 1.11.1
-#No longer
-pyQt5 >= 12.8.1 #Check if correct
-OpenCV
-Vimba
+pyqt >= 5.9.2
+opencv >= 4.0.1
+vimbapython >= 1.0.1
+tensorflow >= 2.3.0
+numpy >= 1.19.2
+matplotlib >= 3.3.4
