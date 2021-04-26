@@ -615,8 +615,9 @@ class Camera:
         @return list of all active producers
         """
         if(not producer_path in self.paths):
-            self.h.add_file(producer_path)
-            self.paths.append(producer_path)
+            if(producer_path.endswith(".cti")):
+                self.h.add_file(producer_path)
+                self.paths.append(producer_path)
         
         return self.paths
     

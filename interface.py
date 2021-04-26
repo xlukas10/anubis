@@ -841,7 +841,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_reset_sequence_settings.clicked.connect(self.reset_seq_settings)
         self.btn_save_model.clicked.connect(self.save_model)
         self.btn_load_model.clicked.connect(self.load_model)
-        self.btn_load_dataset.clicked.connect(lambda: self.get_directory(self.line_edit_dataset_path))
+        self.btn_load_dataset.clicked.connect(self.choose_dataset)
         self.btn_preprocess.clicked.connect(self.preprocess_dataset)
         self.btn_train_cancel.clicked.connect(self.train_model)
         
@@ -1582,6 +1582,12 @@ class Ui_MainWindow(QtCore.QObject):
             else:
                 self.set_status_msg("Failed to save model")
     
+    def choose_dataset(self):
+        """!@brief Get dataset path and reenable preprocess button.
+        """
+        self.get_directory(self.line_edit_dataset_path)
+        self.btn_preprocess.setEnabled(True)
+        
     def preprocess_dataset(self):
         """!@brief Is called after user chooses dataset and clicks the load button.
         @details This method will proceed only if some path to the dataset has
@@ -1590,8 +1596,9 @@ class Ui_MainWindow(QtCore.QObject):
         the loaded neural network. Preprocessing runs in its own thread and 
         provides callback to the GUI.
         """
-        if(self.line_edit_dataset_path.text()):
+        if(self.line_edit_dataset_path.text() and self.model_loaded):
             try:
+                self.btn_preprocess.setEnabled(False)
                 path = self.line_edit_dataset_path.text()
                 files = os.scandir(path)
                 categories = []
@@ -1706,8 +1713,9 @@ class Ui_MainWindow(QtCore.QObject):
         @param[in] frame Picture to be classified. The format is OpenCV image.
         """
         #Tensorflow index is 3, if the gui changes, this may need to chage as well
-        if(self.tabs.currentIndex()==3):
-            if(not self.prediction_flag.is_set()):
+        if(self.tabs.currentIndex() == 3 and 
+           self.tensorflow_tabs.currentIndex() == 0):
+            if(not self.prediction_flag.is_set() and self.model_loaded == True):
                 self.prediction_flag.set()
                 
                 self.prediction_thread = threading.Thread(

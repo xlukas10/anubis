@@ -73,7 +73,7 @@ class Prediction_graph(FigureCanvasQTAgg):
                 top_5.append(top)
                 top_indices.append(top_index)
         
-        self.probability = top_5#test with multiple output classes
+        self.probability = top_5
         self.figure.canvas.axes.clear()
         
         self.axes.bar(operator.itemgetter(*top_indices)(self.categories),top_5,self.w)

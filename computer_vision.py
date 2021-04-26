@@ -42,7 +42,7 @@ class Computer_vision():
         """
         if(self.model):
             keras.backend.clear_session()
-            self.model = None
+            self.__init__(self.plot)
         
         
         try:
