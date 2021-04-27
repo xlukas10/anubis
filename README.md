@@ -1,7 +1,7 @@
 ## What is Anubis?
 Anubis is an application created as a part of a bachelor thesis. The application allows user to connect GenICam compliant devices from various vendors without need to use multiple applications. The cameras can be used to acquire images and save them to the hard drive. Cameras can also be configured using GenICam nodes. The application also implements a Tensorflow library which allows user to load up their ANN models and use them for training as well as for classification.
 
-![alt text][/Help/whole_app.png]
+![alt text][./Help/whole_app.png]
 
 ## Building the app
 The application is diustributed in a form of source files and can be run from any IDE or via console by running the anubis.py file. In case you want to create executable that is not dependent on any external libraries, you can follow this short tutorial. Please note that the application was tested mainly by running it inside of a python environment and the executable can contain some unforeseen bugs.
