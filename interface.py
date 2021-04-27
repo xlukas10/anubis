@@ -25,6 +25,7 @@ import time
 import win32api
 import os
 from queue import Queue
+import webbrowser
 
 import cv2
 
@@ -33,7 +34,6 @@ from global_camera import cam
 from global_queue import active_frame_queue
 from computer_vision import Computer_vision
 from config_level import Config_level
-import webbrowser
 
 class Ui_MainWindow(QtCore.QObject):
     def __init__(self):
