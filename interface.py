@@ -1012,7 +1012,14 @@ class Ui_MainWindow(QtCore.QObject):
         self.set_status_msg("Configuration saved")
         
     def about(self):
-        pass
+        """!@brief Shows simple about dialog
+        @details About dialog contains informations about version, author etc.
+        """
+        QtWidgets.QMessageBox.about(self.centralwidget, "About", 
+                                    "<p>Author: Jakub Lukaszczyk</p>" +
+                                    "<p>Version: 1.0</p>" + 
+                                    "<p>Original release: 2021</p>" +
+                                    "<p>Gui created using Qt</p>")
     
 #-------------Connect camera tab--------------------
     def add_cti(self):
