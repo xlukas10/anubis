@@ -5,10 +5,11 @@ Created on Wed Dec  9 21:17:17 2020
 @author: Jakub Lukaszczyk
 """
 
-#will be neccessary?
+"""
+Global camera object
+"""
+
 from camera import Camera
 
-
-#Change location to be read from settings file!!!
+##Global camera object
 cam = Camera()
-#'C:/Programy/Allied Vision/Vimba_4.0/VimbaGigETL/Bin/Win64/VimbaGigETL.cti'

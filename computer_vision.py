@@ -288,7 +288,6 @@ class Gui_callback(keras.callbacks.Callback):
     def on_predict_end(self, logs=None):
         self._update_progbar(logs=logs)
 
-#CHNG
     def _reset_progbar(self):
         self.train_vals['progress'] = 0
         self.progress_flag.set()

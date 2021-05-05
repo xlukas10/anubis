@@ -25,7 +25,12 @@ from config_level import Config_level
 from vendors import Vendors
 
 class Camera:
+    """!@brief This class implements backend for the communication with cameras using
+    Harvester and any other implemented API. Currently the app contains Harvester
+    and API Vimba.
+    """
     def __init__(self, producer_paths = None):
+        """!@brief Initialize Camera object"""
         ##Harvester object used to communicate with Harvester module
         self.h = Harvester()
         ##paths to GenTL producers

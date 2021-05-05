@@ -5,6 +5,8 @@ Created on Mon Oct 19 09:08:58 2020
 @author: Jakub Lukaszczyk
 """
 
+"""!@brief Main application file used to start and properly close the application
+"""
 
 from PyQt5 import QtWidgets
 from interface import Ui_MainWindow

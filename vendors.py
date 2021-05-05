@@ -5,9 +5,8 @@ Created on Wed Mar 24 19:53:55 2021
 @author: Jakub Lukaszczyk
 """
 
-"""
-In this file there are defined all implemented vendors or more precisely their
-enum names
+"""!@brief In this file there are defined all implemented vendors or more precisely their
+enum names.
 """
 import enum
 
