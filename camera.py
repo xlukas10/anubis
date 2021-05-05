@@ -11,12 +11,7 @@ import queue
 import copy
 import cv2
 import os #for working with save path
-from PyQt5 import QtGui
 from datetime import datetime
-import enum
-import time#tmp for testing purposes
-from queue import Queue
-import genicam
 
 from global_queue import frame_queue
 from global_queue import active_frame_queue
@@ -123,7 +118,7 @@ class Camera:
                     if camera.get_id() == selected_device:
                         return index#Test this if it works right probably different name for id than id_
         else:
-            for index, camera in enumerate(h.device_info_list):
+            for index, camera in enumerate(self.h.device_info_list):
                 if camera.id_ == selected_device:
                     return index
     
