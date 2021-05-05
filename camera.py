@@ -31,7 +31,8 @@ class Camera:
         ##paths to GenTL producers
         self.paths = []
         if(producer_paths):
-            self.add_gentl_producer(producer_paths)
+            for path in producer_paths:
+                self.add_gentl_producer(path)
             
         ##Camera vendor used to select the correct API
         self.vendor = Vendors.Other
@@ -54,7 +55,10 @@ class Camera:
         #if there is selected camera which uses different API, temporarily start 
         #Harvester to reload the camera list
         if not self.vendor == Vendors.Other:
-            self.add_gentl_producer(self.paths)
+            tmp_paths = self.paths.copy()
+            self.paths = []
+            for path in tmp_paths:
+                self.add_gentl_producer(path)
         self.h.update()
         self.devices_info = []
         for device in self.h.device_info_list:
@@ -73,7 +77,10 @@ class Camera:
         """
         
         if not self.vendor == Vendors.Other:
-            self.add_gentl_producer(self.paths)
+            tmp_paths = self.paths.copy()
+            self.paths = []
+            for path in tmp_paths:
+                self.add_gentl_producer(path)
             self.h.update()
         #translate selected device to index in harvester's device info list
         for index, camera in enumerate(self.devices_info):
@@ -433,12 +440,17 @@ class Camera:
         @return Unmodified frame from camera
         """
         if(self.vendor == Vendors.Allied_Vision_Technologies):
-            with Vimba.get_instance() as vimba:
-                cams = vimba.get_all_cameras()
-                with cams [self.active_camera] as cam:
-                    frame = cam.get_frame()
-                    pixel_format = str(frame.get_pixel_format())
-                    return [frame.as_opencv_image(), pixel_format]
+            while(True):
+                try:
+                    with Vimba.get_instance() as vimba:
+                        cams = vimba.get_all_cameras()
+                        with cams [self.active_camera] as cam:
+                            frame = cam.get_frame()
+                            pixel_format = str(frame.get_pixel_format())
+                            return [frame.as_opencv_image(), pixel_format]
+                except:
+                    pass
+                
         else:
             self.ia.start_acquisition()
                 
@@ -614,14 +626,21 @@ class Camera:
         """
         
         if self.vendor == Vendors.Allied_Vision_Technologies:
-            with Vimba.get_instance() as vimba:
-                cams = vimba.get_all_cameras()
-                with cams[self.active_camera] as c:
-                    try:
-                        c.start_streaming(handler=self._frame_handler_vimba)
-                        self._stream_stop_switch.wait()
-                    finally:
-                        c.stop_streaming()
+            while(True):
+                #if an error occurs, the program will try again until the 
+                #stream is established
+                try:
+                    with Vimba.get_instance() as vimba:
+                        cams = vimba.get_all_cameras()
+                        with cams[self.active_camera] as c:
+                            try:
+                                c.start_streaming(handler=self._frame_handler_vimba)
+                                self._stream_stop_switch.wait()
+                            finally:
+                                c.stop_streaming()
+                                return
+                except:
+                    pass
         else:
             self.ia.start_acquisition()
             

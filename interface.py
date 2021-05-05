@@ -41,7 +41,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         ##Automatic feature refresh timer
         self.feat_refresh_timer  = QtCore.QTimer(self)
-        self.feat_refresh_timer.setInterval(400000)
+        self.feat_refresh_timer.setInterval(4000)
         self.feat_refresh_timer.timeout.connect(self.update_parameters)
         self.feat_refresh_timer.timeout.connect(self.start_refresh_parameters)
         self.feat_refresh_timer.start()
@@ -1142,12 +1142,14 @@ class Ui_MainWindow(QtCore.QObject):
                 self.camera_icon.setPixmap(self.icon_busy)
                 self.set_status_msg("Starting recording")
                 
+                
+                self.recording = True
+                
                 #Start new recording with defined name and save path
                 cam.start_recording(self.line_edit_save_location.text(),
                                     self.line_edit_sequence_name.text(),
                                     'nothing')
                 
-                self.recording = True
                 
                 #If automatic sequence duration is set, create thread that will
                 #automatically terminate the recording
@@ -1205,10 +1207,12 @@ class Ui_MainWindow(QtCore.QObject):
                 self.camera_icon.setPixmap(self.icon_busy)
                 self.set_status_msg("Starting preview",1500)
                 
+                
+                self.preview_live = True
+                
                 #Start camera frame acquisition (not recording)
                 cam.start_acquisition()
                 
-                self.preview_live = True
                 
                 #Create and run thread to draw frames to gui
                 self.show_preview_thread = threading.Thread(target=self.show_preview)
@@ -1254,7 +1258,7 @@ class Ui_MainWindow(QtCore.QObject):
         difference.
         """
         #Method runs only if camera is connected
-        if self.connected:
+        if self.connected and not(self.preview_live or self.recording):
             #Set status icon and message
             self.set_status_msg("Receiving single frame",1500)
             self.camera_icon.setPixmap(self.icon_busy)
@@ -1273,7 +1277,7 @@ class Ui_MainWindow(QtCore.QObject):
             h, w, ch = image.shape
             bytes_per_line = ch * w
             image = QtGui.QImage(image.data, w, h, bytes_per_line, self._get_QImage_format(pixel_format))
-#TODO Get color format dynamically
+
             
             #get size of preview window
             w_preview = self.preview_area.size().width()
@@ -1886,8 +1890,9 @@ class Ui_MainWindow(QtCore.QObject):
         @details used to start a thread to refresh parameters values. Not
         called by user but automatically.
         """
-        #called every 3 seconds or so
-        if (self.feat_widgets and self.connected and
+        #called every 4 seconds
+        if (self.feat_widgets and self.connected and self.tabs.currentIndex() == 1 and
+            not(self.preview_live or self.recording) and 
             not self.param_flag.is_set() and self.update_completed_flag.is_set()):
             
             self.update_completed_flag.clear()
@@ -1904,7 +1909,11 @@ class Ui_MainWindow(QtCore.QObject):
             return
         
         for parameter in self.feat_widgets:
-            self.parameter_values[parameter] = cam.read_param_value(parameter)
+            if(not(self.preview_live or self.recording) and 
+               self.tabs.currentIndex() == 1):
+                self.parameter_values[parameter] = cam.read_param_value(parameter)
+            else:
+                return
         self.update_flag.set()
     
     def update_parameters(self):
@@ -1914,7 +1923,9 @@ class Ui_MainWindow(QtCore.QObject):
         Like start_refresh_parameters, this method is bound to the timer.
         """
         
-        if self.connected and not self.param_flag.is_set() and self.update_flag.is_set():
+        if (self.connected and not self.param_flag.is_set() and 
+            self.tabs.currentIndex() == 1 and
+            self.update_flag.is_set() and not(self.preview_live or self.recording)):
             self.update_flag.clear()
             
             for parameter in self.feat_widgets:
