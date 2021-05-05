@@ -964,7 +964,6 @@ class Ui_MainWindow(QtCore.QObject):
                 elif(line.startswith("CTI_FILES_PATHS")):
                     cti_files = True
                 elif(cti_files == True):
-                    print(line)
                     loaded_cti = cam.add_gentl_producer(line)
                     
         #if no cti path is present in the config adding files will be skipped
@@ -1262,7 +1261,6 @@ class Ui_MainWindow(QtCore.QObject):
             
             #Get image
             image, pixel_format = cam.get_single_frame()
-            print(pixel_format)
             
             #Try to run prediction
             self.predict(image)
@@ -1482,7 +1480,6 @@ class Ui_MainWindow(QtCore.QObject):
         elif(format_string == 'Format_BGR888' or format_string == 'BGR8'):
             image_format = QtGui.QImage.Format_BGR888
         else:
-            print('Invalid')
             image_format = QtGui.QImage.Format_Invalid
         
         return image_format
@@ -1579,7 +1576,6 @@ class Ui_MainWindow(QtCore.QObject):
                                                     )
         #Set label text to chosen folder path
         if(name[0]):
-            print("here")
             saved = self.vision.save_model(name[0])
             if(saved):
                 self.set_status_msg("Model saved")
@@ -1938,7 +1934,7 @@ class Ui_MainWindow(QtCore.QObject):
                     elif(type(widget) == QtWidgets.QCheckBox):
                         widget.setChecked(value)
                     else:
-                        print("Update not implemented")
+                        pass
                 except:
                     pass
             self.update_completed_flag.set()

@@ -88,8 +88,8 @@ class Camera:
                 cams = vimba.get_all_cameras()
                 with cams [self.active_camera] as cam:
                     try:
-                        #Makes sure that the camera won't send packets larger than destination pc
-                        #can raceive
+                        #Makes sure that the camera won't send packets larger 
+                        #than destination pc can raceive.
                         cam.GVSPAdjustPacketSize.run()
                         while not cam.GVSPAdjustPacketSize.is_done():
                             pass
@@ -116,7 +116,7 @@ class Camera:
                 cams = vimba.get_all_cameras()
                 for index, camera in enumerate(cams):
                     if camera.get_id() == selected_device:
-                        return index#Test this if it works right probably different name for id than id_
+                        return index
         else:
             for index, camera in enumerate(self.h.device_info_list):
                 if camera.id_ == selected_device:
@@ -232,16 +232,6 @@ class Camera:
                             
                             features_out['attr_tooltip'] = attr
                             
-                            
-                            '''
-                            try:
-                                attr = feature.get_unit()
-                                print(attr)
-                            except (AttributeError, VimbaFeatureError):
-                                attr = None
-                            
-                            features_out[name]['attr_unit'] = attr
-                            '''
                             feature_queue.put(features_out)
                     flag.set()
         else:
@@ -269,7 +259,6 @@ class Camera:
                     continue
 
                 feat_vis = feature_obj.visibility
-                print(feat_vis)
                 if( feat_vis < visibility ):
                     features_out = {}
                     features_out['name'] = feature_obj.name
@@ -284,7 +273,6 @@ class Camera:
                             attr = False
                         else:
                             attr = True
-                        print("sss")
                     except:
                         attr = None
                     
@@ -318,36 +306,15 @@ class Camera:
                             attr = "StringFeature"
                         elif(attr == 9):
                             attr = "EnumFeature"
-                            print("found enum")
                         else:
                             attr = None
-                        print(feature_obj.name)
-#todo category feature
+
                     except:
                         attr = None
                     
                     features_out['attr_type'] = attr
-                    
-                    #Get availible enums for enum feature type
-                    if(features_out['attr_type'] == "EnumFeature"):
-                        pass#Not yet implemetnted
-                        #print(dir(feature_obj))
-                        #print("here")
-                        #attr = feature_obj.selected_features
-                        #print(attr)
-                    
-                        attr = None
-                    
-                        features_out['attr_enums'] = attr
-                    
-                    #Get category for the feature
-                    try:
-                        attr = "category"#feature.category
-#not yet implemented
-                    except:
-                        attr = None
-                
-                    features_out['attr_cat'] = attr
+                    features_out['attr_enums'] = None
+                    features_out['attr_cat'] = None
                         
                     #Get feature's value if it exists
                     try:
@@ -388,16 +355,7 @@ class Camera:
                     
                     features_out['attr_tooltip'] = attr
                     
-                    
-                    '''
-                    try:
-                        attr = feature.get_unit()
-                        print(attr)
-                    except (AttributeError, VimbaFeatureError):
-                        attr = None
-                    
-                    features_out[name]['attr_unit'] = attr
-                    '''
+                  
                 
                     feature_queue.put(features_out)
             flag.set()
@@ -431,8 +389,6 @@ class Camera:
         @param[in] new_value Variable compatible with value key in parameter
         @return True if success else returns False
         """
-        print(parameter_name)
-        print(new_value)
         if(self.vendor == Vendors.Allied_Vision_Technologies):
 #EDIT to work well with new parameter dictionary (name, value, maximum etc.)
             with Vimba.get_instance() as vimba:
@@ -441,7 +397,6 @@ class Camera:
                     try:
                         getattr(cam, parameter_name).set(new_value)
                     except (AttributeError, VimbaFeatureError):
-                        print("ne")
                         return False
         else:
             try:
@@ -699,7 +654,6 @@ class Camera:
             
         num = 0
         extension = '.png'
-        print("consuming")
         while self.acquisition_running:
             if not frame_queue.empty(): 
                 frame = frame_queue.get_nowait()[0]
@@ -727,7 +681,7 @@ class Camera:
                 active_frame_queue.put_nowait([frame_copy.as_opencv_image(),
                                                str(frame_copy.get_pixel_format())])
             else:
-                print("queue full")
+                pass
             cam.queue_frame(frame)
         except:
             pass
