@@ -103,7 +103,7 @@ class Computer_vision():
             only uses it to make prediction about what is in the picture. The
             result is shown in the plot passed by reference in the __init__ method.
         @param[in] frame OpenCV image that the prediction will be done for.
-        @param[in] predition_flag Announces that the prediction was completed
+        @param[in] prediction_flag Announces that the prediction was completed
         """
         
         #get current frame
