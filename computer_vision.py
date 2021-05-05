@@ -11,8 +11,6 @@ import numpy as np
 import cv2
 import os
 import random
-import threading
-import time
 
 class Computer_vision():
     def __init__(self,plot):

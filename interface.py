@@ -26,8 +26,6 @@ import os
 from queue import Queue
 import webbrowser
 
-import cv2
-
 from prediction_graph import Prediction_graph
 from global_camera import cam
 from global_queue import active_frame_queue

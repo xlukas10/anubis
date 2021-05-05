@@ -6,8 +6,6 @@ Created on Sat Feb 27 08:38:16 2021
 """
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
-import numpy as np
 import operator
 
 class Prediction_graph(FigureCanvasQTAgg):
