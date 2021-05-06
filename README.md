@@ -4,7 +4,9 @@ Anubis is an application created as a part of a bachelor thesis. The application
 ![alt text](./Help/whole_app.png "Application preview")
 
 ## How to run
-To run this application you need to install all the dependencies specified in the requirements.txt file. To ease things up you can use the conda_environment.yml file which will import the environment automatically. For this to work you should use Anaconda navigator application. Bear in mind that you might still need to insatll Vimba manually.
+To run this application you need to install all the dependencies specified in the requirements.txt file. After you install the dependencies, you will need to install Vimba SDK and Vimba python. Download Vimba from [here](https://www.alliedvision.com/en/products/software.html). When the installation completes, leave the Install Vimba Drivers checked and exit the installer. After all remaining drivers finish intalling restar your computer.
+
+Now you can navigate to your Vimba installation folder and in the directory Vimba_4.2/VimbaPython/Source run command 'pip install .' in case of problems refer to readme file in that folder. The application should now be set up and able to run.
 
 When you have everything prepared you can run the anubis.py script or you can proceed to building the app for it to be executable without a need for a Python environment on the host computer.
 
