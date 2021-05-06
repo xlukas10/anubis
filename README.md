@@ -19,4 +19,4 @@ NAVOD
 The application will most likely not be further developed, however if it is used in some classes, the bugs that will arise will be fixed. Whole application is written to be modular and as such anyone can develop it further and create forks of this project.
 
 ## Documentation
-Documentation is written using Doxygen and can be generated using doxygen command inside root directory. The html version of the documentation can be found here. More information about the project, used tools etc. Can be found in the bachelor thesis itself which is accessible in the czech language on this [link](https://www.vutbr.cz).
+Documentation is written using Doxygen and can be generated using doxygen command inside the root directory. Doxygen will generate a html and a Latex versions of the documentation, use of the html version is strongly recommended. More information about the project, used tools etc. can be found in the bachelor thesis itself which is accessible in the czech language on this [link](https://www.vutbr.cz).
