@@ -1,0 +1,6 @@
+Both models consist of 3 64x64 convolution layers and one dense output layer.
+Models have one output category which, when trained correctly, should output 0 for a dog image and 1 for a cat image.
+Inputs should be resized to 50x50 greyscale format (handled by the application automatically).
+
+The trained model was trained using the Kaggle Cats and Dogs Dataset ( https://www.microsoft.com/en-us/download/details.aspx?id=54765 ).
+The untrained model is exactly the same, but it wasn't trained yet. It can be used to train recognition of a similar two category dataset.
