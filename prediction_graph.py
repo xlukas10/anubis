@@ -26,9 +26,10 @@ class Prediction_graph(FigureCanvasQTAgg):
         self.categories = ["ctg1", "ctg2", "ctg3", "ctg4", "ctg5"]
         self.probability = [0, 0, 0, 0, 0]
         self.w = 1
-        self.axes.set_ylim(-1,1)
-        
+   
         self.axes.bar(self.categories,self.probability,self.w)
+        self.axes.set_ylim(-1,1)
+        self.axes.autoscale(False)
         super(Prediction_graph,self).__init__(self.figure)
     
     def add_categories(self, categories = []):
@@ -73,6 +74,8 @@ class Prediction_graph(FigureCanvasQTAgg):
         
         self.probability = top_5
         self.figure.canvas.axes.clear()
+        
+        self.axes.set_ylim(-1.1 ,1.1)
         
         self.axes.bar(operator.itemgetter(*top_indices)(self.categories),top_5,self.w)
         self.figure.canvas.draw()
