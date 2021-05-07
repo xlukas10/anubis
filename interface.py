@@ -1118,6 +1118,8 @@ class Ui_MainWindow(QtCore.QObject):
             self.fps_status.setText("FPS: " + str(self.fps))
             self.set_status_msg("Disconnecting camera")
             
+            self.preview_live = False
+            self.recording = False
             #Disconnect camera
             cam.disconnect_camera()
             
@@ -1173,6 +1175,7 @@ class Ui_MainWindow(QtCore.QObject):
                 #End recording
                 cam.stop_recording()
                 self.recording = False
+                self.preview_live = False
                 self.set_status_msg("Recording stopped", 3500)
     
     def seq_duration_wait(self):
@@ -1862,7 +1865,7 @@ class Ui_MainWindow(QtCore.QObject):
                     #the text error
                     self.feat_widgets[param["name"]] = QtWidgets.QPushButton(self.tab_config)
                     self.feat_widgets[param["name"]].setText("Execute command")
-                    self.feat_widgets[param["name"]].clicked.connect(lambda param=param: cam.execute_command(param))
+                    self.feat_widgets[param["name"]].clicked.connect(lambda val,param=param: cam.execute_command(param["name"]))
                 else:
                     #If the feature type is not recognized, create a label with 
                     #the text error
@@ -1906,13 +1909,31 @@ class Ui_MainWindow(QtCore.QObject):
         calls for the most recent value of each parameter.
         """
         if(not self.feat_widgets):
+            self.update_completed_flag.set()
             return
         
-        for parameter in self.feat_widgets:
+        params = Queue()
+        tries = 0
+        while(tries <= 10):
+            if(cam.get_parameters(params, 
+                    threading.Event(), 
+                    self.combo_config_level.currentIndex()+1)):
+                break
+            else:
+                tries += 1
+                
+        if(tries >= 10):
+            self.update_completed_flag.set()
+            return
+        
+        while(not params.empty()):
+            parameter = params.get()
+            print(parameter)
             if(not(self.preview_live or self.recording) and 
                self.tabs.currentIndex() == 1):
-                self.parameter_values[parameter] = cam.read_param_value(parameter)
+                self.parameter_values[parameter["name"]] = parameter["attr_value"]
             else:
+                self.update_completed_flag.set()
                 return
         self.update_flag.set()
     
@@ -1922,19 +1943,20 @@ class Ui_MainWindow(QtCore.QObject):
         and this method can transfer the new values of the parameters to the GUI. 
         Like start_refresh_parameters, this method is bound to the timer.
         """
-        
         if (self.connected and not self.param_flag.is_set() and 
             self.tabs.currentIndex() == 1 and
             self.update_flag.is_set() and not(self.preview_live or self.recording)):
+            
             self.update_flag.clear()
             
             for parameter in self.feat_widgets:
-                value = self.parameter_values[parameter]
-                widget = self.feat_widgets[parameter]
-                if(value == None):
-                    continue
-                
                 try:
+                    value = self.parameter_values[parameter]
+                    widget = self.feat_widgets[parameter]
+                    if(value == None):
+                        continue
+                    print("ddd")
+                    
                     if(type(widget) == QtWidgets.QLineEdit):
                         widget.setText(str(value))
                     elif(type(widget) == QtWidgets.QComboBox):
@@ -1942,10 +1964,11 @@ class Ui_MainWindow(QtCore.QObject):
                         #Set found index to be the active one
                         if index >= 0:
                             widget.setCurrentIndex(index)
+                    elif(type(widget) == QtWidgets.QDoubleSpinBox or
+                         type(widget) == QtWidgets.QSpinBox):
+                        widget.setValue(value)
                     elif(type(widget) == QtWidgets.QCheckBox):
                         widget.setChecked(value)
-                    else:
-                        pass
                 except:
                     pass
             self.update_completed_flag.set()
@@ -1999,15 +2022,24 @@ class Ui_MainWindow(QtCore.QObject):
         a status message
         """
         if self.connected:
-            name = QtWidgets.QFileDialog.getOpenFileName(self.centralwidget,
-                                                         "Load Configuration",
-                                                         filter="XML files (*.xml)")
-           
-            #Set label text to chosen folder path
-            cam.load_config(name[0])
-            
-            self.set_status_msg("Configuration loaded")
-    
+            if(not self.recording and not self.preview_live):
+                name = QtWidgets.QFileDialog.getOpenFileName(self.centralwidget,
+                                                             "Load Configuration",
+                                                             filter="XML files (*.xml)")
+               
+                #Set label text to chosen folder path
+                if(name[0]):
+                    tries = 0
+                    while(tries <= 10):
+                        if(cam.load_config(name[0])):
+                            self.set_status_msg("Configuration loaded")
+                            return
+                        else:
+                            tries += 1
+                    self.set_status_msg("Loading failed", 2500)
+            else:
+                self.set_status_msg("Stop recording and preview before loading config")
+        
     def callback_parameters(self):
         """!@brief Auxiliary method used to transfer thread state change into
         the main thread.

@@ -138,109 +138,111 @@ class Camera:
         @param[in] flag used to signal that the method finished (threading object)
         @param[in] visibility Defines level of parameters that should be put in
             the queue
-        @return A dictionary with parameter names as keys. Each key points to 
-            dictionary containing given parameter information: name, 
-            value, type, range, increment and max_length 
-            if given information exist for the parameter
+        @return True if success else False
         """
         #categories are defined by GenICam SFNC
         if(self.vendor == Vendors.Allied_Vision_Technologies):
             #Establishing communication
-            with Vimba.get_instance() as vimba:
-                cams = vimba.get_all_cameras ()
-                with cams[self.active_camera] as cam:
-                    features = cam.get_all_features()
-                    for feature in features:
-                        feat_vis = int(feature.get_visibility())
-                        if(feat_vis > 0 and feat_vis <= visibility ):
-                            name = feature.get_name()
-                            
-                            features_out = {}
-                            features_out['name'] = name
-                            
-                            disp_name = feature.get_display_name()
-                            features_out['attr_name'] = disp_name
-                            
-                            #if feature does not have read permission, go to next iteration
-                            if(not feature.get_access_mode()[0]):
-                                continue
-                            
-                            #Get feature's write mode
-                            try:
-                                attr = feature.get_access_mode()[1]
-                            except (AttributeError, VimbaFeatureError):
-                                attr = None
-                            
-                            features_out['attr_enabled'] = attr
-                            
-                            #Get feature's type if it exists
-                            try:
-                                attr = str(feature.get_type())
-                                attr = attr.replace("<class 'vimba.feature.", '')
-                                attr = attr.replace("'>","")
-                            except (AttributeError, VimbaFeatureError):
-                                attr = None
-                            
-                            features_out['attr_type'] = attr
-                            
-                            #Get availible enums for enum feature type
-                            if(features_out['attr_type'] == "EnumFeature"):
+            try:
+                with Vimba.get_instance() as vimba:
+                    cams = vimba.get_all_cameras ()
+                    with cams[self.active_camera] as cam:
+                        features = cam.get_all_features()
+                        for feature in features:
+                            feat_vis = int(feature.get_visibility())
+                            if(feat_vis > 0 and feat_vis <= visibility ):
+                                name = feature.get_name()
+                                
+                                features_out = {}
+                                features_out['name'] = name
+                                
+                                disp_name = feature.get_display_name()
+                                features_out['attr_name'] = disp_name
+                                
+                                #if feature does not have read permission,
+                                #go to next iteration
+                                if(not feature.get_access_mode()[0]):
+                                    continue
+                                
+                                #Get feature's write mode
                                 try:
-                                    attr = feature.get_available_entries()
+                                    attr = feature.get_access_mode()[1]
+                                except (AttributeError, VimbaFeatureError):
+                                    attr = None
+                                
+                                features_out['attr_enabled'] = attr
+                                
+                                #Get feature's type if it exists
+                                try:
+                                    attr = str(feature.get_type())
+                                    attr = attr.replace("<class 'vimba.feature.", '')
+                                    attr = attr.replace("'>","")
+                                except (AttributeError, VimbaFeatureError):
+                                    attr = None
+                                
+                                features_out['attr_type'] = attr
+                                
+                                #Get availible enums for enum feature type
+                                if(features_out['attr_type'] == "EnumFeature"):
+                                    try:
+                                        attr = feature.get_available_entries()
+                                    except (AttributeError, VimbaFeatureError):
+                                        attr = None
+                                
+                                    features_out['attr_enums'] = attr
+                                
+                                #Get category for the feature
+                                try:
+                                    attr = feature.get_category()
                                 except (AttributeError, VimbaFeatureError):
                                     attr = None
                             
-                                features_out['attr_enums'] = attr
-                            
-                            #Get category for the feature
-                            try:
-                                attr = feature.get_category()
-                            except (AttributeError, VimbaFeatureError):
-                                attr = None
-                        
-                            features_out['attr_cat'] = attr
+                                features_out['attr_cat'] = attr
+                                    
+                                #Get feature's value if it exists
+                                try:
+                                    attr = feature.get()
+                                except (AttributeError, VimbaFeatureError):
+                                    attr = None
                                 
-                            #Get feature's value if it exists
-                            try:
-                                attr = feature.get()
-                            except (AttributeError, VimbaFeatureError):
-                                attr = None
-                            
-                            features_out['attr_value'] = attr
-                            
-                            #Get feature's range if it exists
-                            try:
-                                attr = feature.get_range()
-                            except (AttributeError, VimbaFeatureError):
-                                attr = None
-                            
-                            features_out['attr_range'] = attr
-                            
-                            #Get feature's increment if it exists
-                            try:
-                                attr = feature.get_increment()
-                            except (AttributeError, VimbaFeatureError):
-                                attr = None
-                            
-                            features_out['attr_increment'] = attr
-                            
-                            #Get feature's max length if it exists
-                            try:
-                                attr = feature.get_max_length()
-                            except (AttributeError, VimbaFeatureError):
-                                attr = None
-                            
-                            features_out['attr_max_length'] = attr
-                            
-                            try:
-                                attr = feature.get_tooltip()
-                            except (AttributeError, VimbaFeatureError):
-                                attr = None
-                            
-                            features_out['attr_tooltip'] = attr
-                            
-                            feature_queue.put(features_out)
-                    flag.set()
+                                features_out['attr_value'] = attr
+                                
+                                #Get feature's range if it exists
+                                try:
+                                    attr = feature.get_range()
+                                except (AttributeError, VimbaFeatureError):
+                                    attr = None
+                                
+                                features_out['attr_range'] = attr
+                                
+                                #Get feature's increment if it exists
+                                try:
+                                    attr = feature.get_increment()
+                                except (AttributeError, VimbaFeatureError):
+                                    attr = None
+                                
+                                features_out['attr_increment'] = attr
+                                
+                                #Get feature's max length if it exists
+                                try:
+                                    attr = feature.get_max_length()
+                                except (AttributeError, VimbaFeatureError):
+                                    attr = None
+                                
+                                features_out['attr_max_length'] = attr
+                                
+                                try:
+                                    attr = feature.get_tooltip()
+                                except (AttributeError, VimbaFeatureError):
+                                    attr = None
+                                
+                                features_out['attr_tooltip'] = attr
+                                
+                                feature_queue.put(features_out)
+                        flag.set()
+                return True
+            except:
+                return False
         else:
             features = dir(self.ia.remote_device.node_map)
             
@@ -415,21 +417,22 @@ class Camera:
     
     def execute_command(self, command_feature):
         """@brief Execute command feature type
-        @param[in] command_feature Dictionary containing at least 'name' of 
-            the selected feature
+        @param[in] command_feature Name of the selected command feature
         """
-        #not tested
+        print(command_feature)
         if(self.vendor == Vendors.Allied_Vision_Technologies):
             with Vimba.get_instance() as vimba:
                 cams = vimba.get_all_cameras ()
                 with cams[self.active_camera] as cam:
                     try:
-                        getattr(cam, command_feature['name']).run()
+                        getattr(cam, command_feature).run()
+                        print("done")
                     except:
+                        print("oops")
                         pass
         else:
             try:
-                getattr(self.ia.remote_device.node_map, command_feature['name']).execute()
+                getattr(self.ia.remote_device.node_map, command_feature).execute()
             except:
                 pass
     
@@ -506,18 +509,23 @@ class Camera:
         """!@brief Load existing camera configuration
         @param[in] path Defines a path and a name of the file containing the
             configuration of the camera
+        @return True if success else False
         """
         if self.vendor == Vendors.Allied_Vision_Technologies:
-            with Vimba.get_instance() as vimba:
-                cams = vimba.get_all_cameras ()
-                with cams[self.active_camera] as cam:
-                    cam.load_settings(path, PersistType.NoLUT)
+                try:
+                    with Vimba.get_instance() as vimba:
+                        cams = vimba.get_all_cameras()
+                        with cams[self.active_camera] as cam:
+                            cam.load_settings(path, PersistType.NoLUT)
+                            return True
+                except:
+                    return False
         else:
             param = {}
             val = None
             attr_type = None
             with open(path, 'r') as config:
-                config_dense = (line for line in config if line) #removes blank lines
+                config_dense = (line for line in config if line)
                 for line in config_dense:
                     line = line.rstrip('\n')
                     if line.startswith('attr_value') and param:
@@ -546,6 +554,8 @@ class Camera:
                     elif line.startswith('name'):
                         param['name'] = line.split('=')[1]
                         val = None
+                        
+                return True
     
     def save_config(self,path):
         """!@brief Saves configuration of a camera to .xml file
