@@ -11,7 +11,7 @@ Now you can navigate to your Vimba installation folder and in the directory Vimb
 When you have everything prepared you can run the anubis.py script or you can proceed to building the app for it to be executable without a need for a Python environment on the host computer.
 
 ## Building the app
-The application is diustributed in a form of source files and can be run from any IDE or via console by running the anubis.py file. In case you want to create executable that is not dependent on any external libraries, you can follow this short tutorial. Please note that the application was tested mainly by running it inside of a python environment and the executable can contain some unforeseen bugs.
+The application is distributed in a form of source files and can be run from any IDE or via console by running the anubis.py file. In case you want to create executable that is not dependent on any external libraries, you can follow this short tutorial. Please note that the application was tested mainly by running it inside of a python environment and the executable can contain some unforeseen bugs.
 
 1. you will need to do these steps to make sure that the Tensorflow will be included correctly in the output file. 
 	* Locate your environment folder and copy Lib/site-packages/tesnsorflow folder into the root directory of the application. If you cannot locate it, it may be named tensorflow_core. You can copy this one and rename it to tensorflow.
