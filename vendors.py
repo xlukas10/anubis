@@ -14,11 +14,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""!@brief In this file there are defined all implemented vendors or more precisely their
-enum names.
-"""
+
 import enum
 
 class Vendors(enum.IntEnum):
+    """!@brief In this class there are defined all implemented vendors or more precisely their
+    enum names.
+    """
     Other = 0
     Allied_Vision_Technologies = 1

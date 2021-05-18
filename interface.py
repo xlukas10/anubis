@@ -14,17 +14,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""
-This file implements Ui_MainWindow class which defines the application's 
-graphical user interface. Methods setupUi and retranslateUi are generated from
-QtDesigner using pyuic5 tool. When modifiying the GUI these methods should be 
-carefully edited with regards to calls at their ends which are used to bind 
-methods to the widgets and initialize other variables.
 
-Methods in the class are mainly used to check some conditions and run methods 
-of other connected classes like Camera and Computer_vision.
-
-"""
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import threading
@@ -40,7 +30,17 @@ from global_queue import active_frame_queue
 from computer_vision import Computer_vision
 from config_level import Config_level
 
+
 class Ui_MainWindow(QtCore.QObject):
+    """!@brief Main class for user interface
+    @details This file implements Ui_MainWindow class which defines the application's
+    graphical user interface. Methods setupUi and retranslateUi are generated from
+    QtDesigner using pyuic5 tool. When modifying the GUI these methods should be
+    carefully edited with regards to calls at their ends which are used to bind
+    methods to the widgets and initialize other variables.
+    Methods in the class are mainly used to check some conditions and run methods
+    of other connected classes like Camera and Computer_vision.
+    """
     def __init__(self):
         """!@brief Initialize the class and all its variables
         """
@@ -1936,7 +1936,6 @@ class Ui_MainWindow(QtCore.QObject):
         
         while(not params.empty()):
             parameter = params.get()
-            print(parameter)
             if(not(self.preview_live or self.recording) and 
                self.tabs.currentIndex() == 1):
                 self.parameter_values[parameter["name"]] = parameter["attr_value"]
@@ -1963,7 +1962,6 @@ class Ui_MainWindow(QtCore.QObject):
                     widget = self.feat_widgets[parameter]
                     if(value == None):
                         continue
-                    print("ddd")
                     
                     if(type(widget) == QtWidgets.QLineEdit):
                         widget.setText(str(value))

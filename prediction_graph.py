@@ -19,7 +19,7 @@ from matplotlib.figure import Figure
 import operator
 
 class Prediction_graph(FigureCanvasQTAgg):
-    
+    """!@brief Prediction results plot"""
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         """!@brief Initializes prediction graph
         @details The graph is created as a bar plot with 5 categories all

@@ -22,6 +22,7 @@ import os
 import random
 
 class Computer_vision():
+    """!brief Implements Tensorflow communication"""
     def __init__(self,plot):
         """!@brief Initialize object and its variables
         @param[in] plot The class needs to have a reference to the GUI object the
@@ -104,6 +105,10 @@ class Computer_vision():
                            validation_split=self.split,epochs=epochs,
                            callbacks=[callback])
             self.busy = False
+
+            self.train_vals['progress'] = 100
+            self.progress_flag.set()
+
             training_flag.clear()
              
     def classify(self,frame,prediction_flag):
@@ -234,6 +239,7 @@ class Computer_vision():
 
         
 class Gui_callback(keras.callbacks.Callback):
+    """!@brief callback for training progress to GUI"""
     def __init__(self, train_vals, progress_flag, count_mode='samples', stateful_metrics=None):
         super(Gui_callback, self).__init__()
         
@@ -269,10 +275,7 @@ class Gui_callback(keras.callbacks.Callback):
         # When this logger is called inside `fit`, validation is silent.
         self._called_in_fit = True
 
-
-
-
-#Pass in label for epochs
+    #Pass in label for epochs
     def on_epoch_begin(self, epoch, logs=None):
         self.active_epoch = epoch
 
@@ -311,7 +314,7 @@ class Gui_callback(keras.callbacks.Callback):
         
 
     def _update_progbar(self, batch=None, logs=None):
-        """Updates the progbar."""
+        """!@brief Updates the progress bar"""
         logs = logs or {}
         self._maybe_init_progbar()
         self.seen += 1
