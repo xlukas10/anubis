@@ -28,7 +28,6 @@ class Computer_vision():
         @param[in] plot The class needs to have a reference to the GUI object the
         classification results will be shown in.
         """
-        print("init")
         self.model = None
         self.width = 1
         self.height =  1
