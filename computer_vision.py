@@ -317,7 +317,8 @@ class Gui_callback(keras.callbacks.Callback):
         logs = logs or {}
         self._maybe_init_progbar()
         self.seen += 1
-        logs = tf_utils.to_numpy_or_python_type(logs)
+        #logs = tf_utils.to_numpy_or_python_type(logs)
+
         
         # Only block async when verbose = 1.
         if(self.target == None):
