@@ -17,6 +17,9 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from tab_connect import Tab_connect
+from tab_recording import Tab_recording
+from tab_tensorflow import Tab_tensorflow
 import threading
 import time
 import win32api
@@ -24,7 +27,7 @@ import os
 from queue import Queue
 import webbrowser
 
-from prediction_graph import Prediction_graph
+
 from global_camera import cam
 from global_queue import active_frame_queue
 from computer_vision import Computer_vision
@@ -68,9 +71,10 @@ class Ui_MainWindow(QtCore.QObject):
         self.move_x_prev = 0
         ##Last value of the dragging in the preview area - y axis
         self.move_y_prev = 0
+        '''
         ##Progress percentage of dataset loading/preprocessing
         self.process_perc = [0]
-        
+        '''
         ##Used to store values of parameters when automatically refreshing them
         self.parameter_values = {}
         
@@ -102,7 +106,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.detected = []
         ##Is camera connected
         self.connected = False
-        
+        '''
         ##Is true while the tensorflow training is running
         self.training_flag = threading.Event()
         ##Flag is not set while the application is getting parameters from the cam object
@@ -112,14 +116,14 @@ class Ui_MainWindow(QtCore.QObject):
         self.process_flag = threading.Event()
         ##Signal used to tell the main thread to update dataset progress
         self.process_prog_flag = threading.Event()
-        
-        ##Widget used to transfer GUI changes from thread into the main thread while training
+        '''
+        """##Widget used to transfer GUI changes from thread into the main thread while training
         self.callback_train_signal = QtWidgets.QLineEdit()
         self.callback_train_signal.textChanged.connect(self.update_training)
         
         ##Widget used to transfer GUI changes from thread into the main thread while processing dataset
         self.callback_process_signal = QtWidgets.QLineEdit()
-        self.callback_process_signal.textChanged.connect(self.update_processing)
+        self.callback_process_signal.textChanged.connect(self.update_processing)"""
         
         ##Widget used to transfer GUI changes from thread into the main thread while updating preview
         self.resize_signal = QtWidgets.QLineEdit()
@@ -128,7 +132,7 @@ class Ui_MainWindow(QtCore.QObject):
         ##Widget used to transfer GUI changes from thread into the main thread while showing parameters
         self.parameters_signal = QtWidgets.QLineEdit()
         self.parameters_signal.textChanged.connect(self.show_parameters)
-        
+        '''
         ##Signal used to tell the main thread to update training progress
         self.progress_flag = threading.Event()
         
@@ -143,7 +147,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         ##Signals that prediction was completed and a new one can be made
         self.prediction_flag = threading.Event()
-        
+        '''
         ##Signals that a recording was stopped, either by timer or manually
         self.interupt_flag = threading.Event()
         
@@ -262,55 +266,11 @@ class Ui_MainWindow(QtCore.QObject):
         self.tabs.setObjectName("tabs")
         
         #Tab - Connect camera
-        self.tab_connect = QtWidgets.QWidget()
-        self.tab_connect.setObjectName("tab_connect")
-        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.tab_connect)
-        self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.widget_4 = QtWidgets.QWidget(self.tab_connect)
-        self.widget_4.setObjectName("widget_4")
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.widget_4)
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.btn_connect_camera = QtWidgets.QPushButton(self.widget_4)
-        self.btn_connect_camera.setObjectName("btn_connect_camera")
-        self.horizontalLayout_3.addWidget(self.btn_connect_camera)
-        self.btn_refresh_cameras = QtWidgets.QPushButton(self.widget_4)
-        self.btn_refresh_cameras.setObjectName("btn_refresh_cameras")
-        self.horizontalLayout_3.addWidget(self.btn_refresh_cameras)
-        self.btn_disconnect_camera = QtWidgets.QPushButton(self.widget_4)
-        self.btn_disconnect_camera.setObjectName("btn_disconnect_camera")
-        self.horizontalLayout_3.addWidget(self.btn_disconnect_camera)
-        self.verticalLayout_4.addWidget(self.widget_4)
-        self.list_detected_cameras = QtWidgets.QListWidget(self.tab_connect)
-        self.list_detected_cameras.setObjectName("list_detected_cameras")
-        
-        
-        #Connect refresh camera to the UI
-        
-        self.verticalLayout_4.addWidget(self.list_detected_cameras)
-        
-        self.frame_cti = QtWidgets.QFrame(self.tab_connect)
-        self.frame_cti.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_cti.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_cti.setObjectName("frame_cti")
-        self.gridLayout_7 = QtWidgets.QGridLayout(self.frame_cti)
-        self.gridLayout_7.setObjectName("gridLayout_7")
-        self.btn_remove_cti = QtWidgets.QPushButton(self.frame_cti)
-        self.btn_remove_cti.setObjectName("btn_remove_cti")
-        self.gridLayout_7.addWidget(self.btn_remove_cti, 0, 3, 1, 1)
-        self.btn_add_cti = QtWidgets.QPushButton(self.frame_cti)
-        self.btn_add_cti.setObjectName("btn_add_cti")
-        self.gridLayout_7.addWidget(self.btn_add_cti, 0, 2, 1, 1)
-        self.tip_add_cti = QtWidgets.QLabel(self.frame_cti)
-        self.tip_add_cti.setWordWrap(True)
-        self.tip_add_cti.setObjectName("tip_add_cti")
-        self.gridLayout_7.addWidget(self.tip_add_cti, 0, 0, 2, 1)
-        self.combo_remove_cti = QtWidgets.QComboBox(self.frame_cti)
-        self.combo_remove_cti.setObjectName("combo_remove_cti")
-        self.gridLayout_7.addWidget(self.combo_remove_cti, 1, 2, 1, 2)
-        self.verticalLayout_4.addWidget(self.frame_cti)
 
+        self.tab_connect = Tab_connect()
         self.tabs.addTab(self.tab_connect, "")
-        
+
+
         #Tab - Configure camera
     #read present parameters on tab change and when read parameters button (To be added) is pressed
         
@@ -362,84 +322,12 @@ class Ui_MainWindow(QtCore.QObject):
         self.verticalLayout_3.addWidget(self.widget_3)
         self.tabs.addTab(self.tab_config, "")
         
-        #Tab - Configure recording
-        self.tab_recording_config = QtWidgets.QWidget()
-        self.tab_recording_config.setObjectName("tab_recording_config")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.tab_recording_config)
-        self.verticalLayout.setObjectName("verticalLayout")
         
-        self.widget_sequence_name = QtWidgets.QWidget(self.tab_recording_config)
-        self.widget_sequence_name.setObjectName("widget_sequence_name")
-        
-        self.formLayout_4 = QtWidgets.QFormLayout(self.widget_sequence_name)
-        self.formLayout_4.setObjectName("formLayout_4")
-        
-        self.label_file_name_recording = QtWidgets.QLabel(self.widget_sequence_name)
-        self.label_file_name_recording.setObjectName("label_file_name_recording")
-        self.formLayout_4.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_file_name_recording)
-        
-        self.line_edit_sequence_name = QtWidgets.QLineEdit(self.widget_sequence_name)
-        self.line_edit_sequence_name.setObjectName("line_edit_sequence_name")
-        self.formLayout_4.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.line_edit_sequence_name)
-        
-        self.verticalLayout.addWidget(self.widget_sequence_name)
-        
-        self.label_sequence_name = QtWidgets.QLabel(self.tab_recording_config)
-        self.label_sequence_name.setObjectName("label_sequence_name")
-        self.verticalLayout.addWidget(self.label_sequence_name)
-        
-        self.widget_sequence_save = QtWidgets.QWidget(self.tab_recording_config)
-        self.widget_sequence_save.setObjectName("widget_sequence_save")
-        self.formLayout_3 = QtWidgets.QFormLayout(self.widget_sequence_save)
-        self.formLayout_3.setObjectName("formLayout_3")
-        
-        self.file_manager_save_location = QtWidgets.QPushButton(self.widget_sequence_save)
-        self.file_manager_save_location.setObjectName("file_manager_save_location")
-        
-        self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.file_manager_save_location)
-        
-        self.line_edit_save_location = QtWidgets.QLineEdit(self.widget_sequence_save)
-        self.line_edit_save_location.setObjectName("line_edit_save_location")
-        self.formLayout_3.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.line_edit_save_location)
-        
-        self.verticalLayout.addWidget(self.widget_sequence_save)
-        
-        self.widget_duration = QtWidgets.QWidget(self.tab_recording_config)
-        self.widget_duration.setObjectName("widget_duration")
-        self.formLayout_2 = QtWidgets.QFormLayout(self.widget_duration)
-        self.formLayout_2.setObjectName("formLayout_2")
-        
-        self.label_sequence_duration = QtWidgets.QLabel(self.widget_duration)
-        self.label_sequence_duration.setObjectName("label_sequence_duration")
-        self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_sequence_duration)
-        
-        self.line_edit_sequence_duration = QtWidgets.QLineEdit(self.widget_duration)
-        self.line_edit_sequence_duration.setObjectName("line_edit_sequence_duration")
-        #accept only numbers
-        
-        self.formLayout_2.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.line_edit_sequence_duration)
-        
-        self.verticalLayout.addWidget(self.widget_duration)
-        
-        self.label_sequence_duration_tip = QtWidgets.QLabel(self.tab_recording_config)
-        self.label_sequence_duration_tip.setObjectName("label_sequence_duration_tip")
-        self.verticalLayout.addWidget(self.label_sequence_duration_tip)
-        
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout.addItem(spacerItem1)
-        
-        self.btn_save_sequence_settings = QtWidgets.QPushButton(self.tab_recording_config)
-        self.btn_save_sequence_settings.setObjectName("btn_save_sequence_settings")
-        self.verticalLayout.addWidget(self.btn_save_sequence_settings)
-        
-        self.btn_reset_sequence_settings = QtWidgets.QPushButton(self.tab_recording_config)
-        self.btn_reset_sequence_settings.setObjectName("btn_reset_sequence_settings")
-        
-        self.verticalLayout.addWidget(self.btn_reset_sequence_settings)
-        
+
+        self.tab_recording_config = Tab_recording()
         self.tabs.addTab(self.tab_recording_config, "")
-        
         #Tab - Keras/Tensorflow/Learning,Classification
+        '''
         self.tab_tensorflow = QtWidgets.QWidget()
         self.tab_tensorflow.setObjectName("tab_tensorflow")
         
@@ -622,7 +510,9 @@ class Ui_MainWindow(QtCore.QObject):
         
         self.gridLayout_3.addWidget(self.tensorflow_tabs, 2, 0, 1, 2)
         self.tabs.addTab(self.tab_tensorflow, "")
-        
+        '''
+        self.tab_tensorflow = Tab_tensorflow()
+        self.tabs.addTab(self.tab_tensorflow, "")
         
         self.gridLayout.addWidget(self.tabs, 0, 0, 2, 1)
         #methods to call on tab change
@@ -727,7 +617,18 @@ class Ui_MainWindow(QtCore.QObject):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
         
-        self.vision = Computer_vision(self.predictions)
+        """self.vision = Computer_vision(self.predictions)
+        defdf
+        globaldfg
+        os.fdopeng
+        defdf
+        globaldf
+        globaldfg
+        df
+        g
+        df
+        globaldf
+        globaldf"""
     
     def retranslateUi(self, MainWindow):
         """!@brief Sets names of widgets.
@@ -743,13 +644,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_single_frame.setText(_translate("MainWindow", "Single frame"))
         self.btn_zoom_in.setText(_translate("MainWindow", "Zoom In"))
         self.btn_zoom_out.setText(_translate("MainWindow", "Zoom Out"))
-        self.btn_connect_camera.setText(_translate("MainWindow", "Connect"))
-        self.btn_refresh_cameras.setText(_translate("MainWindow", "Refresh"))
-        self.btn_disconnect_camera.setText(_translate("MainWindow", "Disconnect"))
-        self.tip_add_cti.setText(_translate("MainWindow", "Tip: If you can\'t detect your camera try adding new .cti file from your camera vendor"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_connect), _translate("MainWindow", "Connect Camera"))
-        self.btn_add_cti.setText(_translate("MainWindow", "Add a new .cti file"))
-        self.btn_remove_cti.setText(_translate("MainWindow", "Remove selected .cti"))
         self.label_config_level.setText(_translate("MainWindow", "Configuration level"))
         self.combo_config_level.setItemText(0, _translate("MainWindow", "Beginner"))
         self.combo_config_level.setItemText(1, _translate("MainWindow", "Expert"))
@@ -759,16 +654,9 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_save_config.setText(_translate("MainWindow", "Save Configuration"))
         self.btn_load_config.setText(_translate("MainWindow", "Load Configuration"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_config), _translate("MainWindow", "Configure Camera"))
-        self.label_file_name_recording.setText(_translate("MainWindow", "File name"))
-        self.label_sequence_name.setText(_translate("MainWindow", "Tip: Use %n for sequence number, %d for date and %t for time stamp "))
-        self.file_manager_save_location.setText(_translate("MainWindow", "Save Location"))
-        self.label_sequence_duration.setText(_translate("MainWindow", "Sequence duration [s]"))
-        self.label_sequence_duration_tip.setText(_translate("MainWindow", "Tip: Leave empty for manual control using Start/Stop recording buttons"))
-        self.btn_save_sequence_settings.setText(_translate("MainWindow", "Save settings"))
-        self.btn_reset_sequence_settings.setText(_translate("MainWindow", "Default settings"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_recording_config), _translate("MainWindow", "Configure Recording"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_tensorflow), _translate("MainWindow", "Tensorflow"))
-        self.btn_save_model.setText(_translate("MainWindow", "Save model"))
+        '''self.btn_save_model.setText(_translate("MainWindow", "Save model"))
         self.line_edit_model_name.setText(_translate("MainWindow", "Select a model to load"))
         self.btn_load_model.setText(_translate("MainWindow", "Load model"))
         self.tensorflow_tabs.setTabText(self.tensorflow_tabs.indexOf(self.tab_classify), _translate("MainWindow", "Classify"))
@@ -788,7 +676,8 @@ class Ui_MainWindow(QtCore.QObject):
         self.label_res_width.setText(_translate("MainWindow", "Width"))
         self.label_res_height.setText(_translate("MainWindow", "Height"))
         self.tensorflow_tabs.setTabText(self.tensorflow_tabs.indexOf(self.tab_train), _translate("MainWindow", "Train"))
-        self.tabs.setTabText(self.tabs.indexOf(self.tab_tensorflow), _translate("MainWindow", "Tensorflow"))
+        '''
+        #self.tabs.setTabText(self.tabs.indexOf(self.tab_tensorflow), _translate("MainWindow", "Tensorflow"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.actionAdd_Remove_cti_file.setText(_translate("MainWindow", "Add .cti file"))
@@ -823,36 +712,29 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_single_frame.clicked.connect(self.single_frame)
         self.btn_start_preview.clicked.connect(self.preview)
         self.btn_start_recording.clicked.connect(self.record)
-        self.btn_refresh_cameras.clicked.connect(self.refresh_cameras)
-        self.btn_add_cti.clicked.connect(self.add_cti)
-        self.btn_remove_cti.clicked.connect(self.remove_cti)
-        
-        self.btn_connect_camera.clicked.connect(
-            lambda: self.connect_camera(self.list_detected_cameras.currentRow()))
-        
-        self.list_detected_cameras.itemDoubleClicked.connect(
-            lambda: self.connect_camera(self.list_detected_cameras.currentRow()))
-        #možná lambda s indexem itemu
-        
-        self.btn_disconnect_camera.clicked.connect(self.disconnect_camera)
+
+        #CONNECTING TAB
+        self.tab_connect.send_status_msg.connect(self.set_status_msg)
+        self.tab_connect.connection_update.connect(self.update_camera_status)
+        self.status_timer.timeout.connect(self.clear_status)
+
+        self.tab_recording_config.send_status_msg.connect(self.set_status_msg)
+        self.tab_tensorflow.send_status_msg.connect(self.set_status_msg)
+
+
         self.combo_config_level.currentIndexChanged.connect(self.load_parameters)
         self.btn_save_config.clicked.connect(self.save_cam_config)
         self.btn_load_config.clicked.connect(self.load_cam_config)
-        self.file_manager_save_location.clicked.connect(lambda: self.get_directory(self.line_edit_save_location))
-        
-        
-        
-        self.btn_save_sequence_settings.clicked.connect(self.save_seq_settings)
-        self.btn_reset_sequence_settings.clicked.connect(self.reset_seq_settings)
-        self.btn_save_model.clicked.connect(self.save_model)
+       
+        """self.btn_save_model.clicked.connect(self.save_model)
         self.btn_load_model.clicked.connect(self.load_model)
         self.btn_load_dataset.clicked.connect(self.choose_dataset)
         self.btn_preprocess.clicked.connect(self.preprocess_dataset)
-        self.btn_train_cancel.clicked.connect(self.train_model)
+        self.btn_train_cancel.clicked.connect(self.train_model)"""
         
         self.action_save_settings.triggered.connect(self.save_cti_config)
-        self.actionRemove_cti_file.triggered.connect(self.remove_cti)
-        self.actionAdd_Remove_cti_file.triggered.connect(self.add_cti)
+        self.actionRemove_cti_file.triggered.connect(self.tab_connect.remove_cti)
+        self.actionAdd_Remove_cti_file.triggered.connect(self.tab_connect.add_cti)
         self.actionSave_camera_config.triggered.connect(self.save_cam_config)
         self.actionLoad_camera_config.triggered.connect(self.load_cam_config)
         self.actionOpen_Help.triggered.connect(lambda: 
@@ -869,9 +751,7 @@ class Ui_MainWindow(QtCore.QObject):
         @details if a text widget needs certain input type, the validators are
         set up here. For example setting prohibited characters of the file saved.
         """
-        self.line_edit_sequence_duration.setValidator(QtGui.QDoubleValidator(0,16777216,5))
-        expression = QtCore.QRegExp("^[^\\\\/:*?\"<>|]*$")
-        self.line_edit_sequence_name.setValidator(QtGui.QRegExpValidator(expression))
+        pass
     
     def eventFilter(self, obj, event):
         """!@brief Implements dragging inside preview area
@@ -958,22 +838,30 @@ class Ui_MainWindow(QtCore.QObject):
         
         cti_files = False
         loaded_cti = None
+        filename = None,
+        save_location = None,
+        sequence_duration = None
         
+
         with open("config.ini", 'r') as config:
             for line in config:
                 #reading configuration for recording
                 line = line.rstrip('\n')
                 if(line.startswith("filename=")):
-                    self.line_edit_sequence_name.setText(line.replace("filename=", "", 1))
+                    filename = line.replace("filename=", "", 1)
+                    #self.line_edit_sequence_name.setText(line.replace("filename=", "", 1))
                 elif(line.startswith("save_location=")):
-                    self.line_edit_save_location.setText(line.replace("save_location=", "", 1))
+                    save_location = line.replace("save_location=", "", 1)
+                    #self.line_edit_save_location.setText(line.replace("save_location=", "", 1))
                 elif(line.startswith("sequence_duration=")):
-                    self.line_edit_sequence_duration.setText(line.replace("sequence_duration=", "", 1))
+                    sequence_duration = line.replace("sequence_duration=", "", 1)
+                    #self.line_edit_sequence_duration.setText(line.replace("sequence_duration=", "", 1))
                 elif(line.startswith("CTI_FILES_PATHS")):
                     cti_files = True
                 elif(cti_files == True):
                     loaded_cti = cam.add_gentl_producer(line)
-                    
+            
+        self.tab_recording_config.load_config(filename, save_location, sequence_duration)
         #if no cti path is present in the config adding files will be skipped
         try:
             self.combo_remove_cti.addItems(loaded_cti)
@@ -1025,119 +913,7 @@ class Ui_MainWindow(QtCore.QObject):
                                     "<p>Original release: 2021</p>" +
                                     "<p>Gui created using Qt</p>")
     
-#-------------Connect camera tab--------------------
-    def add_cti(self):
-        """!@brief Used to load a new GenTL producer file.
-        @details User can select a new file using file dialog.
-        """
-        path = QtWidgets.QFileDialog.getOpenFileName(self.centralwidget,
-                                                     "Load GenTL producer",
-                                                     filter="CTI files (*.cti)")
-        
-        #If user changes his/her mind and closes the file dialog, don't
-        #add empty producer
-        if(path[0]):
-            cti_files = cam.add_gentl_producer(path[0])
-            try:
-                self.combo_remove_cti.clear()
-                self.combo_remove_cti.addItems(cti_files)
-            except:
-                pass
-            
-            self.set_status_msg("File added")
-    
-    def remove_cti(self):
-        """!@brief Used to remove selected GenTL producer file.
-        @details User can select file from combo box.
-        """
-        
-        cti_files, removed = cam.remove_gentl_producer(self.combo_remove_cti.currentText())
-        if(removed):
-            self.set_status_msg("File removed")
-            self.combo_remove_cti.clear()
-            self.combo_remove_cti.addItems(cti_files)
-    
-    def refresh_cameras(self):
-        """!@brief Calls function to detect connected cameras and prints them
-        as items in a list.
-        @details If no cameras are present nothing will happen. If cameras are
-        detected, all previous item are cleared and cameras detected in this call
-        are printed.
-        """
-        #set status message
-        self.set_status_msg("Searching for cameras", 1500)
-        
-        #clear the list so the cameras won't appear twice or more
-        self.list_detected_cameras.clear()
-        
-        #Get a list of cameras and inser each one to the interface as an 
-        #entry in the list.
-        self.detected = cam.get_camera_list()
-        for device in self.detected:
-            output = device['model']
-#in  the future maybe add icon based on interface type
-            self.list_detected_cameras.addItem(output)
-    
-    def connect_camera(self, index):
-        """!@brief Connect to selected camera
-        @details This method is called either by double clicking camera in a 
-        list or by pressing connect button
-        @param[in] index index of selected camera in the list
-        """
-        #Something must be selected
-        if index != -1:
-            
-            #If some camera is connected, disconnect it first
-            if self.connected:
-                self.disconnect_camera()
-            
-            #set green background to the selected camera
-            self.list_detected_cameras.item(index).setBackground(QtGui.QColor('#70BF4E'))
-            
-            #Print status message
-            self.set_status_msg("Connecting camera")
-            
-            #Connect camera
-            cam.select_camera(self.detected[index]['id_'])
-            
-            
-            self.set_status_msg("Camera connected")
-            
-            #Set up the status bar
-            self.camera_icon.setPixmap(self.icon_standby)
-            self.camera_status.setText("Camera: "+self.detected[index]['model'])
-            self.connected = True
-    
-    def disconnect_camera(self):
-        """!@brief Disconnect current camera
-        @details Method disconnects camera and sets all statusbar items to 
-        their default state.
-        """
-        #Disconnect only if already connected
-        if self.connected:
-            #Get default states
-            self.connected = False
-            self.received = 0
-            self.fps = 0.0
-            self.camera_icon.setPixmap(self.icon_offline)
-            self.camera_status.setText("Camera: Not connected")
-            
-            self.receive_status.setText("Received frames: " + str(self.received))
-            self.fps_status.setText("FPS: " + str(self.fps))
-            self.set_status_msg("Disconnecting camera")
-            
-            self.preview_live = False
-            self.recording = False
-            #Disconnect camera
-            cam.disconnect_camera()
-            
-            
-            self.set_status_msg("Camera disconnected")
-            
-            #Imidiately search for new cameras
-            self.refresh_cameras()
-    
-#-------------Camera control buttons and image-----------------
+    #-------------Camera control buttons and image-----------------
     def record(self):
         """!@brief Starts and stops recording
         @details Is called by start/stop button. Recording is always started 
@@ -1558,6 +1334,7 @@ class Ui_MainWindow(QtCore.QObject):
         '''
     
 #-----------Tensorflow tab----------------------------
+    '''
     def load_model(self):
         """!@brief When user wants to load a tensorflow model, this method will
         open a file dialog and makes sure the path provided actually contains
@@ -1736,8 +1513,8 @@ class Ui_MainWindow(QtCore.QObject):
                 self.prediction_thread = threading.Thread(
                     target=self.vision.classify, kwargs={'frame': frame, 'prediction_flag': self.prediction_flag})
                 self.prediction_thread.start()
-    
-#------------Camera config tab--------------------------
+    '''
+    #------------Camera config tab--------------------------
     def show_parameters(self):
         """!@brief Loads all camera's features and creates dynamic widgets for
         every feature.
@@ -2057,73 +1834,36 @@ class Ui_MainWindow(QtCore.QObject):
         else:
             self.parameters_signal.setText("B")
     
-#--------------Recording config tab-----------------------------
-    def reset_seq_settings(self):
-        """!@brief Restores default recording settings
-        @details Settings are saved to config.ini file. Defaults are hard-coded
-        in this method.
-        """
-        file_contents = []
-        
-        #Open config file and load its contents
-        with open("config.ini", 'r') as config:
-            file_contents = config.readlines()
-        
-        end_of_rec_conf = None
-        #Find end of Recording config part of the file
-        #if no delimiter is found a new one is added
-        try:
-            end_of_rec_conf = file_contents.index("CTI_FILES_PATHS\n")
-        except(ValueError):
-            file_contents.append("CTI_FILES_PATHS\n")
-            end_of_rec_conf = -1
-            
-        with open("config.ini", 'w') as config:
-            #Write default states to the file
-            config.write("RECORDING\n")
-            config.write("filename=img(%n)\n")
-            config.write("save_location=Recording\n")
-#maybe set to the documents folder
-            config.write("sequence_duration=0\n")
-            
-            #When at the end of recording config part, just copy the rest of
-            #the initial file.
-            if(end_of_rec_conf):
-                for line in file_contents[end_of_rec_conf:]:
-                    config.write(line)
-        
-        #Fill the Recording tab with updated values
-        self.read_config()
-        
-        #Print status msg
-        self.set_status_msg("Configuration restored",2500)
-    
-    def save_seq_settings(self):
-        """!@brief Saves recording settings
-        @details Settings are saved to config.ini file. Parameters saved are:
-        file name, save, location and sequence duration.
-        """
-        file_contents = []
-        
-        #Open config file and load its contents
-        with open("config.ini", 'r') as config:
-            file_contents = config.readlines()
-        
-        #Open config file for writing
-        with open("config.ini", 'w') as config:
-            
-            for line in file_contents:
-                #Reading configuration for recording
-                if(line.startswith("filename=")):
-                    config.write("filename=" + self.line_edit_sequence_name.text() + "\n")
-                elif(line.startswith("save_location=")):
-                    config.write("save_location=" + self.line_edit_save_location.text() + "\n")
-                elif(line.startswith("sequence_duration=")):
-                    config.write("sequence_duration=" + self.line_edit_sequence_duration.text() + "\n")
-                else:
-                    #All content not concerning recording is written back without change
-                    config.write(line)
-        self.set_status_msg("Configuration saved")
-    
+   
+
+#____________________NEW METHODS
 
 
+    def update_camera_status(self, connected, state, name):
+        """!@brief Updates camera status variables and status bar
+        @details This method is called when tab_connect sends its update signal.
+        The method will change camera state icons and name. If the camera is being 
+        disconnected, the fps and received frames will be reseted.
+        @param[in] connected The new status of camera (connected or disconnected)
+        @param[in] state Numeric state of the camera (0=disconnected, 1=standby, 2=busy)
+        @param[in] name Connected camera name. If the camera is being disconnected
+        the name is "Not connected"
+        """
+        self.connected = connected
+        self.camera_status.setText("Camera: " + name)
+
+        if(state == 1):
+            self.camera_icon.setPixmap(self.icon_standby)
+        if(state == 2):
+            self.camera_icon.setPixmap(self.icon_busy)
+        else:
+            self.received = 0
+            self.fps = 0.0
+            
+            self.receive_status.setText("Received frames: " + str(self.received))
+            self.fps_status.setText("FPS: " + str(self.fps))
+            self.camera_icon.setPixmap(self.icon_offline)
+            self.preview_live = False
+            self.recording = False
+
+        
