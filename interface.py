@@ -20,6 +20,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from tab_connect import Tab_connect
 from tab_recording import Tab_recording
 from tab_tensorflow import Tab_tensorflow
+from tab_configure import Tab_configure
 import threading
 import time
 import win32api
@@ -30,8 +31,6 @@ import webbrowser
 
 from global_camera import cam
 from global_queue import active_frame_queue
-from computer_vision import Computer_vision
-from config_level import Config_level
 
 
 class Ui_MainWindow(QtCore.QObject):
@@ -50,12 +49,7 @@ class Ui_MainWindow(QtCore.QObject):
         
         super(Ui_MainWindow,self).__init__()
         
-        ##Automatic feature refresh timer
-        self.feat_refresh_timer  = QtCore.QTimer(self)
-        self.feat_refresh_timer.setInterval(4000)
-        self.feat_refresh_timer.timeout.connect(self.update_parameters)
-        self.feat_refresh_timer.timeout.connect(self.start_refresh_parameters)
-        self.feat_refresh_timer.start()
+        
         
         ##Holds current frame displayed in the GUI
         self.image_pixmap = None
@@ -71,32 +65,14 @@ class Ui_MainWindow(QtCore.QObject):
         self.move_x_prev = 0
         ##Last value of the dragging in the preview area - y axis
         self.move_y_prev = 0
-        ##Used to store values of parameters when automatically refreshing them
-        self.parameter_values = {}
         
-        ##Flag used when running various parameter refreshing methods
-        self.update_completed_flag = threading.Event()
-        self.update_completed_flag.set()
-        
-        ##Flag used when running various parameter refreshing methods
-        self.update_flag = threading.Event()
         
         ##Value of current preview zoom in %/100
         self.preview_zoom = 1
         ##Resizing image to preview area size instead of using zoom
         self.preview_fit = True
         
-        ##Holds parameter category paths for tree widget
-        self.top_items = {}
-        ##Holds children widgets for tree widget
-        self.children_items = {}
         
-        ##Contains all dynamically created widgets for parameters
-        self.feat_widgets = {}
-        ##Contains all dynamically created labels of parameters
-        self.feat_labels = {}
-        ##Stores dictionaries of every parameter until they are processed to the GUI
-        self.feat_queue = Queue()
         
         ##List of detected cameras
         self.detected = []
@@ -107,12 +83,12 @@ class Ui_MainWindow(QtCore.QObject):
         self.resize_signal = QtWidgets.QLineEdit()
         self.resize_signal.textChanged.connect(self.update_img)
         
-        ##Widget used to transfer GUI changes from thread into the main thread while showing parameters
-        self.parameters_signal = QtWidgets.QLineEdit()
-        self.parameters_signal.textChanged.connect(self.show_parameters)
+        
         
         ##Signals that a recording was stopped, either by timer or manually
         self.interupt_flag = threading.Event()
+
+        
         
         ##State of recording
         self.recording = False
@@ -133,6 +109,8 @@ class Ui_MainWindow(QtCore.QObject):
         
         ##Timer used to show a status messages for specific time window
         self.status_timer = QtCore.QTimer()
+
+        
         
         
         
@@ -237,55 +215,17 @@ class Ui_MainWindow(QtCore.QObject):
         #Tab - Configure camera
     #read present parameters on tab change and when read parameters button (To be added) is pressed
         
-    
-        self.tab_config = QtWidgets.QWidget()
-        self.tab_config.setObjectName("tab_config")
-        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.tab_config)
-        self.verticalLayout_3.setObjectName("verticalLayout_3")
-        
-        self.frame_config_level = QtWidgets.QFrame(self.tab_config)
-        self.frame_config_level.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.frame_config_level.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.frame_config_level.setObjectName("frame_config_level")
-        self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.frame_config_level)
-        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
-        self.label_config_level = QtWidgets.QLabel(self.frame_config_level)
-        self.label_config_level.setObjectName("label_config_level")
-        self.horizontalLayout_5.addWidget(self.label_config_level)
-        self.combo_config_level = QtWidgets.QComboBox(self.frame_config_level)
-        self.combo_config_level.setObjectName("combo_config_level")
-        self.combo_config_level.addItem("")
-        self.combo_config_level.addItem("")
-        self.combo_config_level.addItem("")
-        
-        self.horizontalLayout_5.addWidget(self.combo_config_level)
-        self.verticalLayout_3.addWidget(self.frame_config_level)
         
         
-        self.tree_features = QtWidgets.QTreeWidget(self.tab_config)
-        self.tree_features.setObjectName("tree_features")
-        self.tree_features.setColumnWidth(0,250)
-        self.verticalLayout_3.addWidget(self.tree_features)
-        
-        
-        self.widget_3 = QtWidgets.QWidget(self.tab_config)
-        self.widget_3.setObjectName("widget_3")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.widget_3)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        
-        self.btn_save_config = QtWidgets.QPushButton(self.widget_3)
-        self.btn_save_config.setObjectName("btn_save_config")
-        
-        self.horizontalLayout_2.addWidget(self.btn_save_config)
-        
-        self.btn_load_config = QtWidgets.QPushButton(self.widget_3)
-        self.btn_load_config.setObjectName("btn_load_config")
-        self.horizontalLayout_2.addWidget(self.btn_load_config)
-        
-        self.verticalLayout_3.addWidget(self.widget_3)
+        self.tab_config = Tab_configure()
         self.tabs.addTab(self.tab_config, "")
-        
-        
+
+        ##Automatic feature refresh timer
+        self.feat_refresh_timer  = QtCore.QTimer(self)
+        self.feat_refresh_timer.setInterval(4000)
+        self.feat_refresh_timer.timeout.connect(self.tab_config.update_parameters)
+        self.feat_refresh_timer.timeout.connect(self.tab_config.start_refresh_parameters)
+        self.feat_refresh_timer.start()
 
         self.tab_recording_config = Tab_recording()
         self.tabs.addTab(self.tab_recording_config, "")
@@ -412,14 +352,9 @@ class Ui_MainWindow(QtCore.QObject):
         self.btn_zoom_in.setText(_translate("MainWindow", "Zoom In"))
         self.btn_zoom_out.setText(_translate("MainWindow", "Zoom Out"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_connect), _translate("MainWindow", "Connect Camera"))
-        self.label_config_level.setText(_translate("MainWindow", "Configuration level"))
-        self.combo_config_level.setItemText(0, _translate("MainWindow", "Beginner"))
-        self.combo_config_level.setItemText(1, _translate("MainWindow", "Expert"))
-        self.combo_config_level.setItemText(2, _translate("MainWindow", "Guru"))
-        self.tree_features.headerItem().setText(0, _translate("MainWindow", "Feature"))
-        self.tree_features.headerItem().setText(1, _translate("MainWindow", "Value"))
-        self.btn_save_config.setText(_translate("MainWindow", "Save Configuration"))
-        self.btn_load_config.setText(_translate("MainWindow", "Load Configuration"))
+
+        
+
         self.tabs.setTabText(self.tabs.indexOf(self.tab_config), _translate("MainWindow", "Configure Camera"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_recording_config), _translate("MainWindow", "Configure Recording"))
         self.tabs.setTabText(self.tabs.indexOf(self.tab_tensorflow), _translate("MainWindow", "Tensorflow"))
@@ -467,17 +402,14 @@ class Ui_MainWindow(QtCore.QObject):
 
         self.tab_recording_config.send_status_msg.connect(self.set_status_msg)
         self.tab_tensorflow.send_status_msg.connect(self.set_status_msg)
+        self.tab_config.send_status_msg.connect(self.set_status_msg)
 
-
-        self.combo_config_level.currentIndexChanged.connect(self.load_parameters)
-        self.btn_save_config.clicked.connect(self.save_cam_config)
-        self.btn_load_config.clicked.connect(self.load_cam_config)
         
         self.action_save_settings.triggered.connect(self.save_cti_config)
         self.actionRemove_cti_file.triggered.connect(self.tab_connect.remove_cti)
         self.actionAdd_Remove_cti_file.triggered.connect(self.tab_connect.add_cti)
-        self.actionSave_camera_config.triggered.connect(self.save_cam_config)
-        self.actionLoad_camera_config.triggered.connect(self.load_cam_config)
+        self.actionSave_camera_config.triggered.connect(self.tab_config.save_cam_config)
+        self.actionLoad_camera_config.triggered.connect(self.tab_config.load_cam_config)
         self.actionOpen_Help.triggered.connect(lambda: 
                             webbrowser.open(
                                 os.path.dirname(os.path.realpath(__file__)) + 
@@ -528,12 +460,13 @@ class Ui_MainWindow(QtCore.QObject):
         @details Used to do actions when entering specific tab.
         """
         index = self.tabs.currentIndex()
+        self.tab_config.tab_index = index
         
         if index == 0:
             pass
         if index == 1:#Camera configuration tab
             #Request parameters from camera and show them in gui
-            self.load_parameters()
+            self.tab_config.load_parameters()
     
     def set_status_msg(self, message, timeout=0):
         """!@brief Shows message in status bar
@@ -670,17 +603,18 @@ class Ui_MainWindow(QtCore.QObject):
                 self.set_status_msg("Starting recording")
                 
                 
+                self.tab_config.recording = True
                 self.recording = True
                 
                 #Start new recording with defined name and save path
-                cam.start_recording(self.line_edit_save_location.text(),
-                                    self.line_edit_sequence_name.text(),
+                cam.start_recording(self.tab_recording_config.line_edit_save_location.text(),
+                                    self.tab_recording_config.line_edit_sequence_name.text(),
                                     'nothing')
                 
                 
                 #If automatic sequence duration is set, create thread that will
                 #automatically terminate the recording
-                if(float(self.line_edit_sequence_duration.text()) > 0):
+                if(self.tab_recording_config.line_edit_sequence_duration.value() > 0):
                     self.interupt_flag.clear()
                     self.seq_duration_thread = threading.Thread(target=self.seq_duration_wait)
                     self.seq_duration_thread.start()
@@ -701,6 +635,8 @@ class Ui_MainWindow(QtCore.QObject):
                 cam.stop_recording()
                 self.recording = False
                 self.preview_live = False
+                self.tab_config.preview_live = False
+                self.tab_config.recording = False
                 self.set_status_msg("Recording stopped", 3500)
     
     def seq_duration_wait(self):
@@ -736,6 +672,7 @@ class Ui_MainWindow(QtCore.QObject):
                 self.set_status_msg("Starting preview",1500)
                 
                 
+                self.tab_config.preview_live = True
                 self.preview_live = True
                 
                 #Start camera frame acquisition (not recording)
@@ -754,6 +691,8 @@ class Ui_MainWindow(QtCore.QObject):
                 cam.stop_acquisition()
                 
                 self.preview_live = False
+                
+                self.tab_config.preview_live = False
     
     def set_zoom(self, flag):
         """!@brief Set the zoom amount of the image previewed
@@ -795,7 +734,8 @@ class Ui_MainWindow(QtCore.QObject):
             image, pixel_format = cam.get_single_frame()
             
             #Try to run prediction
-            self.predict(image)
+            if(self.tabs.currentIndex() == 3):
+                self.tab_tensorflow.predict(image)
             
             #Set up a new value of received frames in the statusbar
             self.received = self.received + 1
@@ -862,7 +802,8 @@ class Ui_MainWindow(QtCore.QObject):
                     active_frame_queue.get_nowait()
                 
                 #Try to run a prediction
-                self.predict(image[0])
+                if(self.tabs.currentIndex() == 3):
+                    self.tab_tensorflow.predict(image[0])
                 
                 #Set up a new value of received frames in the statusbar
                 self.receive_status.setText("Received frames: " + str(self.received))
@@ -1073,328 +1014,6 @@ class Ui_MainWindow(QtCore.QObject):
         RGB8Planar (Deprecated, use RGB8_Planar), RGB10Planar (Deprecated, use RGB10_Planar),
         RGB12Planar (Deprecated, use RGB12_Planar), RGB16Planar (Deprecated, use RGB16_Planar), 
         '''
-    
-
-    #------------Camera config tab--------------------------
-    def show_parameters(self):
-        """!@brief Loads all camera's features and creates dynamic widgets for
-        every feature.
-        @details This method is called when user first enters parameters tab or
-        when the configuration level changes. All the widgets are created dynamically
-        and based on the type of the feature, proper widget type is selected. Also
-        these widgets have method to change their value associated with them
-        when created.
-        """
-        num = 0
-        
-        categories = []
-        self.top_items = {}
-        self.children_items = {}
-        
-        self.tree_features.clear()
-        
-        for name in self.feat_widgets:
-            self.feat_widgets[name].deleteLater()
-        
-        for name in self.feat_labels:
-            self.feat_labels[name].deleteLater()
-        
-        self.feat_widgets.clear()
-        self.feat_labels.clear()
-        
-        while not self.feat_queue.empty():
-            try:
-                param = self.feat_queue.get()
-                param['attr_cat'] = param['attr_cat'].lstrip('/')
-                ctgs = param['attr_cat'].split('/')
-                for i, ctg in enumerate(ctgs):
-                    if(not(ctg in categories)):
-                        if(i == 0):
-                            self.top_items[ctg] = QtWidgets.QTreeWidgetItem([ctg])
-                            self.tree_features.addTopLevelItem(self.top_items[ctg])
-                        else:
-                            self.top_items[ctg] = QtWidgets.QTreeWidgetItem([ctg])
-                            self.top_items[ctgs[i-1]].addChild(self.top_items[ctg])
-                        categories.append(ctg)
-            #Create a new label with name of the feature
-            
-                self.feat_labels[param["name"]] = QtWidgets.QLabel(self.tab_config)
-                self.feat_labels[param["name"]].setObjectName(param["name"])
-                self.feat_labels[param["name"]].setText(param["attr_name"])
-                #If the feature has a tooltip, set it.
-                try:
-                    self.feat_labels[param["name"]].setToolTip(param["attr_tooltip"])
-                except:
-                    pass
-                
-                #Place the label on the num line of the layout
-                #self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.LabelRole, self.feat_labels[param["name"]])
-                
-                #If the feature does not have a value, set it to 0
-                if param["attr_value"] == None:
-                    param["attr_value"] = 0
-                    
-                #Based on the feature type, right widget is chosen to hold the
-                #feature's value
-                
-                if param["attr_type"] == "IntFeature":
-                    #For int feature a Line edit field is created, but only 
-                    #integers can be written in.
-                    self.feat_widgets[param["name"]] = QtWidgets.QSpinBox(self.tab_config)
-                    if(param["attr_range"]):
-                        self.feat_widgets[param["name"]].setRange(
-                                                param["attr_range"][0],
-                                                param["attr_range"][1])
-                    
-                    #Set text to the current value of the feature
-                    self.feat_widgets[param["name"]].setValue(param["attr_value"])
-                    
-                    #Call feature change for this feature when enter is pressed in this field.
-                    #Text is the value that will be set to the feature.
-                    self.feat_widgets[param["name"]].valueChanged.connect(lambda new_val,param=param: cam.set_parameter(param["name"],new_val))
-                elif param["attr_type"] == "FloatFeature":
-                    #For float feature a Line edit field is created, but only 
-                    #real numbers can be written in.
-                    self.feat_widgets[param["name"]] = QtWidgets.QDoubleSpinBox(self.tab_config)
-                    if(param["attr_range"]):
-                        self.feat_widgets[param["name"]].setRange(
-                                                param["attr_range"][0],
-                                                param["attr_range"][1])
-                    
-                    #Set text to the current value of the feature
-                    self.feat_widgets[param["name"]].setValue(param["attr_value"])
-                    
-                    #Call feature change for this feature when enter is pressed in this field.
-                    #Text is the value that will be set to the feature.
-                    self.feat_widgets[param["name"]].valueChanged.connect(lambda new_val,param=param: cam.set_parameter(param["name"],new_val))
-                elif param["attr_type"] == "StringFeature":
-                    #For string feature a Line edit field is created.
-                    self.feat_widgets[param["name"]] = QtWidgets.QLineEdit(self.tab_config)
-                    
-                    #Set text to the current value of the feature
-                    self.feat_widgets[param["name"]].setText(param["attr_value"])
-                    
-                    #Call feature change for this feature when enter is pressed in this field.
-                    #Text is the value that will be set to the feature.
-                    self.feat_widgets[param["name"]].returnPressed.connect(lambda new_val,param=param: cam.set_parameter(param["name"],new_val))            
-                elif param["attr_type"] == "BoolFeature":
-                    #For bool feature a checkbox is created.
-                    self.feat_widgets[param["name"]] = QtWidgets.QCheckBox(self.tab_config)
-                    
-                    #If value is true the checkbox is ticked otherwise remains empty
-                    self.feat_widgets[param["name"]].setChecked(param["attr_value"])
-                    
-                    #When state of the checkbox change, the feature is sent to 
-                    #the camera and changed to the new state
-                    self.feat_widgets[param["name"]].stateChanged.connect(lambda new_val,param=param: cam.set_parameter(param["name"],new_val))
-                elif param["attr_type"] == "EnumFeature":
-                    #For enum feature a combo box is created.
-                    self.feat_widgets[param["name"]] = QtWidgets.QComboBox(self.tab_config)
-                    
-                    #All available enum states are added as options to the
-                    #combo box.
-                    for enum in param["attr_enums"]:
-                        self.feat_widgets[param["name"]].addItem(str(enum))
-                    
-                    #Search the options and find the index of the active value
-                    index = self.feat_widgets[param["name"]].findText(str(param["attr_value"]), QtCore.Qt.MatchFixedString)
-                    
-                    #Set found index to be the active one
-                    if index >= 0:
-                        self.feat_widgets[param["name"]].setCurrentIndex(index)
-                    
-                    #When different option is selected change the given enum in
-                    #the camera
-                    self.feat_widgets[param["name"]].activated.connect(lambda new_val,param=param: cam.set_parameter(param["name"],new_val+1))
-                elif param["attr_type"] == "CommandFeature":
-                    #If the feature type is not recognized, create a label with 
-                    #the text error
-                    self.feat_widgets[param["name"]] = QtWidgets.QPushButton(self.tab_config)
-                    self.feat_widgets[param["name"]].setText("Execute command")
-                    self.feat_widgets[param["name"]].clicked.connect(lambda val,param=param: cam.execute_command(param["name"]))
-                else:
-                    #If the feature type is not recognized, create a label with 
-                    #the text error
-                    self.feat_widgets[param["name"]] = QtWidgets.QLabel(self.tab_config)
-                    self.feat_widgets[param["name"]].setText("Unknown feature type")
-                
-                self.feat_widgets[param["name"]].setEnabled(param["attr_enabled"])
-                
-                #Add newly created widget to the layout on the num line
-                new_item = QtWidgets.QTreeWidgetItem(self.top_items[ctgs[-1]] ,['', ''])
-                #add new item to the last subcategory of its category tree
-                self.tree_features.setItemWidget(new_item, 0,self.feat_labels[param["name"]])
-                self.tree_features.setItemWidget(new_item, 1,self.feat_widgets[param["name"]])
-                #new_item = QtWidgets.QTreeWidgetItem(self.top_items[param['attr_cat']] ,[self.feat_labels[param["name"]], self.feat_widgets[param["name"]]])
-                self.children_items[param["name"]] = new_item
-                #self.parameters_layout.setWidget(num, QtWidgets.QFormLayout.FieldRole, self.feat_widgets[param["name"]])
-                num += 1
-            except:
-                pass
-                #we'll get here when queue is empty
-        self.param_flag.clear()
-    
-    def start_refresh_parameters(self):
-        """!@brief Called automatically when feat_refresh_timer runs out
-        @details used to start a thread to refresh parameters values. Not
-        called by user but automatically.
-        """
-        #called every 4 seconds
-        if (self.feat_widgets and self.connected and self.tabs.currentIndex() == 1 and
-            not(self.preview_live or self.recording) and 
-            not self.param_flag.is_set() and self.update_completed_flag.is_set()):
-            
-            self.update_completed_flag.clear()
-            
-            self.update_thread = threading.Thread(target=self.get_new_val_parameters)
-            self.update_thread.start()
-    
-    def get_new_val_parameters(self):
-        """!@brief Check for new parameter value
-        @details after camera features are loaded, this method periodically 
-        calls for the most recent value of each parameter.
-        """
-        if(not self.feat_widgets):
-            self.update_completed_flag.set()
-            return
-        
-        params = Queue()
-        tries = 0
-        while(tries <= 10):
-            if(cam.get_parameters(params, 
-                    threading.Event(), 
-                    self.combo_config_level.currentIndex()+1)):
-                break
-            else:
-                tries += 1
-                
-        if(tries >= 10):
-            self.update_completed_flag.set()
-            return
-        
-        while(not params.empty()):
-            parameter = params.get()
-            if(not(self.preview_live or self.recording) and 
-               self.tabs.currentIndex() == 1):
-                self.parameter_values[parameter["name"]] = parameter["attr_value"]
-            else:
-                self.update_completed_flag.set()
-                return
-        self.update_flag.set()
-    
-    def update_parameters(self):
-        """!@brief Writes new values of the parameters to the GUI.
-        @details After get_new_val_parameters finishes, the update_flag is set 
-        and this method can transfer the new values of the parameters to the GUI. 
-        Like start_refresh_parameters, this method is bound to the timer.
-        """
-        if (self.connected and not self.param_flag.is_set() and 
-            self.tabs.currentIndex() == 1 and
-            self.update_flag.is_set() and not(self.preview_live or self.recording)):
-            
-            self.update_flag.clear()
-            
-            for parameter in self.feat_widgets:
-                try:
-                    value = self.parameter_values[parameter]
-                    widget = self.feat_widgets[parameter]
-                    if(value == None):
-                        continue
-                    
-                    if(type(widget) == QtWidgets.QLineEdit):
-                        widget.setText(str(value))
-                    elif(type(widget) == QtWidgets.QComboBox):
-                        index = widget.findText(str(value), QtCore.Qt.MatchFixedString)
-                        #Set found index to be the active one
-                        if index >= 0:
-                            widget.setCurrentIndex(index)
-                    elif(type(widget) == QtWidgets.QDoubleSpinBox or
-                         type(widget) == QtWidgets.QSpinBox):
-                        widget.setValue(value)
-                    elif(type(widget) == QtWidgets.QCheckBox):
-                        widget.setChecked(value)
-                except:
-                    pass
-            self.update_completed_flag.set()
-    
-    def load_parameters(self):
-        """!@brief Fills layout with feature name and value pairs
-        @details Based on the feature type a new label, text area, checkbox or
-        combo box is created. In this version all available parameters are shown.
-        """
-        
-        #Start filling features in only with connected camera
-        if self.connected and not self.param_flag.is_set():
-            #Status message
-            
-            self.set_status_msg("Reading features")
-            
-            #empty feature queue
-            self.get_params_thread = threading.Thread(
-                target=cam.get_parameters,
-                kwargs={'feature_queue': self.feat_queue,
-                        'flag': self.param_flag,
-                        'visibility': Config_level(self.combo_config_level.currentIndex()+1)})
-            self.param_callback_thread = threading.Thread(target=self.callback_parameters)
-            
-            
-            self.param_callback_thread.start()
-            self.get_params_thread.start()
-    
-    def save_cam_config(self):
-        """!@brief Opens file dialog for user to select where to save camera 
-        configuration.
-        @details Called by Save configuration button. Configuration is saved 
-        as an .xml file and its contents are dependent on module used in Camera 
-        class to save the config.
-        """
-        
-        if(self.connected):
-            #Open file dialog for choosing a save location and name
-            name = QtWidgets.QFileDialog.getSaveFileName(self.centralwidget,
-                                                         "Save Configuration",
-                                                         filter="XML files (*.xml)",
-                                                         directory="config.xml")
-            
-            #Save camera config to path specified in name (0 index)
-            cam.save_config(name[0])
-    
-    def load_cam_config(self):
-        """!@brief Allows a user to choose saved xml configuration and load it
-        into the camera
-        @details Allowes only xml file in the file dialog and after loading prints
-        a status message
-        """
-        if self.connected:
-            if(not self.recording and not self.preview_live):
-                name = QtWidgets.QFileDialog.getOpenFileName(self.centralwidget,
-                                                             "Load Configuration",
-                                                             filter="XML files (*.xml)")
-               
-                #Set label text to chosen folder path
-                if(name[0]):
-                    tries = 0
-                    while(tries <= 10):
-                        if(cam.load_config(name[0])):
-                            self.set_status_msg("Configuration loaded")
-                            return
-                        else:
-                            tries += 1
-                    self.set_status_msg("Loading failed", 2500)
-            else:
-                self.set_status_msg("Stop recording and preview before loading config")
-        
-    def callback_parameters(self):
-        """!@brief Auxiliary method used to transfer thread state change into
-        the main thread.
-        """
-        self.param_flag.wait()
-        
-        if(self.parameters_signal.text() != "A"):
-            self.parameters_signal.setText("A")
-        else:
-            self.parameters_signal.setText("B")
-    
    
 
 #____________________NEW METHODS
@@ -1411,6 +1030,7 @@ class Ui_MainWindow(QtCore.QObject):
         the name is "Not connected"
         """
         self.connected = connected
+        self.tab_config.connected = connected
         self.camera_status.setText("Camera: " + name)
 
         if(state == 1):
@@ -1426,5 +1046,8 @@ class Ui_MainWindow(QtCore.QObject):
             self.camera_icon.setPixmap(self.icon_offline)
             self.preview_live = False
             self.recording = False
+            
+            self.tab_config.preview_live = False
+            self.tab_config.recording = False
 
         
