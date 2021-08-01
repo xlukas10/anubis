@@ -6,6 +6,7 @@ class Tab_recording(QtWidgets.QWidget):
     #signals
     send_status_msg = Signal(str, int)
     #connection_update = Signal(bool, int, str)#connected, state - 0=disconnected 1=standby 2=busy, camera name
+    configuration_update = Signal(str, str, float)#name, location, duration
 
     def __init__(self):
         super(Tab_recording, self).__init__()
@@ -96,7 +97,9 @@ class Tab_recording(QtWidgets.QWidget):
 
 
     def connect_actions(self):
-        pass
+        self.line_edit_save_location.textChanged.connect(self.send_conf_update)
+        self.line_edit_sequence_duration.valueChanged.connect(self.send_conf_update)
+        self.line_edit_sequence_name.textChanged.connect(self.send_conf_update)
 
     def set_texts(self):
         self.label_file_name_recording.setText("File name")
@@ -212,4 +215,9 @@ class Tab_recording(QtWidgets.QWidget):
         if(line_output):
             line_output.setText(name)
         return name
-               
+    
+    def send_conf_update(self):
+        self.configuration_update.emit(self.line_edit_sequence_name.text(), 
+                                        self.line_edit_save_location.text(), 
+                                        self.line_edit_sequence_duration.value())
+                                        
