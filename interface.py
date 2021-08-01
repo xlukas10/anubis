@@ -538,7 +538,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.tab_recording_config.load_config(filename, save_location, sequence_duration)
         #if no cti path is present in the config adding files will be skipped
         try:
-            self.combo_remove_cti.addItems(loaded_cti)
+            self.tab_connect.combo_remove_cti.addItems(loaded_cti)
         except:
             pass
         
