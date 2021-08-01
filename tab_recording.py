@@ -24,7 +24,7 @@ class Tab_recording(QtWidgets.QWidget):
         self.widget_sequence_name = QtWidgets.QWidget(self)
         self.widget_sequence_name.setObjectName("widget_sequence_name")
         
-        self.layout_sequence_name = QtWidgets.QFormLayout(self)
+        self.layout_sequence_name = QtWidgets.QFormLayout(self.widget_sequence_name)
         self.layout_sequence_name.setObjectName("layout_sequence_name")
         
         self.label_file_name_recording = QtWidgets.QLabel(self.widget_sequence_name)
