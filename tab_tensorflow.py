@@ -24,8 +24,7 @@ class Tab_tensorflow(QtWidgets.QWidget):
 
         ##Is true while the tensorflow training is running
         self.training_flag = threading.Event()
-        ##Flag is not set while the application is getting parameters from the cam object
-        self.param_flag = threading.Event()
+        
         
         ##Signals that computer vision class is still processing dataset
         self.process_flag = threading.Event()
@@ -435,8 +434,7 @@ class Tab_tensorflow(QtWidgets.QWidget):
         @param[in] frame Picture to be classified. The format is OpenCV image.
         """
         #Tensorflow index is 3, if the gui changes, this may need to chage as well
-        if(self.tabs.currentIndex() == 3 and 
-           self.tensorflow_tabs.currentIndex() == 0):
+        if(self.tensorflow_tabs.currentIndex() == 0):
             if(not self.prediction_flag.is_set() and self.model_loaded == True):
                 self.prediction_flag.set()
                 
