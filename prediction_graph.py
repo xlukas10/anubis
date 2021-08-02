@@ -75,10 +75,10 @@ class Prediction_graph(FigureCanvasQTAgg):
                   
                 for j in range(len(probability)):     
                     if probability[j] > top:
-                        top = probability[j];
+                        top = probability[j]
                         top_index = j
                           
-                probability.remove(top);
+                probability.remove(top)
                 top_5.append(top)
                 top_indices.append(top_index)
         

@@ -493,7 +493,6 @@ class Ui_MainWindow(QtCore.QObject):
     
     def predict(self, image):
         if self.tabs.indexOf(self.tab_tensorflow) == self.tabs.currentIndex():
-            print(image)
             self.tab_tensorflow.predict(image)
 
     def update_fps(self, fps):

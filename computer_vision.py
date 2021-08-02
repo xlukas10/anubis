@@ -145,7 +145,7 @@ class Computer_vision():
             #save output to variable and write it to the plot
             
             
-            prediction_flag.clear()
+        prediction_flag.clear()
     
     def process_dataset(self, path, process_perc , categories=[], process_flag = None, callback_flag = None):
         """!@brief Prepare dataset to be used as input and desired output.
