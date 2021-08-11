@@ -15,7 +15,6 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from tensorflow import keras
-from tensorflow.python.keras.utils import tf_utils
 import numpy as np
 import cv2
 import os
