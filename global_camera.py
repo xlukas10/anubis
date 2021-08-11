@@ -18,7 +18,20 @@
 Global camera object
 """
 
-from camera import Camera
+from camera_connector import Camera_connector
+import atexit
 
 ##Global camera object
-cam = Camera()
+cams = Camera_connector()
+active_cam = '0'
+
+def close_cameras():
+    for index in range(cams.active_devices_count):
+        print(index)
+        cams.disconnect_camera(index)
+
+atexit.register(close_cameras)
+
+def change_active_cam(new):
+    global active_cam
+    active_cam = new

@@ -1,5 +1,5 @@
-from PyQt5 import QtCore, QtGui, QtWidgets 
-from global_camera import cam
+from PyQt5 import QtGui, QtWidgets 
+import global_camera
 from PyQt5.QtCore import pyqtSignal as Signal
 
 class Tab_connect(QtWidgets.QWidget):
@@ -94,7 +94,7 @@ class Tab_connect(QtWidgets.QWidget):
         #If user changes his/her mind and closes the file dialog, don't
         #add empty producer
         if(path[0]):
-            cti_files = cam.add_gentl_producer(path[0])
+            cti_files = global_camera.cams.add_gentl_producer(path[0])
             try:
                 self.combo_remove_cti.clear()
                 self.combo_remove_cti.addItems(cti_files)
@@ -108,7 +108,7 @@ class Tab_connect(QtWidgets.QWidget):
         @details User can select file from combo box.
         """
         
-        cti_files, removed = cam.remove_gentl_producer(self.combo_remove_cti.currentText())
+        cti_files, removed = global_camera.cams.remove_gentl_producer(self.combo_remove_cti.currentText())
         if(removed):
             self.send_status_msg.emit("File removed", 0)
             self.combo_remove_cti.clear()
@@ -129,9 +129,9 @@ class Tab_connect(QtWidgets.QWidget):
         
         #Get a list of cameras and inser each one to the interface as an 
         #entry in the list.
-        self.detected = cam.get_camera_list()
+        self.detected = global_camera.cams.search_for_cameras()
         for device in self.detected:
-            output = device['model']
+            output = device['mechanism'] + ': ' + device['model']
 #in  the future maybe add icon based on interface type
             self.list_detected_cameras.addItem(output)
     
@@ -155,8 +155,8 @@ class Tab_connect(QtWidgets.QWidget):
             self.send_status_msg.emit("Connecting camera", 0)
             
             #Connect camera
-            cam.select_camera(self.detected[index]['id_'])
-            
+            global_camera.change_active_cam(global_camera.cams.select_camera(self.detected[index]['mechanism'], self.detected[index]['id_']))
+            print(global_camera.active_cam)
             
             self.send_status_msg.emit("Camera connected", 0)
             
@@ -180,8 +180,7 @@ class Tab_connect(QtWidgets.QWidget):
             
             
             #Disconnect camera
-            cam.disconnect_camera()
-            
+            global_camera.cams.disconnect_camera(int(global_camera.active_cam))
             
             self.send_status_msg.emit("Camera disconnected", 0)
             

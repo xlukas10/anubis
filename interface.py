@@ -22,16 +22,12 @@ from tab_recording import Tab_recording
 from tab_tensorflow import Tab_tensorflow
 from tab_configure import Tab_configure
 from camera_control_gui import Camera_control_gui
-import threading
 
-import win32api
 import os
-from queue import Queue
 import webbrowser
 
 
-from global_camera import cam
-from global_queue import active_frame_queue
+import global_camera 
 
 
 class Ui_MainWindow(QtCore.QObject):
@@ -396,7 +392,7 @@ class Ui_MainWindow(QtCore.QObject):
                 elif(line.startswith("CTI_FILES_PATHS")):
                     cti_files = True
                 elif(cti_files == True):
-                    loaded_cti = cam.add_gentl_producer(line)
+                    loaded_cti = global_camera.cams.add_gentl_producer(line)
             
         self.tab_recording_config.load_config(filename, save_location, sequence_duration)
         #if no cti path is present in the config adding files will be skipped
@@ -414,7 +410,7 @@ class Ui_MainWindow(QtCore.QObject):
         @details When the program starts, the saved producers are loaded 
         from the config file. Save method overwrites any previous configuration.
         """
-        paths = cam.get_gentl_producers()
+        paths = global_camera.cams.producer_paths
         config = []
         
         

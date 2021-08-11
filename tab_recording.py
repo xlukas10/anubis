@@ -1,5 +1,4 @@
 from PyQt5 import QtCore, QtGui, QtWidgets 
-from global_camera import cam
 from PyQt5.QtCore import pyqtSignal as Signal
 
 class Tab_recording(QtWidgets.QWidget):

@@ -1,5 +1,4 @@
 from PyQt5 import QtCore, QtGui, QtWidgets 
-from global_camera import cam
 from PyQt5.QtCore import pyqtSignal as Signal
 from prediction_graph import Prediction_graph
 from computer_vision import Computer_vision
@@ -339,7 +338,9 @@ class Tab_tensorflow(QtWidgets.QWidget):
                             'callback_flag': self.process_prog_flag})
                 self.callback_preprocess_thread = threading.Thread(target=self.preprocess_callback)
                 
-                
+                self.callback_preprocess_thread.start().daemon = True
+                self.preprocess_thread.start().daemon = True
+
                 self.callback_preprocess_thread.start()
                 self.preprocess_thread.start()
             except:
@@ -390,6 +391,9 @@ class Tab_tensorflow(QtWidgets.QWidget):
             
             self.callback_train_thread = threading.Thread(target=self.training_callback)
             
+            self.train_thread.daemon = True
+            self.callback_train_thread.daemon = True
+
             self.callback_train_thread.start()
             self.train_thread.start()
         else:
@@ -440,6 +444,8 @@ class Tab_tensorflow(QtWidgets.QWidget):
                 
                 self.prediction_thread = threading.Thread(
                     target=self.vision.classify, kwargs={'frame': frame, 'prediction_flag': self.prediction_flag})
+
+                self.prediction_thread.daemon = True
                 self.prediction_thread.start()
 
     def get_directory(self, line_output = None):

@@ -1,7 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets 
-from global_camera import cam
+import global_camera
 from PyQt5.QtCore import pyqtSignal as Signal
-import os
 import threading
 import win32api
 import time
@@ -193,7 +192,7 @@ class Camera_control_gui(QtWidgets.QWidget):
                 self.recording = True
                 
                 #Start new recording with defined name and save path
-                cam.start_recording(self.save_location,
+                global_camera.cams.active_devices[global_camera.active_cam].start_recording(self.save_location,
                                     self.save_filename,
                                     'nothing')
                 
@@ -203,10 +202,12 @@ class Camera_control_gui(QtWidgets.QWidget):
                 if(self.sequence_duration > 0):
                     self.interrupt_flag.clear()
                     self.seq_duration_thread = threading.Thread(target=self.seq_duration_wait)
+                    self.seq_duration_thread.daemon = True
                     self.seq_duration_thread.start()
                 
                 #Start live preview in a new thread
                 self.show_preview_thread = threading.Thread(target=self.show_preview)
+                self.show_preview_thread.daemon = True
                 self.show_preview_thread.start()
                 self.send_status_msg.emit("Recording",0)
             else:
@@ -218,7 +219,7 @@ class Camera_control_gui(QtWidgets.QWidget):
                 self.interrupt_flag.set()
                 
                 #End recording
-                cam.stop_recording()
+                global_camera.cams.active_devices[global_camera.active_cam].stop_recording()
                 self.recording_update.emit(False)
                 self.recording = False
                 self.preview_live = False
@@ -262,11 +263,12 @@ class Camera_control_gui(QtWidgets.QWidget):
                 self.preview_live = True
                 
                 #Start camera frame acquisition (not recording)
-                cam.start_acquisition()
+                global_camera.cams.active_devices[global_camera.active_cam].start_acquisition()
                 
                 
                 #Create and run thread to draw frames to gui
                 self.show_preview_thread = threading.Thread(target=self.show_preview)
+                self.show_preview_thread.daemon = True
                 self.show_preview_thread.start()
             else:
                 #Reset status icon and print message
@@ -274,7 +276,7 @@ class Camera_control_gui(QtWidgets.QWidget):
                 self.send_status_msg.emit("Stopping preview",1500)
                 
                 #Stop receiving frames
-                cam.stop_acquisition()
+                global_camera.cams.active_devices[global_camera.active_cam].stop_acquisition()
                 
                 self.preview_live = False
                 self.preview_update.emit(False)
@@ -317,7 +319,7 @@ class Camera_control_gui(QtWidgets.QWidget):
             self.connection_update.emit(True, 2, "-1")
             
             #Get image
-            image, pixel_format = cam.get_single_frame()
+            image, pixel_format = global_camera.cams.active_devices[global_camera.active_cam].get_single_frame()
             
             #Try to run prediction
             self.request_prediction.emit(image)
