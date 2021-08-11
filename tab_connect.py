@@ -4,7 +4,9 @@ from PyQt5.QtCore import pyqtSignal as Signal
 
 class Tab_connect(QtWidgets.QWidget):
     #signals
+    ##Used to send status message to the GUI
     send_status_msg = Signal(str, int)
+    ##Signals current state of camera connection
     connection_update = Signal(bool, int, str)#connected, state - 0=disconnected 1=standby 2=busy, camera name
 
     def __init__(self):

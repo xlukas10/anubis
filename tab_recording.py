@@ -3,14 +3,13 @@ from PyQt5.QtCore import pyqtSignal as Signal
 
 class Tab_recording(QtWidgets.QWidget):
     #signals
+    ##Used to send status message to the GUI
     send_status_msg = Signal(str, int)
-    #connection_update = Signal(bool, int, str)#connected, state - 0=disconnected 1=standby 2=busy, camera name
+    ##Signal configuration change to the GUI
     configuration_update = Signal(str, str, float)#name, location, duration
 
     def __init__(self):
         super(Tab_recording, self).__init__()
-
-        
 
         self.add_widgets()
         self.connect_actions()
@@ -187,6 +186,11 @@ class Tab_recording(QtWidgets.QWidget):
     
 
     def load_config(self, filename=None , save_location=None, sequence_duration=None):
+        """!@brief Fills in saved values for recording configuration
+        @param[in] filename Template for naming saved files
+        @param[in] save_location Where should the images be saved
+        @param[in] sequence_duration Length of a recording sequence
+        """
         try:
             sequence_duration = float(sequence_duration)
         except ValueError:
@@ -200,7 +204,6 @@ class Tab_recording(QtWidgets.QWidget):
             self.line_edit_sequence_duration.setValue(sequence_duration)
 
     def get_directory(self, line_output = None):
-        #set_record_path
         """!@brief Opens file dialog for user to set path to save frames.
         @details Method is called by Save Location button. Path is written to 
         the label next to the button and can be further modified.
@@ -216,6 +219,7 @@ class Tab_recording(QtWidgets.QWidget):
         return name
     
     def send_conf_update(self):
+        """!@brief Used to emit configuration update signal based on current values of line edits"""
         self.configuration_update.emit(self.line_edit_sequence_name.text(), 
                                         self.line_edit_save_location.text(), 
                                         self.line_edit_sequence_duration.value())

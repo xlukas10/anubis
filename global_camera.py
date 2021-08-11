@@ -26,6 +26,8 @@ cams = Camera_connector()
 active_cam = '0'
 
 def close_cameras():
+    """!@brief Function to properly disconnect all cameras when exiting the application
+        """
     for index in range(cams.active_devices_count):
         print(index)
         cams.disconnect_camera(index)
@@ -33,5 +35,8 @@ def close_cameras():
 atexit.register(close_cameras)
 
 def change_active_cam(new):
+    """!@brief Function is used to change the value of the global variable active_cam
+        @param[in] new index of the active camera.
+        """
     global active_cam
     active_cam = new

@@ -70,10 +70,6 @@ class Ui_MainWindow(QtCore.QObject):
         ##Timer used to show a status messages for specific time window
         self.status_timer = QtCore.QTimer()
 
-        
-        
-        
-        
     def setupUi(self, MainWindow):
         """!@brief Create GUI widgets
         @details Excluding section marked as added manually, the whole 
@@ -104,16 +100,10 @@ class Ui_MainWindow(QtCore.QObject):
         self.tabs.setObjectName("tabs")
         
         #Tab - Connect camera
-
         self.tab_connect = Tab_connect()
         self.tabs.addTab(self.tab_connect, "")
 
-
         #Tab - Configure camera
-    #read present parameters on tab change and when read parameters button (To be added) is pressed
-        
-        
-        
         self.tab_config = Tab_configure()
         self.tabs.addTab(self.tab_config, "")
 
@@ -126,14 +116,17 @@ class Ui_MainWindow(QtCore.QObject):
 
         self.tab_recording_config = Tab_recording()
         self.tabs.addTab(self.tab_recording_config, "")
+
         #Tab - Keras/Tensorflow/Learning,Classification
-        
         self.tab_tensorflow = Tab_tensorflow()
         self.tabs.addTab(self.tab_tensorflow, "")
         
         self.gridLayout.addWidget(self.tabs, 0, 0, 2, 1)
+        
         #methods to call on tab change
         self.tabs.currentChanged.connect(self.tab_changed)
+        
+        
         #Menubar buttons
         #-------------------------------------------------------------------
         MainWindow.setCentralWidget(self.centralwidget)
@@ -274,8 +267,6 @@ class Ui_MainWindow(QtCore.QObject):
         class or call method of another object. In this method all such bindings
         done excluding dynamically created widgets like camera's features
         """
-        
-
         #CONNECTING TAB
         self.tab_connect.send_status_msg.connect(self.set_status_msg)
         self.tab_connect.connection_update.connect(self.update_camera_status)
@@ -478,26 +469,54 @@ class Ui_MainWindow(QtCore.QObject):
 
 
     def update_preview(self, state):
+        """!@brief Method is used to transfer information about preview 
+        state to other objects (mostly tabs)
+        @param[in] state Tells whether the preview is active or not
+        """
         self.preview_live = state
         self.preview_and_control.preview_live = state
         self.tab_config.preview_live = state
     
     def update_recording(self, state):
+        """!@brief Method is used to transfer information about recording 
+        state to other objects (mostly tabs)
+        @param[in] state Tells whether the recording is active or not
+        """
         self.recording = state
         self.tab_config.recording = state
         self.preview_and_control.recording = state
     
     def predict(self, image):
+        """!@brief Runs prediction of single image
+        @details The prediction is only requested if the user is on the tensorflow
+        tab and as such has a chance to see the result of the prediction. Otherwise 
+        the prediction would only waste cpu time
+        @param[in] image Image the prediction is to be run on
+        """
         if self.tabs.indexOf(self.tab_tensorflow) == self.tabs.currentIndex():
             self.tab_tensorflow.predict(image)
 
     def update_fps(self, fps):
+        """!@brief Method is used to transfer information from camera preview object
+        to the status bar
+        @param[in] fps Current fps value
+        """
         self.fps = fps
         self.fps_status.setText("FPS: " + str(self.fps))
 
     def update_received_frames(self, received_amount):
+        """!@brief Method is used to transfer information from camera preview object
+        to the status bar
+        @param[in] received_amount How many frames were received
+        """
         self.received = received_amount
         self.receive_status.setText("Received frames: " + str(self.received))
 
     def update_recording_config(self, name, location, duration):
+        """!@brief Method is used to transfer information from recording configuration
+        tab to the active camera
+        @param[in] name Template for naming saved files
+        @param[in] location Where should the images be saved
+        @param[in] duration Length of a recording sequence
+        """
         self.preview_and_control.update_recording_config(name, location, duration)

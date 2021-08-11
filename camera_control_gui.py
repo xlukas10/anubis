@@ -604,6 +604,12 @@ class Camera_control_gui(QtWidgets.QWidget):
         '''
    
     def update_recording_config(self, name, location, duration):
+        """!@brief This method is used to tell the instance of this class current recording configuration
+        @param[in] name Template for naming saved files
+        @param[in] location Where should the images be saved
+        @param[in] duration Length of a recording sequence
+        """
+
         self.save_location = location
         self.save_filename = name
         self.sequence_duration = duration

@@ -8,8 +8,8 @@ from config_level import Config_level
 
 class Tab_configure(QtWidgets.QWidget):
     #signals
+    ##Used to send status message to the GUI
     send_status_msg = Signal(str, int)
-    #connection_update = Signal(bool, int, str)#connected, state - 0=disconnected 1=standby 2=busy, camera name
 
     def __init__(self):
         super(Tab_configure, self).__init__()

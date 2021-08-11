@@ -7,8 +7,8 @@ import threading
 
 class Tab_tensorflow(QtWidgets.QWidget):
     #signals
+    ##Used to send status message to the GUI
     send_status_msg = Signal(str, int)
-    #connection_update = Signal(bool, int, str)#connected, state - 0=disconnected 1=standby 2=busy, camera name
 
     def __init__(self):
         super(Tab_tensorflow, self).__init__()
