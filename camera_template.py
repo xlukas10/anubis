@@ -21,7 +21,7 @@ import cv2
 import os #for working with save path
 from datetime import datetime
 
-from global_queue import frame_queue
+import global_queue
 
 from config_level import Config_level
 
@@ -44,6 +44,8 @@ class Camera_template:
         self.devices_info = []
         ##Index of active camera for active API
         self.active_camera = 0
+
+        self.cam_id = "Undefined"
         
 
     @abstractmethod    
@@ -121,6 +123,10 @@ class Camera_template:
             runs until stream_stop_switch is set
         """
     
+    def create_queues(self, cam_id):
+        self.cam_id = cam_id
+        global_queue.add_frame_queue(cam_id)
+        
     def get_name(self):
         """!@brief Returns name of used mechanism. The name is used to identify it in GUI
         @return Name of the mechanism"""
@@ -170,7 +176,7 @@ class Camera_template:
 
     def disconnect_camera(self):
         """!@brief Disconnect camera and restores the object to its initial state"""
-        
+        global_queue.remove_frame_queue(self.cam_id)
         self.stop_recording()
         self.__init__()
 
@@ -195,8 +201,8 @@ class Camera_template:
         num = 0
         extension = '.png'
         while self.acquisition_running:
-            if not frame_queue.empty(): 
-                frame = frame_queue.get_nowait()[0]
+            if not global_queue.frame_queue[self.cam_id].empty(): 
+                frame = global_queue.frame_queue[self.cam_id].get_nowait()[0]
                 name = name_scheme
                 name = name.replace("%t", datetime.now().strftime("%H-%M-%S"))
                 name = name.replace("%d", datetime.now().strftime("%d-%m-%Y"))

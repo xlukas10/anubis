@@ -24,6 +24,7 @@ class Tab_tensorflow(QtWidgets.QWidget):
         ##Is true while the tensorflow training is running
         self.training_flag = threading.Event()
         
+        self.model_loaded = False
         
         ##Signals that computer vision class is still processing dataset
         self.process_flag = threading.Event()

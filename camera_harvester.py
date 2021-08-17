@@ -1,6 +1,6 @@
 from camera_template import Camera_template
 from config_level import Config_level
-from global_queue import frame_queue
+import global_queue
 from harvesters.core import Harvester
 import threading
 import queue
@@ -323,7 +323,7 @@ class Camera_harvester(Camera_template):
             with self.ia.fetch_buffer() as buffer:
                 frame = buffer.payload.components[0]
                 pixel_format = self.ia.remote_device.node_map.PixelFormat.value
-                frame_queue.put_nowait([frame.data.copy(), pixel_format])
+                global_queue.frame_queue[self.cam_id].put_nowait([frame.data.copy(), pixel_format])
                 #data should contain numpy array which should be compatible
                 #with opencv image ig not do some conversion here
         self.ia.stop_acquisition()
@@ -333,6 +333,7 @@ class Camera_harvester(Camera_template):
         
         self.stop_recording()
         self.disconnect_harvester()
+        global_queue.remove_frame_queue(self.cam_id)
         self.__init__()
 
 #______________Unique methods___________________

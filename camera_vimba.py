@@ -1,7 +1,7 @@
 from camera_template import Camera_template
 from config_level import Config_level
 from vimba import *
-from global_queue import frame_queue, active_frame_queue
+import global_queue
 import copy
 
 class Camera_vimba(Camera_template):
@@ -262,12 +262,12 @@ class Camera_vimba(Camera_template):
             whole frame and put into the frame_queue
         """
         try:
-            if not frame_queue.full() and frame.get_status() == FrameStatus.Complete:
+            if not global_queue.frame_queue[self.cam_id].full() and frame.get_status() == FrameStatus.Complete:
                 frame_copy = copy.deepcopy(frame)
                 if self.is_recording:
-                    frame_queue.put_nowait([frame_copy.as_opencv_image(),
+                    global_queue.frame_queue[self.cam_id].put_nowait([frame_copy.as_opencv_image(),
                                             str(frame_copy.get_pixel_format())])
-                active_frame_queue.put_nowait([frame_copy.as_opencv_image(),
+                global_queue.active_frame_queue[self.cam_id].put_nowait([frame_copy.as_opencv_image(),
                                                str(frame_copy.get_pixel_format())])
             else:
                 pass
@@ -281,5 +281,6 @@ class Camera_vimba(Camera_template):
         self.stop_recording()
         self.cam._close()
         self.vimba._shutdown()
+        global_queue.remove_frame_queue(self.cam_id)
         self.__init__()
     

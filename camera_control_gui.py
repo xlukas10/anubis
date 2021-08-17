@@ -6,8 +6,8 @@ import win32api
 import time
 import numpy as np
 
-
-from global_queue import active_frame_queue
+import global_camera
+import global_queue
 
 class Camera_control_gui(QtWidgets.QWidget):
     #signals
@@ -232,7 +232,7 @@ class Camera_control_gui(QtWidgets.QWidget):
         manually terminated stop the recording.
         """
         #wait for the first frame to be received
-        while active_frame_queue.empty():
+        while global_queue.active_frame_queue[global_camera.active_cam].empty():
             time.sleep(0.001)
         
         #print status message
@@ -375,18 +375,18 @@ class Camera_control_gui(QtWidgets.QWidget):
             cycles = cycles + 1
             
             #Draw only if thre is at least 1 frame to draw
-            if not active_frame_queue.qsize() == 0:
-                image = active_frame_queue.get_nowait()
+            if not global_queue.active_frame_queue[global_camera.active_cam].qsize() == 0:
+                image = global_queue.active_frame_queue[global_camera.active_cam].get_nowait()
                 self.received = self.received + 1
                 
                 frames += 1
                 
                 #Dump all remaining frames (If frames are received faster than 
                 #refresh_rate).
-                while not active_frame_queue.qsize() == 0:
+                while not global_queue.active_frame_queue[global_camera.active_cam].qsize() == 0:
                     frames += 1
                     self.received = self.received + 1
-                    active_frame_queue.get_nowait()
+                    global_queue.active_frame_queue[global_camera.active_cam].get_nowait()
                 
                 #Try to run a prediction
                 self.request_prediction.emit(image[0])

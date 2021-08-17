@@ -11,12 +11,12 @@ class Camera_connector:
     def __init__(self):
         ##Instances of camera control mechanisms. These are used only to list available cameras
         self.mech1 = Camera_vimba()
-        self.mech2 = Camera_harvester()
+        #self.mech2 = Camera_harvester()
         
         ##Dictionary of mechanisms created above. Is used for easier manipulation with given objects
         self.mechanisms = { 
             self.mech1.get_name(): self.mech1,
-            self.mech2.get_name(): self.mech2
+            #self.mech2.get_name(): self.mech2
         }
 
         ##List of currently detected devices
@@ -63,7 +63,9 @@ class Camera_connector:
             
         self.active_devices[str(self.active_devices_count)].get_camera_list()
         self.active_devices[str(self.active_devices_count)].select_camera(device_id)
+        self.active_devices[str(self.active_devices_count)].create_queues(str(self.active_devices_count))
         self.active_devices_count += 1
+
         return str(self.active_devices_count - 1)
 
     def disconnect_camera(self, device):
@@ -78,15 +80,15 @@ class Camera_connector:
         @param[in] producer_path Path to a .cti file
         @return list of all active producers
         """
-        if(not producer_path in self.producer_paths):
-            if(producer_path.endswith(".cti")):
-                self.producer_paths.append(producer_path)
-                self.mechanisms["Harvester"].add_gentl_producer(producer_path) 
-                for cam in self.active_devices:
-                    try:
-                        self.active_devices[cam].add_gentl_producer(producer_path)
-                    except:
-                        pass
+        #if(not producer_path in self.producer_paths):
+        #    if(producer_path.endswith(".cti")):
+        #        self.producer_paths.append(producer_path)
+        #        self.mechanisms["Harvester"].add_gentl_producer(producer_path) 
+        #        for cam in self.active_devices:
+        #            try:
+        #                self.active_devices[cam].add_gentl_producer(producer_path)
+        #            except:
+        #                pass
         return self.producer_paths
 
 

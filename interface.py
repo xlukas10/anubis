@@ -458,14 +458,11 @@ class Ui_MainWindow(QtCore.QObject):
         if(state == 2):
             self.camera_icon.setPixmap(self.icon_busy)
         else:
-            
-            
-            self.update_fps(0)
-            self.update_received_frames(0)   
-
             self.camera_icon.setPixmap(self.icon_offline)
             self.update_preview(False)
             self.update_recording(False)
+            self.update_fps(0)
+            self.update_received_frames(0)   
 
 
     def update_preview(self, state):

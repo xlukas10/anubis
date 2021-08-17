@@ -18,6 +18,13 @@
 
 from queue import Queue
 
-frame_queue = Queue()
+frame_queue = {"0": Queue()}
+active_frame_queue = {"0": Queue()}
 
-active_frame_queue = Queue()
+def add_frame_queue(cam_id):
+    frame_queue[str(cam_id)] = Queue()
+    active_frame_queue[str(cam_id)] = Queue()
+
+def remove_frame_queue(cam_id):
+    del frame_queue[str(cam_id)]
+    del active_frame_queue[str(cam_id)]
