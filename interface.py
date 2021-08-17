@@ -278,6 +278,8 @@ class Ui_MainWindow(QtCore.QObject):
         self.tab_recording_config.configuration_update.connect(self.update_recording_config)
 
         self.preview_and_control.preview_update.connect(self.update_preview)
+        self.preview_and_control.connection_update.connect(self.update_camera_status)
+        self.preview_and_control.send_status_msg.connect(self.set_status_msg)
         self.preview_and_control.recording_update.connect(self.update_recording)
         self.preview_and_control.request_prediction.connect(self.predict)
         self.preview_and_control.fps_info.connect(self.update_fps)
@@ -452,10 +454,10 @@ class Ui_MainWindow(QtCore.QObject):
         self.preview_and_control.connected = connected
         if name != "-1":
             self.camera_status.setText("Camera: " + name)
-
+            
         if(state == 1):
             self.camera_icon.setPixmap(self.icon_standby)
-        if(state == 2):
+        elif(state == 2):
             self.camera_icon.setPixmap(self.icon_busy)
         else:
             self.camera_icon.setPixmap(self.icon_offline)
