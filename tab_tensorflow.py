@@ -339,8 +339,8 @@ class Tab_tensorflow(QtWidgets.QWidget):
                             'callback_flag': self.process_prog_flag})
                 self.callback_preprocess_thread = threading.Thread(target=self.preprocess_callback)
                 
-                self.callback_preprocess_thread.start().daemon = True
-                self.preprocess_thread.start().daemon = True
+                self.callback_preprocess_thread.daemon = True
+                self.preprocess_thread.daemon = True
 
                 self.callback_preprocess_thread.start()
                 self.preprocess_thread.start()

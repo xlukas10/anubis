@@ -374,8 +374,8 @@ class Tab_configure(QtWidgets.QWidget):
                         'visibility': Config_level(self.combo_config_level.currentIndex()+1)})
             self.param_callback_thread = threading.Thread(target=self.callback_parameters)
             
-            self.param_callback_thread.start().daemon = True
-            self.get_params_thread.start().daemon = True
+            self.param_callback_thread.daemon = True
+            self.get_params_thread.daemon = True
 
             self.param_callback_thread.start()
             self.get_params_thread.start()
