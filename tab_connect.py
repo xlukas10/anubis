@@ -1,6 +1,7 @@
 from PyQt5 import QtGui, QtWidgets 
 import global_camera
 from PyQt5.QtCore import pyqtSignal as Signal
+from vimba import *
 
 class Tab_connect(QtWidgets.QWidget):
     #signals
@@ -12,6 +13,8 @@ class Tab_connect(QtWidgets.QWidget):
     def __init__(self):
         super(Tab_connect, self).__init__()
 
+        self.v = Vimba.get_instance()
+        self.v._startup()
         self.connected = False
 
         self.add_widgets()
@@ -148,8 +151,8 @@ class Tab_connect(QtWidgets.QWidget):
             
             #If some camera is connected, disconnect it first
             if self.connected:
-                self.disconnect_camera()
-            
+               self.disconnect_camera()
+                          
             #set green background to the selected camera
             self.list_detected_cameras.item(index).setBackground(QtGui.QColor('#70BF4E'))
             
@@ -158,7 +161,6 @@ class Tab_connect(QtWidgets.QWidget):
             
             #Connect camera
             global_camera.change_active_cam(global_camera.cams.select_camera(self.detected[index]['mechanism'], self.detected[index]['id_']))
-            print(global_camera.active_cam)
             
             self.send_status_msg.emit("Camera connected", 0)
             

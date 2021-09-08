@@ -52,7 +52,7 @@ class Camera_connector:
         @param[in] mechanism Mechanism that should establish the connection
         @param[in] device_id ID of a camera you want to connect to
         """
-        self.mechanisms[mechanism].select_camera(device_id)
+        #self.mechanisms[mechanism].select_camera(device_id)
 
         if(mechanism == "Harvester"):
             self.active_devices[str(self.active_devices_count)] = Camera_harvester()
@@ -80,6 +80,7 @@ class Camera_connector:
         @param[in] producer_path Path to a .cti file
         @return list of all active producers
         """
+        #Harvester is currently unused
         #if(not producer_path in self.producer_paths):
         #    if(producer_path.endswith(".cti")):
         #        self.producer_paths.append(producer_path)

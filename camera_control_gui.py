@@ -195,8 +195,7 @@ class Camera_control_gui(QtWidgets.QWidget):
                 global_camera.cams.active_devices[global_camera.active_cam].start_recording(self.save_location,
                                     self.save_filename,
                                     'nothing')
-                
-                
+
                 #If automatic sequence duration is set, create thread that will
                 #automatically terminate the recording
                 if(self.sequence_duration > 0):
