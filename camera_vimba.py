@@ -306,4 +306,3 @@ class Camera_vimba(Camera_template):
         self.stop_recording()
         global_queue.remove_frame_queue(self.cam_id)
         self.__init__()
-    

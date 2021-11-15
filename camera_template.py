@@ -137,6 +137,10 @@ class Camera_template:
         @details Creates a threading object for the right API and starts frame 
             acquisition in that thread (producer thread)
         """
+
+        print("Tady")
+        print(self.cam_id)
+        
         if not self.acquisition_running:
             self._stream_stop_switch = threading.Event()
             self._frame_producer_thread = threading.Thread(target=self._frame_producer)
